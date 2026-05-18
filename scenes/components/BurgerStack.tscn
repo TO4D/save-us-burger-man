@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://bxs2t76pgylko"]
+
+[ext_resource type="Script" uid="uid://bjfc3003yavym" path="res://scenes/components/BurgerStack.gd" id="1_dys1k"]
+
+[node name="BurgerStack" type="Node2D" unique_id=1523976933]
+script = ExtResource("1_dys1k")

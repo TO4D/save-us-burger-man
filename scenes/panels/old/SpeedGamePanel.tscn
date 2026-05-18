@@ -1,0 +1,220 @@
+[gd_scene format=3 uid="uid://5dkn5fgmv07a"]
+
+[ext_resource type="Script" uid="uid://0qpilgtdkocy" path="res://scenes/panels/SpeedGamePanel.gd" id="1_8aca3"]
+[ext_resource type="Texture2D" uid="uid://6ur2c8qulwld" path="res://assets/sprites/cook/cook_area.png" id="2_a3piq"]
+[ext_resource type="PackedScene" uid="uid://bxs2t76pgylko" path="res://scenes/components/BurgerStack.tscn" id="2_rv0lr"]
+
+[node name="SpeedGamePanel" type="Control" unique_id=284145422]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_8aca3")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1614334332]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.2668, 0.27685332, 0.29, 1)
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1542079581]
+texture = ExtResource("2_a3piq")
+centered = false
+
+[node name="HUD" type="Control" parent="." unique_id=1419908291]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 135.0
+grow_horizontal = 2
+
+[node name="TimeBar" type="ProgressBar" parent="HUD" unique_id=1767596333]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 20.0
+offset_right = -20.0
+offset_bottom = 30.0
+grow_horizontal = 2
+value = 100.0
+fill_mode = 1
+show_percentage = false
+
+[node name="TimeLabel" type="Label" parent="HUD" unique_id=881579603]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 50.0
+offset_right = 120.0
+offset_bottom = 73.0
+text = "30.0초"
+
+[node name="BurgerCountLabel" type="Label" parent="HUD" unique_id=376129685]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -102.0
+offset_top = 80.0
+offset_bottom = 103.00001
+grow_horizontal = 0
+text = "남은 주문: 3개"
+horizontal_alignment = 2
+
+[node name="CurrentRecipeDisplay" type="VBoxContainer" parent="." unique_id=1346973858]
+layout_mode = 1
+anchors_preset = -1
+offset_left = 20.0
+offset_top = 120.0
+offset_right = 100.0
+offset_bottom = 200.0
+theme_override_constants/separation = 0
+alignment = 2
+
+[node name="IngredientSlots" type="GridContainer" parent="." unique_id=787356216]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -124.0
+offset_top = -150.0
+offset_right = 124.0
+offset_bottom = -11.0
+grow_horizontal = 2
+grow_vertical = 0
+columns = 4
+
+[node name="PreparationUI" type="Control" parent="." unique_id=255001]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="PreparationUI" unique_id=1532653796]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5882353)
+
+[node name="StatusLabel" type="Label" parent="PreparationUI" unique_id=1710524813]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -115.0
+offset_top = 80.0
+offset_right = 110.0
+offset_bottom = 110.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+
+[node name="CountdownLabel" type="Label" parent="PreparationUI" unique_id=1720321501]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -28.5
+offset_top = -68.5
+offset_right = 28.5
+offset_bottom = 68.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 100
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ResultUI" type="Control" parent="." unique_id=255003]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="ResultUI" unique_id=255004]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.45)
+
+[node name="ParticlesLayer" type="Node2D" parent="ResultUI" unique_id=255007]
+z_index = 10
+
+[node name="ResultLabel" type="Label" parent="ResultUI" unique_id=255005]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 60.0
+offset_bottom = 100.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 28
+text = "성공!"
+horizontal_alignment = 1
+
+[node name="ContinueButton" type="Button" parent="ResultUI" unique_id=255006]
+custom_minimum_size = Vector2(120, 44)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = 160.0
+offset_right = 60.0
+offset_bottom = 204.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "계속"
+
+[node name="PlateArea" type="Control" parent="." unique_id=1766768298]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -125.0
+offset_top = -120.0
+offset_right = 125.0
+offset_bottom = 62.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BurgerStack" parent="PlateArea" unique_id=1523976933 instance=ExtResource("2_rv0lr")]
+position = Vector2(125, 180)
+
+[node name="GameplayStatusLabel" type="Label" parent="." unique_id=255002]
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -112.5
+offset_top = 160.0
+offset_right = 112.5
+offset_bottom = 190.0
+grow_horizontal = 2
+horizontal_alignment = 1

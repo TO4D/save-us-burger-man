@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://jpymc5yu72ku"]
+
+[ext_resource type="Script" uid="uid://cy2h7uomvjvrq" path="res://scenes/panels/StartPanel.gd" id="1"]
+
+[node name="StartPanel" type="Control" unique_id=2127225055]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1112697827]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.13, 0.11, 1)
+
+[node name="Center" type="VBoxContainer" parent="." unique_id=422920646]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -120.0
+offset_top = -90.0
+offset_right = 120.0
+offset_bottom = 90.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="Center" unique_id=563294702]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "The beast is approaching town"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="SubtitleLabel" type="Label" parent="Center" unique_id=17944893]
+layout_mode = 2
+text = "Survive for 60 seconds"
+horizontal_alignment = 1
+
+[node name="StartButton" type="Button" parent="Center" unique_id=400919795]
+custom_minimum_size = Vector2(180, 48)
+layout_mode = 2
+text = "Start"

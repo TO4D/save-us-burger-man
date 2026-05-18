@@ -1,0 +1,213 @@
+[gd_scene format=3 uid="uid://dwo2kyh53r5d2"]
+
+[ext_resource type="PackedScene" uid="uid://dd73papgk5rnr" path="res://scenes/components/HeartsDisplay.tscn" id="1_am2tq"]
+[ext_resource type="Script" uid="uid://dkaxxxta1yh4h" path="res://scenes/panels/MemoryGamePanel.gd" id="1_nwvwx"]
+[ext_resource type="PackedScene" uid="uid://bxs2t76pgylko" path="res://scenes/components/BurgerStack.tscn" id="2_nwvwx"]
+[ext_resource type="Texture2D" uid="uid://6ur2c8qulwld" path="res://assets/sprites/cook/cook_area.png" id="2_ud1xf"]
+
+[node name="MemoryGamePanel" type="Control" unique_id=284145422]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_nwvwx")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=2091795622]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.2668, 0.27685332, 0.29, 1)
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=941216149]
+texture = ExtResource("2_ud1xf")
+centered = false
+
+[node name="HUD" type="Control" parent="." unique_id=1892715396]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 10.0
+offset_bottom = 60.0
+grow_horizontal = 2
+
+[node name="HeartsDisplay" parent="HUD" unique_id=1256585538 instance=ExtResource("1_am2tq")]
+layout_mode = 0
+
+[node name="GameplayStatusLabel" type="Label" parent="." unique_id=155002]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -112.5
+offset_top = 50.0
+offset_right = 112.5
+offset_bottom = 80.0
+grow_horizontal = 2
+horizontal_alignment = 1
+
+[node name="IngredientSlots" type="GridContainer" parent="." unique_id=691278945]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -124.0
+offset_top = -150.0
+offset_right = 124.0
+offset_bottom = -11.0
+grow_horizontal = 2
+grow_vertical = 0
+columns = 4
+
+[node name="ResultUI" type="Control" parent="." unique_id=155004]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="ResultUI" unique_id=155005]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.45)
+
+[node name="ParticlesLayer" type="Node2D" parent="ResultUI" unique_id=155008]
+z_index = 10
+
+[node name="ResultLabel" type="Label" parent="ResultUI" unique_id=155006]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 60.0
+offset_bottom = 100.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 28
+text = "성공!"
+horizontal_alignment = 1
+
+[node name="ContinueButton" type="Button" parent="ResultUI" unique_id=155007]
+custom_minimum_size = Vector2(120, 44)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = 160.0
+offset_right = 60.0
+offset_bottom = 204.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "계속"
+
+[node name="PlateArea" type="Control" parent="." unique_id=1182731068]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -125.0
+offset_top = -120.0
+offset_right = 125.0
+offset_bottom = 62.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BurgerStack" parent="PlateArea" unique_id=1523976933 instance=ExtResource("2_nwvwx")]
+position = Vector2(125, 180)
+
+[node name="PreparationUI" type="Control" parent="." unique_id=155001]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TimerBar" type="ProgressBar" parent="PreparationUI" unique_id=155003]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -115.0
+offset_top = 120.0
+offset_right = 115.0
+offset_bottom = 130.0
+grow_horizontal = 2
+grow_vertical = 2
+value = 100.0
+show_percentage = false
+
+[node name="ColorRect" type="ColorRect" parent="PreparationUI" unique_id=15202392]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5882353)
+
+[node name="RecipeDisplay" type="VBoxContainer" parent="PreparationUI" unique_id=873170414]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -130.0
+offset_top = -170.0
+offset_right = 130.0
+offset_bottom = 70.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 1
+alignment = 2
+
+[node name="ReadyButton" type="Button" parent="PreparationUI" unique_id=1497010169]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -50.0
+offset_top = 140.0
+offset_right = 50.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "준비완료"
+
+[node name="StatusLabel" type="Label" parent="PreparationUI" unique_id=706387949]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -115.0
+offset_top = 80.0
+offset_right = 110.0
+offset_bottom = 110.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "레시피를 외우세요"
+horizontal_alignment = 1

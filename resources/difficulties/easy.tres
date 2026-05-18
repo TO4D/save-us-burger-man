@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DifficultyConfig" format=3 uid="uid://l81w7dy2spfh"]
+
+[ext_resource type="Script" uid="uid://cpbwt2jx44ei" path="res://scripts/data/Ingredient.gd" id="1_q6tng"]
+[ext_resource type="Script" uid="uid://uj34tej5xc6v" path="res://scripts/data/DifficultyConfig.gd" id="2_54i2y"]
+[ext_resource type="Resource" uid="uid://ctsmx58mj7mls" path="res://resources/ingredients/bun_top.tres" id="2_s43kf"]
+[ext_resource type="Resource" uid="uid://b6ub75p7fmpax" path="res://resources/ingredients/bun_bottom.tres" id="3_b1k0b"]
+[ext_resource type="Resource" uid="uid://bh2cbyfyngogk" path="res://resources/ingredients/patty.tres" id="4_fccks"]
+[ext_resource type="Resource" uid="uid://bnda6sn76y1s7" path="res://resources/ingredients/cheese.tres" id="5_5bnwj"]
+[ext_resource type="Resource" uid="uid://c84hji2ek6cgr" path="res://resources/ingredients/lettuce.tres" id="6_f0axj"]
+
+[resource]
+script = ExtResource("2_54i2y")
+ingredient_pool = Array[ExtResource("1_q6tng")]([ExtResource("2_s43kf"), ExtResource("3_b1k0b"), ExtResource("4_fccks"), ExtResource("5_5bnwj"), ExtResource("6_f0axj")])
+slot_pool = Array[ExtResource("1_q6tng")]([ExtResource("2_s43kf"), ExtResource("3_b1k0b"), ExtResource("6_f0axj"), ExtResource("5_5bnwj"), ExtResource("4_fccks")])
+metadata/_custom_type_script = "uid://uj34tej5xc6v"

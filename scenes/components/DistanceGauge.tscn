@@ -1,0 +1,79 @@
+[gd_scene format=3 uid="uid://bd0hxdjgb8p2u"]
+
+[ext_resource type="Script" uid="uid://cfoee8j2l2bpe" path="res://scenes/components/DistanceGauge.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://d4jkf8u0lrbjw" path="res://assets/sprites/store/shop.png" id="2_4dxby"]
+[ext_resource type="Texture2D" uid="uid://lkmoguuup1jb" path="res://assets/sprites/monster/monster.png" id="3_oxxhr"]
+[ext_resource type="Texture2D" uid="uid://8e6plf528a50" path="res://assets/sprites/customers/customer_hungry_new.png" id="4_oxxhr"]
+[ext_resource type="Texture2D" uid="uid://d0c8jjx0568pe" path="res://assets/sprites/customers/customer_new.png" id="5_xmndb"]
+
+[node name="DistanceGauge" type="Control" unique_id=1309183552]
+custom_minimum_size = Vector2(270, 80)
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 80.0
+grow_horizontal = 2
+script = ExtResource("1")
+attacker_texture = ExtResource("5_xmndb")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1803335307]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.09, 0.11, 0.13, 1)
+
+[node name="ShopIcon" type="Sprite2D" parent="." unique_id=461974474]
+position = Vector2(32, 54)
+texture = ExtResource("2_4dxby")
+
+[node name="MonsterIcon" type="Sprite2D" parent="." unique_id=7079341]
+position = Vector2(239, 41)
+texture = ExtResource("3_oxxhr")
+
+[node name="QueueIconB" type="Sprite2D" parent="." unique_id=480824845]
+position = Vector2(2, 66)
+texture = ExtResource("4_oxxhr")
+
+[node name="QueueIconA" type="Sprite2D" parent="." unique_id=305898871]
+position = Vector2(17, 66)
+texture = ExtResource("4_oxxhr")
+
+[node name="CurrentCustomerIcon" type="Sprite2D" parent="." unique_id=46443876]
+position = Vector2(61, 65)
+texture = ExtResource("4_oxxhr")
+
+[node name="Bar" type="ProgressBar" parent="." unique_id=1938841943]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 20.0
+offset_top = 5.0
+offset_right = -20.0
+offset_bottom = 15.0
+grow_horizontal = 2
+value = 100.0
+show_percentage = false
+
+[node name="TimeLabel" type="Label" parent="." unique_id=1714281882]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -177.0
+offset_top = 39.0
+offset_right = -137.0
+offset_bottom = 62.0
+grow_horizontal = 0
+text = "60"
+horizontal_alignment = 2
+
+[node name="StageLabel" type="Label" parent="." unique_id=917639190]
+layout_mode = 0
+offset_left = 96.0
+offset_top = 57.0
+offset_right = 180.0
+offset_bottom = 80.0
+text = "STAGE 1"

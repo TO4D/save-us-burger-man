@@ -1,0 +1,98 @@
+[gd_scene format=3 uid="uid://ga4bdw1e2af0"]
+
+[ext_resource type="Script" uid="uid://dk30230ent6d6" path="res://scenes/panels/DailyReportPanel.gd" id="1_vor3l"]
+
+[node name="DailyReportPanel" type="Control" unique_id=284145422]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_vor3l")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1014431558]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5019608)
+
+[node name="Content" type="VBoxContainer" parent="." unique_id=1950311351]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -200.0
+offset_right = 100.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="Content" unique_id=1255452266]
+layout_mode = 2
+text = "=== 영업 마감 ==="
+horizontal_alignment = 1
+
+[node name="Spacer1" type="Control" parent="Content" unique_id=43868374]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="CustomersServedLabel" type="Label" parent="Content" unique_id=1200309447]
+layout_mode = 2
+text = "처리한 손님: 0명"
+horizontal_alignment = 1
+
+[node name="CustomersMissedLabel" type="Label" parent="Content" unique_id=1357044078]
+layout_mode = 2
+text = "놓친 손님: 0명"
+horizontal_alignment = 1
+
+[node name="CustomersDeclinedLabel" type="Label" parent="Content" unique_id=1156205517]
+layout_mode = 2
+text = "거절한 손님: 0명"
+horizontal_alignment = 1
+
+[node name="Spacer2" type="Control" parent="Content" unique_id=1727824774]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="MorningRevenueLabel" type="Label" parent="Content" unique_id=238178486]
+layout_mode = 2
+text = "아침: 0 Gold"
+horizontal_alignment = 1
+
+[node name="LunchRevenueLabel" type="Label" parent="Content" unique_id=83842957]
+layout_mode = 2
+text = "점심: 0 Gold"
+horizontal_alignment = 1
+
+[node name="EveningRevenueLabel" type="Label" parent="Content" unique_id=1019159949]
+layout_mode = 2
+text = "저녁: 0 Gold"
+horizontal_alignment = 1
+
+[node name="Spacer3" type="Control" parent="Content" unique_id=204065717]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="TotalRevenueLabel" type="Label" parent="Content" unique_id=1154688140]
+layout_mode = 2
+text = "총 매출: 0 Gold"
+horizontal_alignment = 1
+
+[node name="Spacer4" type="Control" parent="Content" unique_id=1280151622]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="ConfirmButton" type="Button" parent="Content" unique_id=539472638]
+custom_minimum_size = Vector2(120, 50)
+layout_mode = 2
+text = "확인"

@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="MinigameConstants" format=3 uid="uid://c3ojuxiuukyxu"]
+
+[ext_resource type="Script" uid="uid://dc61dvnjj2tou" path="res://scripts/data/MinigameConstants.gd" id="1_f5dm4"]
+
+[resource]
+script = ExtResource("1_f5dm4")
+metadata/_custom_type_script = "uid://dc61dvnjj2tou"

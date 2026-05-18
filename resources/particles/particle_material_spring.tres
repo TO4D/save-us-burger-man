@@ -1,0 +1,15 @@
+[gd_resource type="ParticleProcessMaterial" format=3 uid="uid://bdsk88xqjwb71"]
+
+[resource]
+particle_flag_disable_z = true
+angle_min = 1.0728835e-05
+angle_max = 180.00002
+direction = Vector3(0, -1, 0)
+spread = 20.0
+initial_velocity_min = 500.0
+initial_velocity_max = 650.0
+gravity = Vector3(0, 650, 0)
+scale_min = 0.59999996
+color = Color(1, 0.53783333, 0.41000003, 1)
+hue_variation_min = -0.8
+hue_variation_max = 0.99999994

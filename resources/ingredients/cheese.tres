@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Ingredient" format=3 uid="uid://bnda6sn76y1s7"]
+
+[ext_resource type="Script" uid="uid://cpbwt2jx44ei" path="res://scripts/data/Ingredient.gd" id="1_7untq"]
+[ext_resource type="Texture2D" uid="uid://d4hjtbohtuymd" path="res://assets/sprites/ingredients/cheese.png" id="2_7untq"]
+
+[resource]
+script = ExtResource("1_7untq")
+id = "cheese"
+display_name = "cheese"
+sprite = ExtResource("2_7untq")
+stack_height = 16
+stack_offset_y = 2
+metadata/_custom_type_script = "uid://cpbwt2jx44ei"

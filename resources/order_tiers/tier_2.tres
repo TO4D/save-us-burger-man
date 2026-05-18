@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="OrderTier" format=3 uid="uid://b6puic5kekcpw"]
+
+[ext_resource type="Script" uid="uid://d1a3mnqqdami3" path="res://scripts/data/OrderTier.gd" id="1_b3txk"]
+
+[resource]
+script = ExtResource("1_b3txk")
+tier_id = "tier_2"
+star_count = 2
+base_reward = 2
+min_recipe_length = 3
+max_recipe_length = 4
+metadata/_custom_type_script = "uid://d1a3mnqqdami3"

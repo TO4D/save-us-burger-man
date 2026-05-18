@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://clty5vutokdr0"]
+
+[ext_resource type="Script" path="res://scenes/components/HeartsDisplay.gd" id="1_3k0aw"]
+
+[node name="HeartsDisplay" type="HBoxContainer" unique_id=1256585538]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_3k0aw")

@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="OrderTier" format=3 uid="uid://wg3kg0ijpqtl"]
+
+[ext_resource type="Script" uid="uid://d1a3mnqqdami3" path="res://scripts/data/OrderTier.gd" id="1_w54fg"]
+
+[resource]
+script = ExtResource("1_w54fg")
+tier_id = "tier_1"
+metadata/_custom_type_script = "uid://d1a3mnqqdami3"

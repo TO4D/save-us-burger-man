@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="OrderTier" format=3 uid="uid://cdl8p5ru1kaqi"]
+
+[ext_resource type="Script" uid="uid://d1a3mnqqdami3" path="res://scripts/data/OrderTier.gd" id="1_t5xrv"]
+
+[resource]
+script = ExtResource("1_t5xrv")
+tier_id = "tier_4"
+star_count = 4
+base_reward = 7
+min_recipe_length = 5
+max_recipe_length = 6
+speed_burger_count_min = 5
+speed_burger_count_max = 6
+metadata/_custom_type_script = "uid://d1a3mnqqdami3"

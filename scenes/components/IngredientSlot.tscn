@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://dcyr7651s66f"]
+
+[ext_resource type="Script" uid="uid://dv6kaoag80stl" path="res://scenes/components/IngredientSlot.gd" id="1_6td3r"]
+
+[node name="IngredientSlot" type="Button" unique_id=1304146151]
+custom_minimum_size = Vector2(50, 50)
+offset_right = 8.0
+offset_bottom = 8.0
+script = ExtResource("1_6td3r")
+
+[node name="IngredientSprite" type="Sprite2D" parent="." unique_id=1786027015]
+position = Vector2(25, 25)
+scale = Vector2(0.4, 0.4)
+
+[node name="NewBadge" type="Label" parent="." unique_id=444193825]
+visible = false
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "New"
