@@ -33,7 +33,7 @@ func stop() -> void:
 
 
 func set_stage(stage: int) -> void:
-	decay_per_second = 0.5 + float(clamp(stage, 1, 5)) * 0.5
+	decay_per_second = 1.0 + float(clamp(stage, 1, 5)) * 0.75
 
 
 func recover(amount: float) -> void:

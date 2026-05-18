@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" uid="uid://ybh8i7vrjpp3" path="res://scenes/panels/orderPanel.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://bxs2t76pgylko" path="res://scenes/components/BurgerStack.tscn" id="2"]
-[ext_resource type="Texture2D" uid="uid://6ur2c8qulwld" path="res://assets/sprites/cook/cook_area.png" id="2_e1qsf"]
+[ext_resource type="Texture2D" uid="uid://cuewr4oa4504" path="res://assets/sprites/cook/cook_area_grayscale.png" id="2_itku6"]
 [ext_resource type="PackedScene" uid="uid://bd0hxdjgb8p2u" path="res://scenes/components/DistanceGauge.tscn" id="3"]
-[ext_resource type="Texture2D" uid="uid://bcy5u3hsblxls" path="res://assets/sprites/cook/cook_area_jori.png" id="4_itku6"]
-[ext_resource type="Texture2D" uid="uid://boyd3x1vv0jgu" path="res://assets/sprites/cook/cook_area_doma.png" id="5_srb0v"]
+[ext_resource type="Texture2D" uid="uid://ckrdx6bor3gmm" path="res://assets/sprites/cook/cook_area_jori_grayscale.png" id="4_itku6"]
+[ext_resource type="Texture2D" uid="uid://bvodu13gp5ber" path="res://assets/sprites/cook/cook_area_doma_grayscale.png" id="5_srb0v"]
 
 [node name="OrderPanel" type="Control" unique_id=890599604]
 layout_mode = 3
@@ -17,26 +17,28 @@ grow_vertical = 2
 script = ExtResource("1")
 
 [node name="Background" type="ColorRect" parent="." unique_id=1631623308]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.2, 0.21, 0.19, 1)
+color = Color(0.83928066, 0.85323197, 0.82905185, 1)
 
 [node name="Background2" type="Sprite2D" parent="." unique_id=1331383614]
-texture = ExtResource("2_e1qsf")
+texture = ExtResource("2_itku6")
 centered = false
 
 [node name="DistanceGauge" parent="." unique_id=1635089826 instance=ExtResource("3")]
 layout_mode = 1
+offset_bottom = 80.0
 
 [node name="PlayArea" type="Control" parent="." unique_id=1325333956]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 80.0
+offset_top = 90.0
 offset_bottom = 320.0
 grow_horizontal = 2
 
@@ -45,7 +47,7 @@ layout_mode = 0
 offset_left = 12.0
 offset_right = 62.0
 offset_bottom = 90.0
-theme_override_constants/separation = 0
+theme_override_constants/separation = -5
 alignment = 2
 
 [node name="NextRecipeDisplay" type="HBoxContainer" parent="PlayArea" unique_id=1672901450]
@@ -102,23 +104,25 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = -152.0
-offset_right = -10.0
-offset_bottom = -10.0
+offset_left = 14.0
+offset_top = -147.0
+offset_right = -14.0
+offset_bottom = -15.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_constants/h_separation = 6
-theme_override_constants/v_separation = 6
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
 columns = 4
 
 [node name="StatusLabel" type="Label" parent="." unique_id=91600267]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 296.0
-offset_bottom = 320.0
+offset_top = 455.0
+offset_bottom = 479.0
 grow_horizontal = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 12
 text = "Memorize the recipe"
 horizontal_alignment = 1
 
@@ -128,7 +132,7 @@ z_index = 20
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 80.0
+offset_top = 90.0
 offset_bottom = 320.0
 grow_horizontal = 2
 mouse_filter = 2

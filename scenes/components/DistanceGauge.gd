@@ -4,6 +4,7 @@ class_name DistanceGauge
 signal customer_attack_hit
 
 @export var attacker_texture: Texture2D
+@export var distance_display_scale: float = 10.0
 
 @onready var bar: ProgressBar = $Bar
 @onready var monster_icon: Sprite2D = $MonsterIcon
@@ -12,6 +13,7 @@ signal customer_attack_hit
 @onready var queue_icon_b: Sprite2D = $QueueIconB
 @onready var time_label: Label = $TimeLabel
 @onready var stage_label: Label = $StageLabel
+@onready var distance_label: Label = $DistanceLabel
 
 var current_customer_home: Vector2 = Vector2.ZERO
 
@@ -33,7 +35,7 @@ func show_customer_queue() -> void:
 	current_customer_icon.scale = Vector2.ONE
 
 
-func play_customer_attack() -> void:
+func play_customer_attack(restore_queue_at_end: bool = true) -> void:
 	var attacker: Sprite2D = current_customer_icon.duplicate() as Sprite2D
 	if attacker == null:
 		push_error("[DistanceGauge] CurrentCustomerIcon must be a Sprite2D.")
@@ -62,7 +64,8 @@ func play_customer_attack() -> void:
 	await _bounce_attacker_away(attacker)
 	attacker.queue_free()
 
-	show_customer_queue()
+	if restore_queue_at_end:
+		show_customer_queue()
 
 
 func _bounce_attacker_away(attacker: Sprite2D) -> void:
@@ -85,12 +88,13 @@ func _bounce_attacker_away(attacker: Sprite2D) -> void:
 func _on_distance_changed(value: float, max_value: float) -> void:
 	var ratio: float = value / max_value if max_value > 0.0 else 0.0
 	bar.value = ratio * 100.0
+	distance_label.text = "%dm" % roundi(value * distance_display_scale)
 	bar.modulate = Color(1.0, 0.25, 0.2) if ratio <= 0.3 else Color.WHITE
-	monster_icon.position.x = lerpf(42.0, 210.0, ratio)
+	monster_icon.position.x = lerpf(85.0, 310.0, ratio)
 
 
 func _on_time_changed(remaining: float) -> void:
-	time_label.text = "%02d" % int(ceil(remaining))
+	time_label.text = "남은 시간: %02d초" % int(ceil(remaining))
 
 
 func _on_stage_changed(stage: int) -> void:

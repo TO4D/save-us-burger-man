@@ -1,16 +1,23 @@
 [gd_scene format=3 uid="uid://dcyr7651s66f"]
 
 [ext_resource type="Script" uid="uid://dv6kaoag80stl" path="res://scenes/components/IngredientSlot.gd" id="1_6td3r"]
+[ext_resource type="Texture2D" uid="uid://c7kyi3jer2uyh" path="res://assets/sprites/cook/slotBtn_normal_grayscale.png" id="1_l6n4r"]
+[ext_resource type="Texture2D" uid="uid://d13tkutpe3k6b" path="res://assets/sprites/cook/slotBtn_pressed_grayscale.png" id="2_n7s14"]
+[ext_resource type="Texture2D" uid="uid://d31p4iyikulp3" path="res://assets/sprites/cook/slotBtn_hover_grayscale.png" id="3_2wvuu"]
 
-[node name="IngredientSlot" type="Button" unique_id=1304146151]
+[node name="IngredientSlot" type="TextureButton" unique_id=72423062]
 custom_minimum_size = Vector2(50, 50)
-offset_right = 8.0
-offset_bottom = 8.0
+offset_right = 50.0
+offset_bottom = 50.0
+texture_normal = ExtResource("1_l6n4r")
+texture_pressed = ExtResource("2_n7s14")
+texture_hover = ExtResource("3_2wvuu")
+texture_disabled = ExtResource("1_l6n4r")
+ignore_texture_size = true
 script = ExtResource("1_6td3r")
 
 [node name="IngredientSprite" type="Sprite2D" parent="." unique_id=1786027015]
 position = Vector2(25, 25)
-scale = Vector2(0.4, 0.4)
 
 [node name="NewBadge" type="Label" parent="." unique_id=444193825]
 visible = false

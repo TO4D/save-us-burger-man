@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="Ingredient" format=3 uid="uid://ctsmx58mj7mls"]
 
 [ext_resource type="Script" uid="uid://cpbwt2jx44ei" path="res://scripts/data/Ingredient.gd" id="1_4oey7"]
+[ext_resource type="Texture2D" uid="uid://chgfgsg8l5bfg" path="res://assets/sprites/ingredients/icons/icon_bunTop.png" id="1_7l70n"]
 [ext_resource type="Texture2D" uid="uid://b16m41d8jyjvx" path="res://assets/sprites/ingredients/bun_top.png" id="2_oup4l"]
 
 [resource]
@@ -8,6 +9,7 @@ script = ExtResource("1_4oey7")
 id = "bun_top"
 display_name = "bunTop"
 sprite = ExtResource("2_oup4l")
+icon_sprite = ExtResource("1_7l70n")
 stack_height = 19
-stack_offset_y = 4
+stack_offset_y = 6
 metadata/_custom_type_script = "uid://cpbwt2jx44ei"

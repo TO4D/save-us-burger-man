@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Ingredient" format=3 uid="uid://bu5exve0xitg2"]
+
+[ext_resource type="Script" uid="uid://cpbwt2jx44ei" path="res://scripts/data/Ingredient.gd" id="1_7ry4t"]
+[ext_resource type="Texture2D" uid="uid://71udra7ewb67" path="res://assets/sprites/ingredients/icons/icon_tomato.png" id="1_xoas7"]
+[ext_resource type="Texture2D" uid="uid://duq0s60qd7b31" path="res://assets/sprites/ingredients/tomato.png" id="2_7ry4t"]
+
+[resource]
+script = ExtResource("1_7ry4t")
+id = "tomato"
+display_name = "tomato"
+sprite = ExtResource("2_7ry4t")
+icon_sprite = ExtResource("1_xoas7")
+stack_height = 12
+stack_offset_y = 10
+metadata/_custom_type_script = "uid://cpbwt2jx44ei"

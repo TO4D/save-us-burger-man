@@ -33,11 +33,11 @@ static func _get_middle_length(stage: int) -> int:
 		1:
 			return 2
 		2:
-			return randi_range(2, 3)
+			return randi_range(3, 5)
 		3:
 			return 3
 		4:
-			return randi_range(3, 4)
+			return randi_range(4, 8)
 		_:
 			return 4
 

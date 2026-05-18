@@ -7,7 +7,7 @@ signal run_failed(stats: Dictionary)
 signal run_victory(stats: Dictionary)
 signal time_changed(remaining: float)
 
-const RUN_SECONDS := 60.0
+const RUN_SECONDS := 180.0
 const RECOVERY_SINGLE := {1: 6.0, 2: 8.0, 3: 10.0, 4: 12.0, 5: 15.0}
 const RECOVERY_MULTI := {
 	3: {2: 16.0},
@@ -139,13 +139,13 @@ func _has_blackout(stage: int) -> bool:
 		1:
 			return false
 		2:
-			return randf() < 0.3
+			return randf() < 0.05
 		3:
-			return randf() < 0.4
+			return randf() < 0.08
 		4:
-			return randf() < 0.6
+			return randf() < 0.12
 		_:
-			return randf() < 0.8
+			return randf() < 0.18
 
 
 func _recovery_for(stage: int, burger_count: int) -> float:

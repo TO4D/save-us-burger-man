@@ -8,8 +8,13 @@ const EATING_PARTICLE_SCENE = preload("res://resources/particles/Eating.tscn")
 const CUSTOMER_HUNGRY_TEXTURE = preload("res://assets/sprites/customers/knight1.png")
 const CUSTOMER_FULL_TEXTURE = preload("res://assets/sprites/customers/knight2.png")
 const BURGER_SERVE_DELAY_SECONDS := 0.4
+const INGREDIENT_SLOT_GAP := 5
+const INGREDIENT_SLOT_DEFAULT_SIZE := 50.0
+const INGREDIENT_SLOT_COMPACT_SIZE := 42.0
+const INGREDIENT_SLOTS_AREA_LEFT := 10.0
+const INGREDIENT_SLOTS_AREA_RIGHT := -10.0
 
-enum Phase { IDLE, CUSTOMER_ENTERING, PLAYING, CUSTOMER_EXITING, COMPLETE }
+enum Phase { IDLE, CUSTOMER_ENTERING, PLAYING, SERVING, CUSTOMER_EXITING, COMPLETE }
 
 var current_phase: Phase = Phase.IDLE
 var customer: Dictionary = {}
@@ -99,7 +104,7 @@ func _schedule_blackout(token: int) -> void:
 	if token != round_token or current_phase != Phase.PLAYING:
 		return
 	blackout_label.text = ""
-	blackout_overlay.color = Color(0, 0, 0, 0.82)
+	blackout_overlay.color = Color(0, 0, 0, 0.95)
 	await get_tree().create_timer(3.0).timeout
 	if token != round_token:
 		return
@@ -110,14 +115,32 @@ func _setup_ingredient_slots(enabled: bool) -> void:
 	_clear_children(ingredient_slots)
 	var stage: int = customer.get("stage", 1) as int
 	var ingredients: Array[Ingredient] = GameState.get_slot_ingredients(stage)
-	ingredient_slots.columns = 5 if ingredients.size() > 12 else 4
+	var column_count := 5 if ingredients.size() >= 9 else 4
+	var slot_size := INGREDIENT_SLOT_COMPACT_SIZE if column_count == 5 else INGREDIENT_SLOT_DEFAULT_SIZE
+	ingredient_slots.columns = column_count
+	ingredient_slots.add_theme_constant_override("h_separation", INGREDIENT_SLOT_GAP)
+	ingredient_slots.add_theme_constant_override("v_separation", INGREDIENT_SLOT_GAP)
+	_center_ingredient_slots_horizontally(ingredients.size(), column_count, slot_size)
 	for ing in ingredients:
 		var slot: IngredientSlot = INGREDIENT_SLOT_SCENE.instantiate() as IngredientSlot
 		ingredient_slots.add_child(slot)
+		slot.set_slot_size(slot_size)
 		slot.setup(ing, false)
 		slot.disabled = not enabled
 		if enabled:
 			slot.ingredient_picked.connect(_on_ingredient_picked)
+
+
+func _center_ingredient_slots_horizontally(item_count: int, column_count: int, slot_size: float) -> void:
+	var visible_columns := mini(item_count, column_count)
+	var content_width := float(visible_columns) * slot_size + float(maxi(visible_columns - 1, 0)) * INGREDIENT_SLOT_GAP
+	var parent_control := ingredient_slots.get_parent() as Control
+	var parent_width := parent_control.size.x if parent_control != null else size.x
+	var area_left := INGREDIENT_SLOTS_AREA_LEFT
+	var area_right := parent_width + INGREDIENT_SLOTS_AREA_RIGHT
+	var area_center := (area_left + area_right) * 0.5
+	ingredient_slots.offset_left = area_center - content_width * 0.5
+	ingredient_slots.offset_right = area_center + content_width * 0.5 - parent_width
 
 
 func _on_ingredient_picked(ingredient: Ingredient) -> void:
@@ -138,7 +161,7 @@ func _on_ingredient_picked(ingredient: Ingredient) -> void:
 
 
 func _finish_current_burger() -> void:
-	_disable_slots()
+	current_phase = Phase.SERVING
 	status_label.text = "Burger served"
 	await get_tree().create_timer(BURGER_SERVE_DELAY_SECONDS).timeout
 	var eat_position: Vector2 = await _fly_burger_to_customer()
@@ -147,14 +170,7 @@ func _finish_current_burger() -> void:
 
 	if current_recipe_index >= recipes.size():
 		await _exit_customer()
-		var did_recover_distance := false
-		var recover_distance := func() -> void:
-			did_recover_distance = true
-			DistanceManager.recover(recovery)
-		distance_gauge.customer_attack_hit.connect(recover_distance, CONNECT_ONE_SHOT)
-		await distance_gauge.play_customer_attack()
-		if not did_recover_distance:
-			DistanceManager.recover(recovery)
+		_play_customer_attack_and_recover()
 		current_phase = Phase.COMPLETE
 		order_completed.emit(true, 0.0)
 		return
@@ -164,6 +180,7 @@ func _finish_current_burger() -> void:
 	burger_stack.clear_stack()
 	_display_current_recipe()
 	status_label.text = "Next burger"
+	current_phase = Phase.PLAYING
 	_setup_ingredient_slots(true)
 
 
@@ -172,6 +189,13 @@ func _fail_customer() -> void:
 	_disable_slots()
 	status_label.text = "Failed"
 	order_completed.emit(false, 0.0)
+
+
+func _play_customer_attack_and_recover() -> void:
+	var recover_distance := func() -> void:
+		DistanceManager.recover(recovery)
+	distance_gauge.customer_attack_hit.connect(recover_distance, CONNECT_ONE_SHOT)
+	distance_gauge.play_customer_attack(false)
 
 
 func _show_wrong_input_feedback() -> void:

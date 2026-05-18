@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Ingredient" format=3 uid="uid://b7ym2t4f53bx1"]
+
+[ext_resource type="Script" uid="uid://cpbwt2jx44ei" path="res://scripts/data/Ingredient.gd" id="1_ckfbo"]
+[ext_resource type="Texture2D" uid="uid://bxdmp48dweiju" path="res://assets/sprites/ingredients/icons/icon_onion.png" id="1_lo2hv"]
+[ext_resource type="Texture2D" uid="uid://dvkros25jv5qy" path="res://assets/sprites/ingredients/anion.png" id="2_ckfbo"]
+
+[resource]
+script = ExtResource("1_ckfbo")
+id = "onion"
+display_name = "onion"
+sprite = ExtResource("2_ckfbo")
+icon_sprite = ExtResource("1_lo2hv")
+stack_height = 8
+stack_offset_y = 10
+metadata/_custom_type_script = "uid://cpbwt2jx44ei"
