@@ -5,6 +5,7 @@ signal customer_attack_hit
 
 @export var attacker_texture: Texture2D
 @export var distance_display_scale: float = 10.0
+@export var monster_icon_update_interval: float = 1.0
 
 @onready var bar: ProgressBar = $Bar
 @onready var monster_icon: Sprite2D = $MonsterIcon
@@ -17,6 +18,8 @@ signal customer_attack_hit
 @onready var freeze_overlay: ColorRect = $FreezeOverlay
 
 var current_customer_home: Vector2 = Vector2.ZERO
+var pending_monster_icon_x: float = 310.0
+var monster_icon_update_elapsed: float = 0.0
 
 
 func _ready() -> void:
@@ -26,7 +29,17 @@ func _ready() -> void:
 	GameRun.time_changed.connect(_on_time_changed)
 	GameRun.stage_changed.connect(_on_stage_changed)
 	_on_distance_changed(DistanceManager.distance, DistanceManager.MAX_DISTANCE)
+	_apply_monster_icon_position()
 	_on_freeze_changed(false, 0.0)
+
+
+func _process(delta: float) -> void:
+	monster_icon_update_elapsed += delta
+	if monster_icon_update_elapsed < monster_icon_update_interval:
+		return
+
+	monster_icon_update_elapsed = 0.0
+	_apply_monster_icon_position()
 
 
 func show_customer_queue() -> void:
@@ -99,7 +112,16 @@ func _on_distance_changed(value: float, max_value: float) -> void:
 	bar.value = ratio * 100.0
 	distance_label.text = "%dm" % roundi(value * distance_display_scale)
 	bar.modulate = Color(1.0, 0.25, 0.2) if ratio <= 0.3 else Color.WHITE
-	monster_icon.position.x = lerpf(85.0, 310.0, ratio)
+	pending_monster_icon_x = lerpf(85.0, 310.0, ratio)
+
+
+func _apply_monster_icon_position() -> void:
+	monster_icon.position.x = pending_monster_icon_x
+
+
+func refresh_monster_icon_position_immediately() -> void:
+	monster_icon_update_elapsed = 0.0
+	_apply_monster_icon_position()
 
 
 func _on_time_changed(remaining: float) -> void:

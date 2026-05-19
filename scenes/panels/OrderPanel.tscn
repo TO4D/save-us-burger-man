@@ -2,12 +2,14 @@
 
 [ext_resource type="Script" uid="uid://ybh8i7vrjpp3" path="res://scenes/panels/orderPanel.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://bxs2t76pgylko" path="res://scenes/components/BurgerStack.tscn" id="2"]
-[ext_resource type="Texture2D" uid="uid://cuewr4oa4504" path="res://assets/sprites/cook/cook_area_grayscale.png" id="2_itku6"]
+[ext_resource type="Texture2D" uid="uid://6ur2c8qulwld" path="res://assets/sprites/cook/cook_area.png" id="2_25rcf"]
+[ext_resource type="Texture2D" uid="uid://b5hshwhssrpkf" path="res://assets/sprites/store/table_resize.png" id="2_edvyg"]
 [ext_resource type="PackedScene" uid="uid://bd0hxdjgb8p2u" path="res://scenes/components/DistanceGauge.tscn" id="3"]
-[ext_resource type="PackedScene" path="res://scenes/components/ComboCounter.tscn" id="4_combo"]
-[ext_resource type="PackedScene" path="res://scenes/components/UltimateBell.tscn" id="5_bell"]
-[ext_resource type="Texture2D" uid="uid://ckrdx6bor3gmm" path="res://assets/sprites/cook/cook_area_jori_grayscale.png" id="4_itku6"]
-[ext_resource type="Texture2D" uid="uid://bvodu13gp5ber" path="res://assets/sprites/cook/cook_area_doma_grayscale.png" id="5_srb0v"]
+[ext_resource type="PackedScene" uid="uid://7coxq8bafj1k" path="res://scenes/components/ComboCounter.tscn" id="4_combo"]
+[ext_resource type="Texture2D" uid="uid://bcy5u3hsblxls" path="res://assets/sprites/cook/cook_area_jori.png" id="4_edvyg"]
+[ext_resource type="Texture2D" uid="uid://boyd3x1vv0jgu" path="res://assets/sprites/cook/cook_area_doma.png" id="5_aryf5"]
+[ext_resource type="PackedScene" uid="uid://dwkpv5wbo3tqm" path="res://scenes/components/UltimateBell.tscn" id="5_bell"]
+[ext_resource type="PackedScene" uid="uid://o57oulc6d6rj" path="res://scenes/components/RecipePreview.tscn" id="6_preview"]
 
 [node name="OrderPanel" type="Control" unique_id=890599604]
 layout_mode = 3
@@ -28,13 +30,16 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.83928066, 0.85323197, 0.82905185, 1)
 
+[node name="Background1" type="Sprite2D" parent="." unique_id=624440060]
+texture = ExtResource("2_edvyg")
+centered = false
+
 [node name="Background2" type="Sprite2D" parent="." unique_id=1331383614]
-texture = ExtResource("2_itku6")
+texture = ExtResource("2_25rcf")
 centered = false
 
 [node name="DistanceGauge" parent="." unique_id=1635089826 instance=ExtResource("3")]
 layout_mode = 1
-offset_bottom = 80.0
 
 [node name="PlayArea" type="Control" parent="." unique_id=1325333956]
 layout_mode = 1
@@ -44,21 +49,6 @@ offset_top = 90.0
 offset_bottom = 320.0
 grow_horizontal = 2
 
-[node name="RecipeDisplay" type="VBoxContainer" parent="PlayArea" unique_id=1423463867]
-layout_mode = 0
-offset_left = 12.0
-offset_right = 62.0
-offset_bottom = 90.0
-theme_override_constants/separation = -5
-alignment = 2
-
-[node name="NextRecipeDisplay" type="HBoxContainer" parent="PlayArea" unique_id=1672901450]
-layout_mode = 0
-offset_left = 70.0
-offset_right = 160.0
-offset_bottom = 50.0
-theme_override_constants/separation = 4
-
 [node name="CustomerArea" type="Control" parent="PlayArea" unique_id=703238416]
 layout_mode = 1
 anchors_preset = 6
@@ -66,10 +56,10 @@ anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = -118.0
-offset_top = -78.0
-offset_right = -18.0
-offset_bottom = 82.0
+offset_left = -252.0
+offset_top = -90.0
+offset_right = -152.0
+offset_bottom = 70.0
 grow_horizontal = 0
 grow_vertical = 2
 mouse_filter = 2
@@ -89,16 +79,32 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Cook_jori" type="Sprite2D" parent="PlayArea/PlateArea" unique_id=1137743715]
-position = Vector2(60, 166)
-texture = ExtResource("4_itku6")
+position = Vector2(60, 161)
+texture = ExtResource("4_edvyg")
 
 [node name="Cook_doma" type="Sprite2D" parent="PlayArea/PlateArea" unique_id=1613103489]
-position = Vector2(60, 156)
-texture = ExtResource("5_srb0v")
+position = Vector2(60, 158.815)
+scale = Vector2(0.6, 1)
+texture = ExtResource("5_aryf5")
 
 [node name="BurgerStack" parent="PlayArea/PlateArea" unique_id=235041741 instance=ExtResource("2")]
 position = Vector2(60, 180)
 scale = Vector2(0.8, 0.8)
+
+[node name="RecipeDisplay" parent="PlayArea" unique_id=1423463867 instance=ExtResource("6_preview")]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -85.0
+offset_top = -103.0
+offset_right = -5.0
+offset_bottom = -3.0
+grow_horizontal = 0
+grow_vertical = 0
+icon_size = Vector2(70, 23)
 
 [node name="IngredientSlots" type="GridContainer" parent="." unique_id=49289063]
 layout_mode = 1
@@ -117,18 +123,25 @@ theme_override_constants/v_separation = 5
 columns = 4
 
 [node name="ComboCounter" parent="." unique_id=1534753254 instance=ExtResource("4_combo")]
-anchors_preset = 0
-offset_left = 10.0
-offset_top = 302.0
-offset_right = 58.0
-offset_bottom = 324.0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -140.0
+offset_right = 24.0
+offset_bottom = -118.000046
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="UltimateBell" parent="." unique_id=1684200322 instance=ExtResource("5_bell")]
-anchors_preset = 0
-offset_left = 202.0
-offset_top = 276.0
-offset_right = 258.0
-offset_bottom = 348.0
+layout_mode = 0
+offset_left = 9.0
+offset_top = 259.845
+offset_right = 59.0
+offset_bottom = 309.84503
 
 [node name="StatusLabel" type="Label" parent="." unique_id=91600267]
 layout_mode = 1

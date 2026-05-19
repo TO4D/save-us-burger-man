@@ -4,7 +4,7 @@ signal gauge_changed(value: int, max_value: int)
 signal ready_changed(ready: bool)
 signal triggered(recovery_amount: float, freeze_duration: float)
 
-const MAX_GAUGE := 36
+const MAX_GAUGE := 72
 const RECOVERY_AMOUNT := 30.0
 const FREEZE_DURATION := 2.5
 

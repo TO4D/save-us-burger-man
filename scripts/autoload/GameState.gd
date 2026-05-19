@@ -70,6 +70,7 @@ func _create_placeholder_ingredient(data: Dictionary) -> Ingredient:
 	ing.stack_height = data["height"] as int
 	ing.sprite = _create_color_texture(data["color"] as Color)
 	ing.icon_sprite = ing.sprite
+	ing.preview_icon_sprite = ing.icon_sprite
 	return ing
 
 

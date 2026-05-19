@@ -7,12 +7,13 @@ const EATING_PARTICLE_SCENE = preload("res://resources/particles/Eating.tscn")
 
 const CUSTOMER_HUNGRY_TEXTURE = preload("res://assets/sprites/customers/knight1.png")
 const CUSTOMER_FULL_TEXTURE = preload("res://assets/sprites/customers/knight2.png")
-const BURGER_SERVE_DELAY_SECONDS := 0.4
+const BURGER_SERVE_DELAY_SECONDS := 0.35
 const INGREDIENT_SLOT_GAP := 5
 const INGREDIENT_SLOT_DEFAULT_SIZE := 50.0
 const INGREDIENT_SLOT_COMPACT_SIZE := 42.0
 const INGREDIENT_SLOTS_AREA_LEFT := 10.0
 const INGREDIENT_SLOTS_AREA_RIGHT := -10.0
+const SCREEN_SHAKE_STEP_DURATION := 0.04
 
 enum Phase { IDLE, CUSTOMER_ENTERING, PLAYING, SERVING, CUSTOMER_EXITING, COMPLETE }
 
@@ -25,10 +26,15 @@ var current_step: int = 0
 var recovery: float = 0.0
 var round_token: int = 0
 var customer_sprite: Node2D = null
+var screen_shake_elapsed: float = 0.0
+var screen_shake_active: bool = false
+var screen_shake_tween: Tween = null
+var panel_home_position: Vector2 = Vector2.ZERO
+var screen_shake_interval_seconds: float = 0.0
+var screen_shake_offset: float = 0.0
 
 @onready var distance_gauge: DistanceGauge = $DistanceGauge
-@onready var recipe_display: VBoxContainer = $PlayArea/RecipeDisplay
-@onready var next_recipe_display: HBoxContainer = $PlayArea/NextRecipeDisplay
+@onready var recipe_display: RecipePreview = $PlayArea/RecipeDisplay
 @onready var customer_area: Control = $PlayArea/CustomerArea
 @onready var burger_stack: Node2D = $PlayArea/PlateArea/BurgerStack
 @onready var ingredient_slots: GridContainer = $IngredientSlots
@@ -38,7 +44,22 @@ var customer_sprite: Node2D = null
 
 
 func _ready() -> void:
+	panel_home_position = position
 	UltimateManager.triggered.connect(_on_ultimate_triggered)
+	DistanceManager.distance_changed.connect(_on_distance_changed)
+	_on_distance_changed(DistanceManager.distance, DistanceManager.MAX_DISTANCE)
+
+
+func _process(delta: float) -> void:
+	if not visible or not screen_shake_active:
+		return
+
+	screen_shake_elapsed += delta
+	if screen_shake_elapsed < screen_shake_interval_seconds:
+		return
+
+	screen_shake_elapsed = 0.0
+	_play_screen_shake()
 
 
 func on_show(data: Dictionary = {}) -> void:
@@ -56,6 +77,9 @@ func on_show(data: Dictionary = {}) -> void:
 	burger_stack.clear_stack()
 	_setup_ingredient_slots(false)
 	_clear_customer()
+	_reset_screen_shake_position()
+	screen_shake_elapsed = 0.0
+	_on_distance_changed(DistanceManager.distance, DistanceManager.MAX_DISTANCE)
 	distance_gauge.show_customer_queue()
 	_start_customer(round_token)
 
@@ -64,11 +88,13 @@ func on_hide() -> void:
 	round_token += 1
 	current_phase = Phase.IDLE
 	blackout_overlay.visible = false
-	_clear_children(recipe_display)
-	_clear_children(next_recipe_display)
+	recipe_display.clear_recipe()
 	_clear_children(ingredient_slots)
 	burger_stack.clear_stack()
 	_clear_customer()
+	screen_shake_active = false
+	screen_shake_elapsed = 0.0
+	_reset_screen_shake_position()
 
 
 func _start_customer(token: int) -> void:
@@ -201,6 +227,7 @@ func _fail_customer() -> void:
 func _play_customer_attack_and_recover() -> void:
 	var recover_distance := func() -> void:
 		DistanceManager.recover(recovery)
+		distance_gauge.refresh_monster_icon_position_immediately()
 	distance_gauge.customer_attack_hit.connect(recover_distance, CONNECT_ONE_SHOT)
 	distance_gauge.play_customer_attack(false)
 
@@ -234,6 +261,56 @@ func _on_ultimate_triggered(recovery_amount: float, freeze_duration: float) -> v
 	distance_gauge.play_ultimate_barrage()
 
 
+func _on_distance_changed(value: float, _max_value: float) -> void:
+	var distance_meters := value * distance_gauge.distance_display_scale
+	var should_shake := false
+	var next_interval := 0.0
+	var next_offset := 0.0
+
+	if distance_meters <= 200.0:
+		should_shake = true
+		next_interval = 1.0
+		next_offset = 4.0
+	elif distance_meters <= 500.0:
+		should_shake = true
+		next_interval = 1.0
+		next_offset = 2.0
+	elif distance_meters <= 800.0:
+		should_shake = true
+		next_interval = 2.0
+		next_offset = 1.0
+
+	if should_shake == screen_shake_active and is_equal_approx(next_interval, screen_shake_interval_seconds) and is_equal_approx(next_offset, screen_shake_offset):
+		return
+
+	screen_shake_active = should_shake
+	screen_shake_interval_seconds = next_interval
+	screen_shake_offset = next_offset
+	screen_shake_elapsed = 0.0
+	if not should_shake:
+		_reset_screen_shake_position()
+
+
+func _play_screen_shake() -> void:
+	_reset_screen_shake_tween()
+	position = panel_home_position
+	screen_shake_tween = create_tween()
+	screen_shake_tween.tween_property(self, "position:x", panel_home_position.x - screen_shake_offset, SCREEN_SHAKE_STEP_DURATION)
+	screen_shake_tween.tween_property(self, "position:x", panel_home_position.x + screen_shake_offset, SCREEN_SHAKE_STEP_DURATION * 2.0)
+	screen_shake_tween.tween_property(self, "position:x", panel_home_position.x, SCREEN_SHAKE_STEP_DURATION)
+
+
+func _reset_screen_shake_position() -> void:
+	_reset_screen_shake_tween()
+	position = panel_home_position
+
+
+func _reset_screen_shake_tween() -> void:
+	if screen_shake_tween != null and screen_shake_tween.is_valid():
+		screen_shake_tween.kill()
+	screen_shake_tween = null
+
+
 func _fly_burger_to_customer() -> Vector2:
 	var flying_burger: Node2D = _snapshot_burger()
 	add_child(flying_burger)
@@ -242,15 +319,15 @@ func _fly_burger_to_customer() -> Vector2:
 
 	var target_position: Vector2 = customer_area.global_position + Vector2(50.0, 72.0)
 	var tween: Tween = create_tween().set_parallel(true)
-	tween.tween_property(flying_burger, "global_position", target_position, 0.28).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tween.tween_property(flying_burger, "scale", Vector2(0.35, 0.35), 0.28)
+	tween.tween_property(flying_burger, "global_position", target_position, 0.25).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(flying_burger, "scale", Vector2(0.35, 0.35), 0.25)
 	await tween.finished
 	flying_burger.queue_free()
 	return target_position
 
 
 func _play_eating_particles(origin: Vector2) -> void:
-	for i in range(3):
+	for i in range(2):
 		_spawn_eating_particle(origin)
 		await get_tree().create_timer(0.2).timeout
 
@@ -302,30 +379,8 @@ func _snapshot_burger() -> Node2D:
 
 
 func _display_current_recipe() -> void:
-	_display_recipe(current_recipe, recipe_display, Vector2(36, 18))
-	_display_next_recipes()
-
-
-func _display_recipe(recipe: Recipe, parent: VBoxContainer, icon_size: Vector2) -> void:
-	_clear_children(parent)
-	for i in range(recipe.ingredients.size() - 1, -1, -1):
-		var ing: Ingredient = recipe.ingredients[i]
-		var icon: TextureRect = TextureRect.new()
-		icon.texture = ing.sprite
-		icon.custom_minimum_size = icon_size
-		icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		parent.add_child(icon)
-
-
-func _display_next_recipes() -> void:
-	_clear_children(next_recipe_display)
-	for i in range(current_recipe_index + 1, recipes.size()):
-		var preview: VBoxContainer = VBoxContainer.new()
-		preview.custom_minimum_size = Vector2(28, 70)
-		preview.add_theme_constant_override("separation", 0)
-		next_recipe_display.add_child(preview)
-		_display_recipe(recipes[i], preview, Vector2(18, 10))
+	recipe_display.set_recipe(current_recipe)
+	recipe_display.set_recipe_progress(current_recipe_index + 1, recipes.size())
 
 
 func _create_customer_sprite(full: bool) -> Node2D:
