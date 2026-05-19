@@ -37,6 +37,10 @@ var customer_sprite: Node2D = null
 @onready var blackout_label: Label = $BlackoutOverlay/BlackoutLabel
 
 
+func _ready() -> void:
+	UltimateManager.triggered.connect(_on_ultimate_triggered)
+
+
 func on_show(data: Dictionary = {}) -> void:
 	round_token += 1
 	customer = data.get("customer", {})
@@ -149,9 +153,12 @@ func _on_ingredient_picked(ingredient: Ingredient) -> void:
 
 	var expected: Ingredient = current_recipe.ingredients[current_step]
 	if ingredient.id != expected.id:
+		ComboManager.reset_combo()
 		_show_wrong_input_feedback()
 		return
 
+	ComboManager.add_combo()
+	UltimateManager.add_gauge_for_combo(ComboManager.combo)
 	burger_stack.add_ingredient(ingredient)
 	current_step += 1
 	status_label.text = "%d / %d" % [current_step, current_recipe.ingredients.size()]
@@ -217,6 +224,14 @@ func _flash_wrong_input() -> void:
 	var tween: Tween = create_tween()
 	tween.tween_property(flash, "modulate:a", 0.0, 0.22)
 	tween.tween_callback(flash.queue_free)
+
+
+func _on_ultimate_triggered(recovery_amount: float, freeze_duration: float) -> void:
+	if not visible:
+		return
+
+	status_label.text = "Ultimate! +%d / %.1fs freeze" % [int(round(recovery_amount)), freeze_duration]
+	distance_gauge.play_ultimate_barrage()
 
 
 func _fly_burger_to_customer() -> Vector2:

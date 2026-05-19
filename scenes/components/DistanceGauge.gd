@@ -14,6 +14,7 @@ signal customer_attack_hit
 @onready var time_label: Label = $TimeLabel
 @onready var stage_label: Label = $StageLabel
 @onready var distance_label: Label = $DistanceLabel
+@onready var freeze_overlay: ColorRect = $FreezeOverlay
 
 var current_customer_home: Vector2 = Vector2.ZERO
 
@@ -21,9 +22,11 @@ var current_customer_home: Vector2 = Vector2.ZERO
 func _ready() -> void:
 	current_customer_home = current_customer_icon.position
 	DistanceManager.distance_changed.connect(_on_distance_changed)
+	DistanceManager.freeze_changed.connect(_on_freeze_changed)
 	GameRun.time_changed.connect(_on_time_changed)
 	GameRun.stage_changed.connect(_on_stage_changed)
 	_on_distance_changed(DistanceManager.distance, DistanceManager.MAX_DISTANCE)
+	_on_freeze_changed(false, 0.0)
 
 
 func show_customer_queue() -> void:
@@ -68,6 +71,12 @@ func play_customer_attack(restore_queue_at_end: bool = true) -> void:
 		show_customer_queue()
 
 
+func play_ultimate_barrage(projectile_count: int = 6) -> void:
+	for i in range(projectile_count):
+		_spawn_ultimate_projectile(Vector2(34.0 + randf_range(-8.0, 8.0), 67.0 + randf_range(-4.0, 8.0)))
+		await get_tree().create_timer(0.06).timeout
+
+
 func _bounce_attacker_away(attacker: Sprite2D) -> void:
 	var elapsed: float = 0.0
 	var duration: float = 0.75
@@ -99,3 +108,33 @@ func _on_time_changed(remaining: float) -> void:
 
 func _on_stage_changed(stage: int) -> void:
 	stage_label.text = "STAGE %d" % stage
+
+
+func _on_freeze_changed(active: bool, remaining: float) -> void:
+	freeze_overlay.visible = active
+	freeze_overlay.modulate.a = 0.22 if active else 0.0
+	if active:
+		stage_label.text = "FREEZE %.1f" % remaining
+	else:
+		stage_label.text = "STAGE %d" % GameRun.current_stage
+
+
+func _spawn_ultimate_projectile(origin: Vector2) -> void:
+	var projectile := Sprite2D.new()
+	projectile.texture = attacker_texture
+	projectile.position = origin
+	projectile.scale = Vector2(0.4, 0.4)
+	add_child(projectile)
+
+	var target_position := monster_icon.position + Vector2(randf_range(-8.0, 8.0), randf_range(-12.0, 12.0))
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(projectile, "position", target_position, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(projectile, "scale", Vector2(0.8, 0.8), 0.18)
+	await tween.finished
+
+	var hit_tween := create_tween().set_parallel(true)
+	hit_tween.tween_property(monster_icon, "scale", Vector2(1.15, 0.86), 0.05)
+	hit_tween.tween_property(projectile, "modulate:a", 0.0, 0.08)
+	await hit_tween.finished
+	monster_icon.scale = Vector2.ONE
+	projectile.queue_free()

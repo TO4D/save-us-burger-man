@@ -4,6 +4,8 @@
 [ext_resource type="PackedScene" uid="uid://bxs2t76pgylko" path="res://scenes/components/BurgerStack.tscn" id="2"]
 [ext_resource type="Texture2D" uid="uid://cuewr4oa4504" path="res://assets/sprites/cook/cook_area_grayscale.png" id="2_itku6"]
 [ext_resource type="PackedScene" uid="uid://bd0hxdjgb8p2u" path="res://scenes/components/DistanceGauge.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/components/ComboCounter.tscn" id="4_combo"]
+[ext_resource type="PackedScene" path="res://scenes/components/UltimateBell.tscn" id="5_bell"]
 [ext_resource type="Texture2D" uid="uid://ckrdx6bor3gmm" path="res://assets/sprites/cook/cook_area_jori_grayscale.png" id="4_itku6"]
 [ext_resource type="Texture2D" uid="uid://bvodu13gp5ber" path="res://assets/sprites/cook/cook_area_doma_grayscale.png" id="5_srb0v"]
 
@@ -113,6 +115,20 @@ grow_vertical = 0
 theme_override_constants/h_separation = 5
 theme_override_constants/v_separation = 5
 columns = 4
+
+[node name="ComboCounter" parent="." unique_id=1534753254 instance=ExtResource("4_combo")]
+anchors_preset = 0
+offset_left = 10.0
+offset_top = 302.0
+offset_right = 58.0
+offset_bottom = 324.0
+
+[node name="UltimateBell" parent="." unique_id=1684200322 instance=ExtResource("5_bell")]
+anchors_preset = 0
+offset_left = 202.0
+offset_top = 276.0
+offset_right = 258.0
+offset_bottom = 348.0
 
 [node name="StatusLabel" type="Label" parent="." unique_id=91600267]
 layout_mode = 1

@@ -37,6 +37,8 @@ func _process(delta: float) -> void:
 	if remaining_time <= 0.0:
 		running = false
 		DistanceManager.stop()
+		ComboManager.reset()
+		UltimateManager.reset()
 		run_victory.emit(_build_stats())
 
 
@@ -48,6 +50,8 @@ func start() -> void:
 	served_customers = 0
 	failed_customers = 0
 	_customer_index = 0
+	ComboManager.reset()
+	UltimateManager.reset()
 	DistanceManager.reset()
 	DistanceManager.set_stage(current_stage)
 	run_started.emit()
@@ -87,6 +91,8 @@ func on_order_completed(success: bool, recovery: float) -> void:
 func abort() -> void:
 	running = false
 	DistanceManager.stop()
+	ComboManager.reset()
+	UltimateManager.reset()
 
 
 func _create_customer(index: int, stage: int) -> Dictionary:
@@ -160,6 +166,8 @@ func _on_distance_game_over() -> void:
 		return
 
 	running = false
+	ComboManager.reset()
+	UltimateManager.reset()
 	run_failed.emit(_build_stats())
 
 

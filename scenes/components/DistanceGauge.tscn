@@ -76,6 +76,18 @@ offset_right = 180.0
 offset_bottom = 80.0
 text = "STAGE 1"
 
+[node name="FreezeOverlay" type="ColorRect" parent="." unique_id=180917639]
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 18.0
+offset_bottom = 88.0
+grow_horizontal = 2
+mouse_filter = 2
+modulate = Color(1, 1, 1, 0)
+color = Color(0.4, 0.85, 1, 0.18)
+
 [node name="ForeGround" type="Sprite2D" parent="." unique_id=1856372339]
 texture = ExtResource("6_lkd7u")
 centered = false

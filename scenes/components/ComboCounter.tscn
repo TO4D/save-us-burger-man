@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://7coxq8bafj1k"]
+
+[ext_resource type="Script" path="res://scenes/components/ComboCounter.gd" id="1_scl1t"]
+
+[node name="ComboCounter" type="Control"]
+offset_right = 48.0
+offset_bottom = 22.0
+mouse_filter = 2
+script = ExtResource("1_scl1t")
+
+[node name="ValueLabel" type="Label" parent="."]
+layout_mode = 0
+offset_right = 48.0
+offset_bottom = 22.0
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 0.55)
+theme_override_font_sizes/font_size = 18
+text = "x0"
