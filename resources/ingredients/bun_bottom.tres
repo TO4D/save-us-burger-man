@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://ces3qauey1jos" path="res://assets/sprites/ingredients/icons/icon_bunBottom.png" id="1_56bix"]
 [ext_resource type="Script" uid="uid://cpbwt2jx44ei" path="res://scripts/data/Ingredient.gd" id="1_ckyym"]
 [ext_resource type="Texture2D" uid="uid://cxn2dfakqr73c" path="res://assets/sprites/ingredients/bun_bottom.png" id="2_ckyym"]
+[ext_resource type="Texture2D" uid="uid://br77k2xjiahvd" path="res://assets/sprites/ingredients/preview/pre_bun_bottom.png" id="2_km403"]
 
 [resource]
 script = ExtResource("1_ckyym")
@@ -10,6 +11,7 @@ id = "bun_bottom"
 display_name = "bunBottom"
 sprite = ExtResource("2_ckyym")
 icon_sprite = ExtResource("1_56bix")
+preview_icon_sprite = ExtResource("2_km403")
 stack_height = 16
 stack_offset_y = 6
 metadata/_custom_type_script = "uid://cpbwt2jx44ei"

@@ -2,13 +2,14 @@ extends Node
 
 signal panel_changed(new_panel_name: String)
 
-enum PanelType { START, ORDER, GAME_OVER, VICTORY }
+enum PanelType { START, CUTSCENE, ORDER, GAME_OVER, VICTORY }
 
 var panels: Dictionary = {}
 var current_panel: Control = null
 
 func register_panels(panel_layer: CanvasLayer) -> void:
 	panels[PanelType.START] = panel_layer.get_node("StartPanel")
+	panels[PanelType.CUTSCENE] = panel_layer.get_node("CutscenePanel")
 	panels[PanelType.ORDER] = panel_layer.get_node("OrderPanel")
 	panels[PanelType.GAME_OVER] = panel_layer.get_node("GameOverPanel")
 	panels[PanelType.VICTORY] = panel_layer.get_node("VictoryPanel")

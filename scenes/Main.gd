@@ -3,7 +3,8 @@ extends Node2D
 
 func _ready() -> void:
 	PanelManager.register_panels($PanelLayer)
-	$PanelLayer/StartPanel.start_pressed.connect(start_run)
+	$PanelLayer/StartPanel.start_pressed.connect(_on_start_pressed)
+	$PanelLayer/CutscenePanel.cutscene_finished.connect(_on_cutscene_finished)
 	$PanelLayer/OrderPanel.order_completed.connect(_on_order_completed)
 	$PanelLayer/GameOverPanel.restart_pressed.connect(start_run)
 	$PanelLayer/VictoryPanel.restart_pressed.connect(start_run)
@@ -14,6 +15,14 @@ func _ready() -> void:
 
 func start_run() -> void:
 	GameRun.start()
+
+
+func _on_start_pressed() -> void:
+	PanelManager.show_panel(PanelManager.PanelType.CUTSCENE)
+
+
+func _on_cutscene_finished() -> void:
+	start_run()
 
 
 func _on_customer_ready(customer: Dictionary) -> void:

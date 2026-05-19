@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://cpbwt2jx44ei" path="res://scripts/data/Ingredient.gd" id="1_a0l6g"]
 [ext_resource type="Texture2D" uid="uid://c1qsb425g1ydt" path="res://assets/sprites/ingredients/icons/icon_patty.png" id="1_u1n5x"]
 [ext_resource type="Texture2D" uid="uid://ddakgd6a1ko07" path="res://assets/sprites/ingredients/patty.png" id="2_a0l6g"]
+[ext_resource type="Texture2D" uid="uid://hhks5ddebfdq" path="res://assets/sprites/ingredients/preview/pre_patty.png" id="2_uyk2v"]
 
 [resource]
 script = ExtResource("1_a0l6g")
@@ -10,6 +11,7 @@ id = "patty"
 display_name = "patty"
 sprite = ExtResource("2_a0l6g")
 icon_sprite = ExtResource("1_u1n5x")
+preview_icon_sprite = ExtResource("2_uyk2v")
 stack_height = 16
 stack_offset_y = 6
 metadata/_custom_type_script = "uid://cpbwt2jx44ei"

@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://1a8ywfm1s7j4"]
+
+[ext_resource type="Script" uid="uid://cygthe8ppgl1h" path="res://scenes/panels/CutscenePanel.gd" id="1"]
+
+[node name="CutscenePanel" type="Control" unique_id=233831715]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1522146733]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Center" type="VBoxContainer" parent="." unique_id=194664574]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="SceneFrame" type="Panel" parent="Center" unique_id=1284049409]
+custom_minimum_size = Vector2(270, 480)
+layout_mode = 2
+
+[node name="SceneImage" type="TextureRect" parent="Center/SceneFrame" unique_id=1131236341]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Footer" type="HBoxContainer" parent="." unique_id=1718387959]
+custom_minimum_size = Vector2(270, 36)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -40.0
+grow_horizontal = 2
+grow_vertical = 0
+alignment = 1
+
+[node name="ProgressLabel" type="Label" parent="Footer" unique_id=2030120031]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="Footer" unique_id=1723511902]
+custom_minimum_size = Vector2(16, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="NextButton" type="Button" parent="Footer" unique_id=1575419691]
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+text = "Next"

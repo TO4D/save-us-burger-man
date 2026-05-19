@@ -1,20 +1,27 @@
 [gd_scene format=3 uid="uid://fum35x6wo2a6"]
 
-[ext_resource type="Script" path="res://scenes/Main.gd" id="1"]
-[ext_resource type="PackedScene" path="res://scenes/panels/StartPanel.tscn" id="2"]
-[ext_resource type="PackedScene" path="res://scenes/panels/OrderPanel.tscn" id="3"]
-[ext_resource type="PackedScene" path="res://scenes/panels/GameOverPanel.tscn" id="4"]
-[ext_resource type="PackedScene" path="res://scenes/panels/VictoryPanel.tscn" id="5"]
+[ext_resource type="Script" uid="uid://cu375igalkksw" path="res://scenes/Main.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://jpymc5yu72ku" path="res://scenes/panels/StartPanel.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/panels/CutscenePanel.tscn" id="3"]
+[ext_resource type="PackedScene" uid="uid://fmbafdwu28nm" path="res://scenes/panels/OrderPanel.tscn" id="4"]
+[ext_resource type="Texture2D" uid="uid://cm4uui0cmyndi" path="res://assets/images/cut_scene1.png" id="4_q8u5g"]
+[ext_resource type="PackedScene" path="res://scenes/panels/GameOverPanel.tscn" id="5"]
+[ext_resource type="Texture2D" uid="uid://dy6ldpsfhm8kw" path="res://assets/images/cut_scene2.png" id="5_lhr70"]
+[ext_resource type="PackedScene" path="res://scenes/panels/VictoryPanel.tscn" id="6"]
+[ext_resource type="Texture2D" uid="uid://ctu0771wha68n" path="res://assets/images/cut_scene3.png" id="6_wp0k4"]
 
-[node name="Main" type="Node2D"]
+[node name="Main" type="Node2D" unique_id=1284514419]
 script = ExtResource("1")
 
-[node name="PanelLayer" type="CanvasLayer" parent="."]
+[node name="PanelLayer" type="CanvasLayer" parent="." unique_id=1261506663]
 
-[node name="StartPanel" parent="PanelLayer" instance=ExtResource("2")]
+[node name="StartPanel" parent="PanelLayer" unique_id=1136073367 instance=ExtResource("2")]
 
-[node name="OrderPanel" parent="PanelLayer" instance=ExtResource("3")]
+[node name="CutscenePanel" parent="PanelLayer" unique_id=839360778 instance=ExtResource("3")]
+cutscene_images = Array[Texture2D]([ExtResource("4_q8u5g"), ExtResource("5_lhr70"), ExtResource("6_wp0k4")])
 
-[node name="GameOverPanel" parent="PanelLayer" instance=ExtResource("4")]
+[node name="OrderPanel" parent="PanelLayer" unique_id=1169860898 instance=ExtResource("4")]
 
-[node name="VictoryPanel" parent="PanelLayer" instance=ExtResource("5")]
+[node name="GameOverPanel" parent="PanelLayer" unique_id=1639389488 instance=ExtResource("5")]
+
+[node name="VictoryPanel" parent="PanelLayer" unique_id=1262721713 instance=ExtResource("6")]

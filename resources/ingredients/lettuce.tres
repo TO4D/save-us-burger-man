@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://cpbwt2jx44ei" path="res://scripts/data/Ingredient.gd" id="1_0de0w"]
 [ext_resource type="Texture2D" uid="uid://cknvmkuwehdoi" path="res://assets/sprites/ingredients/icons/icon_lettuce.png" id="1_ii8vr"]
 [ext_resource type="Texture2D" uid="uid://5la33pbkv8rg" path="res://assets/sprites/ingredients/lettuce.png" id="2_0de0w"]
+[ext_resource type="Texture2D" uid="uid://fst4p37g4hrj" path="res://assets/sprites/ingredients/preview/pre_lettuce.png" id="2_2ubhy"]
 
 [resource]
 script = ExtResource("1_0de0w")
@@ -10,6 +11,7 @@ id = "lettuce"
 display_name = "lettuce"
 sprite = ExtResource("2_0de0w")
 icon_sprite = ExtResource("1_ii8vr")
+preview_icon_sprite = ExtResource("2_2ubhy")
 stack_height = 6
 stack_offset_y = 4
 metadata/_custom_type_script = "uid://cpbwt2jx44ei"

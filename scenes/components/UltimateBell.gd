@@ -1,12 +1,12 @@
 extends Button
 class_name UltimateBell
 
-const READY_COLOR := Color(1.0, 0.9, 0.4, 1.0)
-const IDLE_COLOR := Color(1.0, 0.97, 0.89, 1.0)
+const READY_COLOR := Color(0.806, 0.699, 0.0, 1.0)
+const IDLE_COLOR := Color(0.205, 0.205, 0.205, 1.0)
 const DIM_COLOR := Color(0.46, 0.43, 0.39, 1.0)
 
-@onready var fill_rect: ColorRect = $Fill
-@onready var glow_rect: ColorRect = $Glow
+@onready var fill_rect: TextureProgressBar = $Fill
+@onready var glow_rect: TextureRect = $Glow
 @onready var label: Label = $Label
 @onready var gauge_label: Label = $GaugeLabel
 
@@ -30,9 +30,7 @@ func _on_pressed() -> void:
 
 func _on_gauge_changed(value: int, max_value: int) -> void:
 	var ratio := float(value) / float(max_value) if max_value > 0 else 0.0
-	var fill_height := size.y * ratio
-	fill_rect.size.y = fill_height
-	fill_rect.position.y = size.y - fill_height
+	fill_rect.value = ratio * fill_rect.max_value
 	gauge_label.text = "%d%%" % int(round(ratio * 100.0))
 
 
