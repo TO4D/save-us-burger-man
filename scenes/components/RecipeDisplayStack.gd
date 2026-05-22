@@ -3,14 +3,18 @@ class_name RecipeDisplayStack
 
 const RECIPE_PREVIEW_SCENE := preload("res://scenes/components/RecipePreview.tscn")
 
-@export var stack_offset: Vector2 = Vector2(0.0,-5.0)
-@export var entry_offset: Vector2 = Vector2(0.0, -42.0)
+@export var stack_offset: Vector2 = Vector2(0.0, -5.0)
+@export var entry_offset: Vector2 = Vector2(0.0, 42.0)
 @export var exit_offset: Vector2 = Vector2(140.0, 0.0)
 @export var entry_duration: float = 0.22
 @export var exit_duration: float = 0.18
-@export var rearrange_duration: float = 0.14
-@export var stagger_delay: float = 0.08
+@export var rearrange_duration: float = 0.18
+@export var stagger_delay: float = 0.1
 @export var background_alpha_falloff: float = 0.08
+@export var progress_label_height: float = 12.0
+@export var progress_label_gap: float = 2.0
+
+@onready var progress_label: Label = $ProgressLabel
 
 var _ticket_views: Array[RecipePreview] = []
 var _animation_token: int = 0
@@ -18,6 +22,7 @@ var _animation_token: int = 0
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_update_ticket_progress()
 
 
 func show_recipes(recipe_list: Array) -> void:
@@ -42,6 +47,7 @@ func clear_recipes() -> void:
 		if is_instance_valid(ticket):
 			ticket.queue_free()
 	_ticket_views.clear()
+	_update_ticket_progress()
 
 
 func complete_current_recipe() -> void:
@@ -61,7 +67,6 @@ func complete_current_recipe() -> void:
 			ticket.queue_free()
 
 	_update_ticket_progress()
-	_prepare_entry_layout()
 	_position_tickets(true)
 
 
@@ -80,6 +85,7 @@ func _play_entry_sequence(token: int) -> void:
 		var tween := create_tween().set_parallel(true)
 		tween.tween_property(ticket, "position", target_position, entry_duration).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		#tween.tween_property(ticket, "modulate:a", _get_ticket_alpha(index), entry_duration)
+		tween.finished.connect(_on_ticket_entry_finished.bind(ticket))
 
 		if index < _ticket_views.size() - 1:
 			await get_tree().create_timer(stagger_delay).timeout
@@ -93,7 +99,7 @@ func _position_tickets(animated: bool) -> void:
 
 		var target_position := _get_ticket_position(ticket, index)
 		var target_alpha := _get_ticket_alpha(index)
-		ticket.z_index = index
+		ticket.z_index = _get_ticket_z_index(index)
 
 		if animated:
 			var tween := create_tween().set_parallel(true)
@@ -112,8 +118,9 @@ func _prepare_entry_layout() -> void:
 			continue
 
 		var target_position := _get_ticket_position(ticket, index)
-		ticket.z_index = index
+		ticket.z_index = _get_ticket_z_index(index)
 		ticket.position = target_position + entry_offset
+		ticket.set_ingredients_visible(index == 0)
 
 	_reorder_ticket_children()
 
@@ -135,13 +142,29 @@ func _get_ticket_position(ticket: RecipePreview, index: int) -> Vector2:
 	)
 
 
+func _get_ticket_z_index(index: int) -> int:
+	return _ticket_views.size() - index
+
+
 func _get_ticket_alpha(index: int) -> float:
 	return clampf(1.0 - background_alpha_falloff * index, 0.72, 1.0)
 
 
+func _on_ticket_entry_finished(ticket: RecipePreview) -> void:
+	if is_instance_valid(ticket):
+		ticket.set_ingredients_visible(true)
+
+
 func _update_ticket_progress() -> void:
 	var total := _ticket_views.size()
-	for index in range(total):
-		var ticket := _ticket_views[index]
-		if is_instance_valid(ticket):
-			ticket.set_recipe_progress(index + 1, total)
+
+	if progress_label == null:
+		return
+
+	progress_label.visible = total > 0
+	if total > 0:
+		progress_label.text = "( 1 / %d )" % total
+	else:
+		progress_label.text = ""
+
+	progress_label.size = Vector2(size.x, progress_label_height)

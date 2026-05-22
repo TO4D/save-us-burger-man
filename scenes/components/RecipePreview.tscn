@@ -10,8 +10,6 @@ anchors_preset = 0
 mouse_filter = 2
 script = ExtResource("1")
 background_padding = Vector2(10, 10)
-count_label_height = 12.0
-count_label_gap = 2.0
 
 [node name="RecipeDisplayBackground" type="NinePatchRect" parent="." unique_id=1198540343]
 layout_mode = 1
@@ -33,14 +31,3 @@ offset_top = 6.0
 offset_right = 84.0
 offset_bottom = 94.0
 mouse_filter = 2
-
-[node name="CountLabel" type="Label" parent="." unique_id=1065983490]
-layout_mode = 0
-offset_left = 5.0
-offset_top = 75.0
-offset_right = 84.0
-offset_bottom = 95.0
-theme_override_colors/font_color = Color(0.051970966, 0.05197096, 0.05197095, 1)
-theme_override_font_sizes/font_size = 12
-horizontal_alignment = 1
-vertical_alignment = 1

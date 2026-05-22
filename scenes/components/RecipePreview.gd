@@ -4,16 +4,12 @@ class_name RecipePreview
 @export var background_padding: Vector2 = Vector2(5.0, 5.0)
 @export var icon_size: Vector2 = Vector2(36.0, 18.0)
 @export var icon_overlap: float = 5.0
-@export var count_label_height: float = 14.0
-@export var count_label_gap: float = 4.0
 
 @onready var background: NinePatchRect = $RecipeDisplayBackground
 @onready var items_root: Control = $ItemsRoot
-@onready var count_label: Label = $CountLabel
 
 var recipe: Recipe = null
-var recipe_index: int = 0
-var recipe_total: int = 0
+var ingredients_visible: bool = true
 
 
 func _ready() -> void:
@@ -28,20 +24,20 @@ func set_recipe(value: Recipe) -> void:
 
 func clear_recipe() -> void:
 	recipe = null
-	recipe_index = 0
-	recipe_total = 0
 	_render_recipe()
 
 
-func set_recipe_progress(index: int, total: int) -> void:
-	recipe_index = index
-	recipe_total = total
-	_render_recipe()
+func set_ingredients_visible(value: bool) -> void:
+	ingredients_visible = value
+	if is_node_ready():
+		items_root.visible = ingredients_visible
 
 
 func _render_recipe() -> void:
 	if not is_node_ready():
 		return
+
+	items_root.visible = ingredients_visible
 
 	for child in items_root.get_children():
 		child.queue_free()
@@ -50,7 +46,6 @@ func _render_recipe() -> void:
 		custom_minimum_size = Vector2.ZERO
 		size = Vector2.ZERO
 		background.visible = false
-		count_label.text = ""
 		return
 
 	var ingredient_count := recipe.ingredients.size()
@@ -61,7 +56,7 @@ func _render_recipe() -> void:
 	)
 	var total_size := Vector2(
 		content_size.x + background_padding.x * 2.0,
-		content_size.y + background_padding.y * 2.0 + count_label_gap + count_label_height
+		content_size.y + background_padding.y * 2.0
 	)
 
 	custom_minimum_size = total_size
@@ -71,9 +66,6 @@ func _render_recipe() -> void:
 	background.size = total_size
 	items_root.position = Vector2(background_padding.x, background_padding.y)
 	items_root.size = content_size
-	count_label.position = Vector2(background_padding.x, total_size.y - background_padding.y - count_label_height)
-	count_label.size = Vector2(content_size.x, count_label_height)
-	count_label.text = "( %d / %d )" % [recipe_index, recipe_total] if recipe_total > 0 else ""
 
 	for i in range(ingredient_count):
 		var ingredient: Ingredient = recipe.ingredients[i]
