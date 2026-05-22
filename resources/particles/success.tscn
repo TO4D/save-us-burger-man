@@ -9,9 +9,9 @@
 
 [node name="spring" type="GPUParticles2D" parent="." unique_id=639712233]
 emitting = false
-amount = 20
+amount = 5
 texture = ExtResource("1_tau4h")
-lifetime = 3.0
+lifetime = 1.5
 one_shot = true
 explosiveness = 1.0
 randomness = 0.5
@@ -19,9 +19,9 @@ process_material = ExtResource("2_7ddcq")
 
 [node name="basic" type="GPUParticles2D" parent="." unique_id=250053435]
 emitting = false
-amount = 50
+amount = 20
 texture = ExtResource("2_vatge")
-lifetime = 3.0
+lifetime = 1.5
 one_shot = true
 explosiveness = 1.0
 randomness = 0.5

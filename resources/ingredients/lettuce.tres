@@ -2,16 +2,22 @@
 
 [ext_resource type="Script" uid="uid://cpbwt2jx44ei" path="res://scripts/data/Ingredient.gd" id="1_0de0w"]
 [ext_resource type="Texture2D" uid="uid://cknvmkuwehdoi" path="res://assets/sprites/ingredients/icons/icon_lettuce.png" id="1_ii8vr"]
-[ext_resource type="Texture2D" uid="uid://5la33pbkv8rg" path="res://assets/sprites/ingredients/lettuce.png" id="2_0de0w"]
 [ext_resource type="Texture2D" uid="uid://fst4p37g4hrj" path="res://assets/sprites/ingredients/preview/pre_lettuce.png" id="2_2ubhy"]
+[ext_resource type="Texture2D" uid="uid://cpyp442ej7xi3" path="res://assets/sprites/ingredients/lettuce2.png" id="4_2ubhy"]
+[ext_resource type="Texture2D" uid="uid://dch30ybdks4h1" path="res://assets/sprites/ingredients/slots/slot_lettuce2.png" id="4_bp0kp"]
+[ext_resource type="Texture2D" uid="uid://038ql586lje0" path="res://assets/sprites/ingredients/slots/slot_lettuce1.png" id="5_mlmxx"]
+[ext_resource type="Texture2D" uid="uid://bmxakks2y3kwp" path="res://assets/sprites/ingredients/slots/slot_lettuce3.png" id="6_w4iqs"]
 
 [resource]
 script = ExtResource("1_0de0w")
 id = "lettuce"
 display_name = "lettuce"
-sprite = ExtResource("2_0de0w")
+sprite = ExtResource("4_2ubhy")
 icon_sprite = ExtResource("1_ii8vr")
 preview_icon_sprite = ExtResource("2_2ubhy")
+slot_button_normal = ExtResource("5_mlmxx")
+slot_button_pressed = ExtResource("6_w4iqs")
+slot_button_hover = ExtResource("4_bp0kp")
 stack_height = 6
 stack_offset_y = 4
 metadata/_custom_type_script = "uid://cpbwt2jx44ei"

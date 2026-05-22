@@ -2,26 +2,30 @@
 
 [ext_resource type="Script" uid="uid://dv6kaoag80stl" path="res://scenes/components/IngredientSlot.gd" id="1_6td3r"]
 [ext_resource type="Texture2D" uid="uid://bhcbbmdnmgfjd" path="res://assets/sprites/cook/slotBtn_normal.png" id="1_l6n4r"]
-[ext_resource type="Texture2D" uid="uid://cj2qk8js7mnr0" path="res://assets/sprites/cook/slotBtn_pressed.png" id="2_n7s14"]
-[ext_resource type="Texture2D" uid="uid://cnauecswlse1c" path="res://assets/sprites/cook/slotBtn_hover.png" id="3_2wvuu"]
+[ext_resource type="Texture2D" uid="uid://dw1i0v87aqnkg" path="res://assets/sprites/cook/slotBtn_focus_border.png" id="5_n7s14"]
 
 [node name="IngredientSlot" type="TextureButton" unique_id=72423062]
-custom_minimum_size = Vector2(50, 50)
+custom_minimum_size = Vector2(52, 52)
 offset_right = 50.0
 offset_bottom = 50.0
 texture_normal = ExtResource("1_l6n4r")
-texture_pressed = ExtResource("2_n7s14")
-texture_hover = ExtResource("3_2wvuu")
-texture_disabled = ExtResource("1_l6n4r")
-ignore_texture_size = true
 script = ExtResource("1_6td3r")
 
-[node name="IngredientSprite" type="Sprite2D" parent="." unique_id=1786027015]
-position = Vector2(25, 25)
+[node name="Visual" type="TextureRect" parent="." unique_id=180295829]
+layout_mode = 0
+offset_right = 50.0
+offset_bottom = 50.0
+mouse_filter = 2
+texture = ExtResource("1_l6n4r")
+stretch_mode = 5
 
-[node name="NewBadge" type="Label" parent="." unique_id=444193825]
+[node name="FocusBorder" type="TextureRect" parent="." unique_id=146711226]
 visible = false
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
-text = "New"
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 56.0
+offset_bottom = 56.0
+mouse_filter = 2
+texture = ExtResource("5_n7s14")
+stretch_mode = 5

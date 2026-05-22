@@ -6,6 +6,10 @@ class_name Ingredient
 @export var sprite: Texture2D
 @export var icon_sprite: Texture2D
 @export var preview_icon_sprite: Texture2D
+@export var slot_button_normal: Texture2D
+@export var slot_button_focused: Texture2D
+@export var slot_button_pressed: Texture2D
+@export var slot_button_hover: Texture2D
 @export var stack_height: int = 32
 @export var stack_offset_y: int = 0
 @export var sound_on_place: AudioStream

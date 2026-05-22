@@ -1,14 +1,17 @@
 [gd_scene format=3 uid="uid://o57oulc6d6rj"]
 
 [ext_resource type="Script" uid="uid://cvxjv7k40fn34" path="res://scenes/components/RecipePreview.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://cedxim0cahume" path="res://assets/sprites/cook/preview_back.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://dbf786n33o8at" path="res://assets/sprites/cook/cook_recipe.png" id="2_lr08r"]
 
 [node name="RecipePreview" type="Control" unique_id=525001118]
-custom_minimum_size = Vector2(70, 100)
+custom_minimum_size = Vector2(90, 100)
 layout_mode = 3
 anchors_preset = 0
 mouse_filter = 2
 script = ExtResource("1")
+background_padding = Vector2(10, 10)
+count_label_height = 12.0
+count_label_gap = 2.0
 
 [node name="RecipeDisplayBackground" type="NinePatchRect" parent="." unique_id=1198540343]
 layout_mode = 1
@@ -17,26 +20,26 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2")
-patch_margin_left = 5
-patch_margin_top = 5
-patch_margin_right = 5
-patch_margin_bottom = 5
+texture = ExtResource("2_lr08r")
+patch_margin_left = 6
+patch_margin_top = 6
+patch_margin_right = 6
+patch_margin_bottom = 6
 
 [node name="ItemsRoot" type="Control" parent="." unique_id=1386305090]
 anchors_preset = 0
-offset_left = 5.0
-offset_top = 5.0
-offset_right = 65.0
-offset_bottom = 95.0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 84.0
+offset_bottom = 94.0
 mouse_filter = 2
 
 [node name="CountLabel" type="Label" parent="." unique_id=1065983490]
 layout_mode = 0
 offset_left = 5.0
-offset_top = 74.0
-offset_right = 65.0
-offset_bottom = 97.0
+offset_top = 75.0
+offset_right = 84.0
+offset_bottom = 95.0
 theme_override_colors/font_color = Color(0.051970966, 0.05197096, 0.05197095, 1)
 theme_override_font_sizes/font_size = 12
 horizontal_alignment = 1

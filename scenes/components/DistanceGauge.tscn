@@ -1,11 +1,10 @@
 [gd_scene format=3 uid="uid://bd0hxdjgb8p2u"]
 
 [ext_resource type="Script" uid="uid://cfoee8j2l2bpe" path="res://scenes/components/DistanceGauge.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://lkmoguuup1jb" path="res://assets/sprites/monster/monster.png" id="3_oxxhr"]
-[ext_resource type="Texture2D" uid="uid://br00fxhokv21i" path="res://assets/sprites/store/shop_grayscale.png" id="3_xmndb"]
-[ext_resource type="Texture2D" uid="uid://8e6plf528a50" path="res://assets/sprites/customers/customer_hungry_new.png" id="4_oxxhr"]
-[ext_resource type="Texture2D" uid="uid://d0c8jjx0568pe" path="res://assets/sprites/customers/customer_new.png" id="5_xmndb"]
-[ext_resource type="Texture2D" uid="uid://btevcvb1rt3p8" path="res://assets/sprites/environment/header.png" id="6_lkd7u"]
+[ext_resource type="Texture2D" uid="uid://hvspgdua73v5" path="res://assets/sprites/distance/distance_background.png" id="3_xmndb"]
+[ext_resource type="Texture2D" uid="uid://kcsd8bxiye07" path="res://assets/sprites/distance/distance_shop.png" id="4_lkd7u"]
+[ext_resource type="Texture2D" uid="uid://be4osif2byu2k" path="res://assets/sprites/distance/distance_evilmonster.png" id="5_f50tn"]
+[ext_resource type="Texture2D" uid="uid://bb50shlic0cs5" path="res://assets/sprites/distance/distance_warrior.png" id="6_0flot"]
 
 [node name="DistanceGauge" type="Control" unique_id=1309183552]
 custom_minimum_size = Vector2(270, 90)
@@ -15,60 +14,57 @@ anchor_right = 1.0
 offset_bottom = 90.0
 grow_horizontal = 2
 script = ExtResource("1")
-attacker_texture = ExtResource("5_xmndb")
+attacker_texture = ExtResource("6_0flot")
 
-[node name="Background" type="ColorRect" parent="." unique_id=1803335307]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="Background" type="Sprite2D" parent="." unique_id=74392598]
+texture = ExtResource("3_xmndb")
+centered = false
 
 [node name="ShopIcon" type="Sprite2D" parent="." unique_id=461974474]
-position = Vector2(36, 71)
-texture = ExtResource("3_xmndb")
+position = Vector2(36, 69)
+texture = ExtResource("4_lkd7u")
 
 [node name="MonsterIcon" type="Sprite2D" parent="." unique_id=7079341]
-position = Vector2(310, 50)
-texture = ExtResource("3_oxxhr")
+position = Vector2(250, 54)
+texture = ExtResource("5_f50tn")
 
 [node name="QueueIconB" type="Sprite2D" parent="." unique_id=480824845]
-position = Vector2(2, 75)
-texture = ExtResource("4_oxxhr")
+position = Vector2(15, 71)
+texture = ExtResource("6_0flot")
 
 [node name="QueueIconA" type="Sprite2D" parent="." unique_id=305898871]
-position = Vector2(17, 75)
-texture = ExtResource("4_oxxhr")
+position = Vector2(22, 71)
+texture = ExtResource("6_0flot")
 
 [node name="CurrentCustomerIcon" type="Sprite2D" parent="." unique_id=46443876]
-position = Vector2(61, 75)
-texture = ExtResource("4_oxxhr")
+position = Vector2(50, 71)
+texture = ExtResource("6_0flot")
 
 [node name="Bar" type="ProgressBar" parent="." unique_id=1938841943]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_left = 4.0
-offset_top = 5.0
-offset_right = -6.0
-offset_bottom = 15.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = 18.0
 grow_horizontal = 2
 value = 100.0
 show_percentage = false
 
 [node name="TimeLabel" type="Label" parent="." unique_id=1714281882]
 layout_mode = 1
-offset_left = 4.0
-offset_top = 15.0
-offset_right = 88.0
-offset_bottom = 53.0
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 12
+offset_left = 8.0
+offset_top = 21.0
+offset_right = 92.0
+offset_bottom = 59.0
+theme_override_colors/font_color = Color(0.71, 0.61391336, 0.5041, 1)
+theme_override_font_sizes/font_size = 10
 text = "남은 시간: 60초
 "
 
 [node name="StageLabel" type="Label" parent="." unique_id=917639190]
+visible = false
 layout_mode = 0
 offset_left = 96.0
 offset_top = 57.0
@@ -78,6 +74,7 @@ text = "STAGE 1"
 
 [node name="FreezeOverlay" type="ColorRect" parent="." unique_id=180917639]
 visible = false
+modulate = Color(1, 1, 1, 0)
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -85,21 +82,16 @@ offset_top = 18.0
 offset_bottom = 88.0
 grow_horizontal = 2
 mouse_filter = 2
-modulate = Color(1, 1, 1, 0)
 color = Color(0.4, 0.85, 1, 0.18)
-
-[node name="ForeGround" type="Sprite2D" parent="." unique_id=1856372339]
-texture = ExtResource("6_lkd7u")
-centered = false
 
 [node name="DistanceLabel" type="Label" parent="." unique_id=777007241]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_left = 20.0
-offset_top = 1.0
+offset_top = 4.0
 offset_right = -20.0
-offset_bottom = 18.0
+offset_bottom = 21.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 10

@@ -1,8 +1,0 @@
-[gd_resource type="AtlasTexture" format=3 uid="uid://dqqvwkejunskc"]
-
-[ext_resource type="Texture2D" uid="uid://bjrr8egduw7un" path="res://assets/sprites/ingredients/old/Burger_Plate.png" id="1_81tok"]
-
-[resource]
-atlas = ExtResource("1_81tok")
-region = Rect2(256, 6, 128, 20)
-filter_clip = true

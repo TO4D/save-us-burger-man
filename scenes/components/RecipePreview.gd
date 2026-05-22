@@ -43,15 +43,12 @@ func _render_recipe() -> void:
 	if not is_node_ready():
 		return
 
-	var previous_size := size
-
 	for child in items_root.get_children():
 		child.queue_free()
 
 	if recipe == null or recipe.ingredients.is_empty():
 		custom_minimum_size = Vector2.ZERO
 		size = Vector2.ZERO
-		position.y += previous_size.y
 		background.visible = false
 		count_label.text = ""
 		return
@@ -59,7 +56,7 @@ func _render_recipe() -> void:
 	var ingredient_count := recipe.ingredients.size()
 	var step_y := maxf(icon_size.y - icon_overlap, 1.0)
 	var content_size := Vector2(
-		icon_size.x,
+		icon_size.x + 34,
 		icon_size.y + step_y * float(maxi(ingredient_count - 1, 0))
 	)
 	var total_size := Vector2(
@@ -69,7 +66,6 @@ func _render_recipe() -> void:
 
 	custom_minimum_size = total_size
 	size = total_size
-	position.y -= total_size.y - previous_size.y
 	background.visible = true
 	background.position = Vector2.ZERO
 	background.size = total_size

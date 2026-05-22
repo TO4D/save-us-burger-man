@@ -2,17 +2,11 @@ extends Control
 
 signal order_completed(success: bool, recovery: float)
 
-const INGREDIENT_SLOT_SCENE = preload("res://scenes/components/IngredientSlot.tscn")
 const EATING_PARTICLE_SCENE = preload("res://resources/particles/Eating.tscn")
 
 const CUSTOMER_HUNGRY_TEXTURE = preload("res://assets/sprites/customers/knight1.png")
 const CUSTOMER_FULL_TEXTURE = preload("res://assets/sprites/customers/knight2.png")
 const BURGER_SERVE_DELAY_SECONDS := 0.35
-const INGREDIENT_SLOT_GAP := 5
-const INGREDIENT_SLOT_DEFAULT_SIZE := 50.0
-const INGREDIENT_SLOT_COMPACT_SIZE := 42.0
-const INGREDIENT_SLOTS_AREA_LEFT := 10.0
-const INGREDIENT_SLOTS_AREA_RIGHT := -10.0
 const SCREEN_SHAKE_STEP_DURATION := 0.04
 
 enum Phase { IDLE, CUSTOMER_ENTERING, PLAYING, SERVING, CUSTOMER_EXITING, COMPLETE }
@@ -32,12 +26,13 @@ var screen_shake_tween: Tween = null
 var panel_home_position: Vector2 = Vector2.ZERO
 var screen_shake_interval_seconds: float = 0.0
 var screen_shake_offset: float = 0.0
+var is_mobile_input: bool = false
 
 @onready var distance_gauge: DistanceGauge = $DistanceGauge
-@onready var recipe_display: RecipePreview = $PlayArea/RecipeDisplay
+@onready var recipe_display_stack: RecipeDisplayStack = $PlayArea/RecipeDisplayStack
 @onready var customer_area: Control = $PlayArea/CustomerArea
 @onready var burger_stack: Node2D = $PlayArea/PlateArea/BurgerStack
-@onready var ingredient_slots: GridContainer = $IngredientSlots
+@onready var ingredient_slots: IngredientSlotGrid = $IngredientSlots
 @onready var status_label: Label = $StatusLabel
 @onready var blackout_overlay: ColorRect = $BlackoutOverlay
 @onready var blackout_label: Label = $BlackoutOverlay/BlackoutLabel
@@ -45,8 +40,10 @@ var screen_shake_offset: float = 0.0
 
 func _ready() -> void:
 	panel_home_position = position
+	is_mobile_input = OS.has_feature("mobile")
 	UltimateManager.triggered.connect(_on_ultimate_triggered)
 	DistanceManager.distance_changed.connect(_on_distance_changed)
+	ingredient_slots.ingredient_picked.connect(_on_ingredient_picked)
 	_on_distance_changed(DistanceManager.distance, DistanceManager.MAX_DISTANCE)
 
 
@@ -88,8 +85,9 @@ func on_hide() -> void:
 	round_token += 1
 	current_phase = Phase.IDLE
 	blackout_overlay.visible = false
-	recipe_display.clear_recipe()
-	_clear_children(ingredient_slots)
+	recipe_display_stack.clear_recipes()
+	ingredient_slots.set_interaction_enabled(false)
+	ingredient_slots.clear_slots()
 	burger_stack.clear_stack()
 	_clear_customer()
 	screen_shake_active = false
@@ -102,7 +100,7 @@ func _start_customer(token: int) -> void:
 	current_recipe = recipes[0]
 
 	status_label.text = "New customer"
-	_display_current_recipe()
+	_display_current_recipes()
 	customer_sprite = _create_customer_sprite(false)
 	customer_area.add_child(customer_sprite)
 	customer_sprite.position = Vector2(150.0, 88.0)
@@ -114,8 +112,9 @@ func _start_customer(token: int) -> void:
 		return
 	_start_play(token)
 
-
 func _start_play(token: int) -> void:
+	if token != round_token:
+		return
 	current_phase = Phase.PLAYING
 	status_label.text = "Tap ingredients in order"
 	_setup_ingredient_slots(true)
@@ -142,35 +141,9 @@ func _schedule_blackout(token: int) -> void:
 
 
 func _setup_ingredient_slots(enabled: bool) -> void:
-	_clear_children(ingredient_slots)
 	var stage: int = customer.get("stage", 1) as int
 	var ingredients: Array[Ingredient] = GameState.get_slot_ingredients(stage)
-	var column_count := 5 if ingredients.size() >= 9 else 4
-	var slot_size := INGREDIENT_SLOT_COMPACT_SIZE if column_count == 5 else INGREDIENT_SLOT_DEFAULT_SIZE
-	ingredient_slots.columns = column_count
-	ingredient_slots.add_theme_constant_override("h_separation", INGREDIENT_SLOT_GAP)
-	ingredient_slots.add_theme_constant_override("v_separation", INGREDIENT_SLOT_GAP)
-	_center_ingredient_slots_horizontally(ingredients.size(), column_count, slot_size)
-	for ing in ingredients:
-		var slot: IngredientSlot = INGREDIENT_SLOT_SCENE.instantiate() as IngredientSlot
-		ingredient_slots.add_child(slot)
-		slot.set_slot_size(slot_size)
-		slot.setup(ing, false)
-		slot.disabled = not enabled
-		if enabled:
-			slot.ingredient_picked.connect(_on_ingredient_picked)
-
-
-func _center_ingredient_slots_horizontally(item_count: int, column_count: int, slot_size: float) -> void:
-	var visible_columns := mini(item_count, column_count)
-	var content_width := float(visible_columns) * slot_size + float(maxi(visible_columns - 1, 0)) * INGREDIENT_SLOT_GAP
-	var parent_control := ingredient_slots.get_parent() as Control
-	var parent_width := parent_control.size.x if parent_control != null else size.x
-	var area_left := INGREDIENT_SLOTS_AREA_LEFT
-	var area_right := parent_width + INGREDIENT_SLOTS_AREA_RIGHT
-	var area_center := (area_left + area_right) * 0.5
-	ingredient_slots.offset_left = area_center - content_width * 0.5
-	ingredient_slots.offset_right = area_center + content_width * 0.5 - parent_width
+	ingredient_slots.configure(ingredients, is_mobile_input, enabled)
 
 
 func _on_ingredient_picked(ingredient: Ingredient) -> void:
@@ -199,6 +172,7 @@ func _finish_current_burger() -> void:
 	await get_tree().create_timer(BURGER_SERVE_DELAY_SECONDS).timeout
 	var eat_position: Vector2 = await _fly_burger_to_customer()
 	await _play_eating_particles(eat_position)
+	await recipe_display_stack.complete_current_recipe()
 	current_recipe_index += 1
 
 	if current_recipe_index >= recipes.size():
@@ -211,7 +185,6 @@ func _finish_current_burger() -> void:
 	current_recipe = recipes[current_recipe_index]
 	current_step = 0
 	burger_stack.clear_stack()
-	_display_current_recipe()
 	status_label.text = "Next burger"
 	current_phase = Phase.PLAYING
 	_setup_ingredient_slots(true)
@@ -378,9 +351,8 @@ func _snapshot_burger() -> Node2D:
 	return root
 
 
-func _display_current_recipe() -> void:
-	recipe_display.set_recipe(current_recipe)
-	recipe_display.set_recipe_progress(current_recipe_index + 1, recipes.size())
+func _display_current_recipes() -> void:
+	recipe_display_stack.show_recipes(recipes.slice(current_recipe_index, recipes.size()))
 
 
 func _create_customer_sprite(full: bool) -> Node2D:
@@ -446,11 +418,4 @@ func _clear_customer() -> void:
 
 
 func _disable_slots() -> void:
-	for child in ingredient_slots.get_children():
-		if child is Button:
-			child.disabled = true
-
-
-func _clear_children(node: Node) -> void:
-	for child in node.get_children():
-		child.queue_free()
+	ingredient_slots.set_interaction_enabled(false)

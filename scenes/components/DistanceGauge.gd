@@ -112,7 +112,7 @@ func _on_distance_changed(value: float, max_value: float) -> void:
 	bar.value = ratio * 100.0
 	distance_label.text = "%dm" % roundi(value * distance_display_scale)
 	bar.modulate = Color(1.0, 0.25, 0.2) if ratio <= 0.3 else Color.WHITE
-	pending_monster_icon_x = lerpf(85.0, 310.0, ratio)
+	pending_monster_icon_x = lerpf(48.0, 250.0, ratio)
 
 
 func _apply_monster_icon_position() -> void:

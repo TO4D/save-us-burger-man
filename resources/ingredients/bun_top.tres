@@ -3,15 +3,21 @@
 [ext_resource type="Script" uid="uid://cpbwt2jx44ei" path="res://scripts/data/Ingredient.gd" id="1_4oey7"]
 [ext_resource type="Texture2D" uid="uid://chgfgsg8l5bfg" path="res://assets/sprites/ingredients/icons/icon_bunTop.png" id="1_7l70n"]
 [ext_resource type="Texture2D" uid="uid://by4iu3yr7xo7g" path="res://assets/sprites/ingredients/preview/pre_bun_top.png" id="2_kkqml"]
-[ext_resource type="Texture2D" uid="uid://b16m41d8jyjvx" path="res://assets/sprites/ingredients/bun_top.png" id="2_oup4l"]
+[ext_resource type="Texture2D" uid="uid://18gm34t1jevv" path="res://assets/sprites/ingredients/slots/slot_bunTop2.png" id="4_elaek"]
+[ext_resource type="Texture2D" uid="uid://doby5os7mf6sn" path="res://assets/sprites/ingredients/bun_top2.png" id="4_kkqml"]
+[ext_resource type="Texture2D" uid="uid://boo8kcsk8l3yy" path="res://assets/sprites/ingredients/slots/slot_bunTop1.png" id="5_jmcuk"]
+[ext_resource type="Texture2D" uid="uid://drcamkhp0lwem" path="res://assets/sprites/ingredients/slots/slot_bunTop3.png" id="6_u3qt5"]
 
 [resource]
 script = ExtResource("1_4oey7")
 id = "bun_top"
 display_name = "bunTop"
-sprite = ExtResource("2_oup4l")
+sprite = ExtResource("4_kkqml")
 icon_sprite = ExtResource("1_7l70n")
 preview_icon_sprite = ExtResource("2_kkqml")
+slot_button_normal = ExtResource("5_jmcuk")
+slot_button_pressed = ExtResource("6_u3qt5")
+slot_button_hover = ExtResource("4_elaek")
 stack_height = 19
 stack_offset_y = 6
 metadata/_custom_type_script = "uid://cpbwt2jx44ei"

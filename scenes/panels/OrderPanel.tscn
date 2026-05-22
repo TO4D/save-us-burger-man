@@ -2,14 +2,15 @@
 
 [ext_resource type="Script" uid="uid://ybh8i7vrjpp3" path="res://scenes/panels/orderPanel.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://bxs2t76pgylko" path="res://scenes/components/BurgerStack.tscn" id="2"]
-[ext_resource type="Texture2D" uid="uid://6ur2c8qulwld" path="res://assets/sprites/cook/cook_area.png" id="2_25rcf"]
-[ext_resource type="Texture2D" uid="uid://b5hshwhssrpkf" path="res://assets/sprites/store/table_resize.png" id="2_edvyg"]
+[ext_resource type="Texture2D" uid="uid://d0r1i1ea72pn2" path="res://assets/sprites/cook/cook_background.png" id="2_edvyg"]
 [ext_resource type="PackedScene" uid="uid://bd0hxdjgb8p2u" path="res://scenes/components/DistanceGauge.tscn" id="3"]
+[ext_resource type="Texture2D" uid="uid://baf1m3n16xgxd" path="res://assets/sprites/cook/cook_slot_background.png" id="3_aryf5"]
 [ext_resource type="PackedScene" uid="uid://7coxq8bafj1k" path="res://scenes/components/ComboCounter.tscn" id="4_combo"]
-[ext_resource type="Texture2D" uid="uid://bcy5u3hsblxls" path="res://assets/sprites/cook/cook_area_jori.png" id="4_edvyg"]
-[ext_resource type="Texture2D" uid="uid://boyd3x1vv0jgu" path="res://assets/sprites/cook/cook_area_doma.png" id="5_aryf5"]
 [ext_resource type="PackedScene" uid="uid://dwkpv5wbo3tqm" path="res://scenes/components/UltimateBell.tscn" id="5_bell"]
-[ext_resource type="PackedScene" uid="uid://o57oulc6d6rj" path="res://scenes/components/RecipePreview.tscn" id="6_preview"]
+[ext_resource type="Texture2D" uid="uid://j6p63de0a6w7" path="res://assets/sprites/cook/cook_doma.png" id="5_ja0vj"]
+[ext_resource type="Script" uid="uid://bkg1316f80lh8" path="res://scenes/components/RecipeDisplayStack.gd" id="6_stack"]
+[ext_resource type="PackedScene" uid="uid://dcyr7651s66f" path="res://scenes/components/IngredientSlot.tscn" id="7_slot"]
+[ext_resource type="Script" uid="uid://b20bp6pi5tbgd" path="res://scenes/components/IngredientSlotGrid.gd" id="8_grid"]
 
 [node name="OrderPanel" type="Control" unique_id=890599604]
 layout_mode = 3
@@ -35,7 +36,7 @@ texture = ExtResource("2_edvyg")
 centered = false
 
 [node name="Background2" type="Sprite2D" parent="." unique_id=1331383614]
-texture = ExtResource("2_25rcf")
+texture = ExtResource("3_aryf5")
 centered = false
 
 [node name="DistanceGauge" parent="." unique_id=1635089826 instance=ExtResource("3")]
@@ -66,61 +67,80 @@ mouse_filter = 2
 
 [node name="PlateArea" type="Control" parent="PlayArea" unique_id=1139684568]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -60.0
-offset_top = -70.0
-offset_right = 60.0
-offset_bottom = 102.0
+anchor_left = 0.34300002
+anchor_top = 0.62600005
+anchor_right = 0.34300002
+anchor_bottom = 0.62600005
+offset_left = -92.61001
+offset_top = -85.98001
+offset_right = 92.38999
+offset_bottom = 86.01999
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Cook_jori" type="Sprite2D" parent="PlayArea/PlateArea" unique_id=1137743715]
-position = Vector2(60, 161)
-texture = ExtResource("4_edvyg")
-
-[node name="Cook_doma" type="Sprite2D" parent="PlayArea/PlateArea" unique_id=1613103489]
-position = Vector2(60, 158.815)
-scale = Vector2(0.6, 1)
-texture = ExtResource("5_aryf5")
+position = Vector2(0, 116)
+texture = ExtResource("5_ja0vj")
+centered = false
 
 [node name="BurgerStack" parent="PlayArea/PlateArea" unique_id=235041741 instance=ExtResource("2")]
-position = Vector2(60, 180)
-scale = Vector2(0.8, 0.8)
+position = Vector2(90, 168)
 
-[node name="RecipeDisplay" parent="PlayArea" unique_id=1423463867 instance=ExtResource("6_preview")]
+[node name="RecipeDisplayStack" type="Control" parent="PlayArea" unique_id=1423463867]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -85.0
-offset_top = -103.0
-offset_right = -5.0
-offset_bottom = -3.0
+offset_left = -90.0
+offset_top = -160.0
 grow_horizontal = 0
 grow_vertical = 0
-icon_size = Vector2(70, 23)
+mouse_filter = 2
+script = ExtResource("6_stack")
 
 [node name="IngredientSlots" type="GridContainer" parent="." unique_id=49289063]
 layout_mode = 1
-anchors_preset = 12
+anchors_preset = 7
+anchor_left = 0.5
 anchor_top = 1.0
-anchor_right = 1.0
+anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = 14.0
-offset_top = -147.0
-offset_right = -14.0
-offset_bottom = -15.0
+offset_left = -111.5
+offset_top = -140.0
+offset_right = 111.5
+offset_bottom = -31.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/h_separation = 5
 theme_override_constants/v_separation = 5
 columns = 4
+script = ExtResource("8_grid")
+
+[node name="Slot1" parent="IngredientSlots" unique_id=493943094 instance=ExtResource("7_slot")]
+layout_mode = 2
+
+[node name="Slot2" parent="IngredientSlots" unique_id=2115129945 instance=ExtResource("7_slot")]
+layout_mode = 2
+
+[node name="Slot3" parent="IngredientSlots" unique_id=842331841 instance=ExtResource("7_slot")]
+layout_mode = 2
+
+[node name="Slot4" parent="IngredientSlots" unique_id=238443889 instance=ExtResource("7_slot")]
+layout_mode = 2
+
+[node name="Slot5" parent="IngredientSlots" unique_id=1626774295 instance=ExtResource("7_slot")]
+layout_mode = 2
+
+[node name="Slot6" parent="IngredientSlots" unique_id=690355756 instance=ExtResource("7_slot")]
+layout_mode = 2
+
+[node name="Slot7" parent="IngredientSlots" unique_id=1388290276 instance=ExtResource("7_slot")]
+layout_mode = 2
+
+[node name="Slot8" parent="IngredientSlots" unique_id=219957290 instance=ExtResource("7_slot")]
+layout_mode = 2
 
 [node name="ComboCounter" parent="." unique_id=1534753254 instance=ExtResource("4_combo")]
 layout_mode = 1
@@ -137,11 +157,12 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="UltimateBell" parent="." unique_id=1684200322 instance=ExtResource("5_bell")]
+visible = false
 layout_mode = 0
-offset_left = 9.0
-offset_top = 259.845
-offset_right = 59.0
-offset_bottom = 309.84503
+offset_left = 217.0
+offset_top = 92.0
+offset_right = 267.0
+offset_bottom = 142.00003
 
 [node name="StatusLabel" type="Label" parent="." unique_id=91600267]
 layout_mode = 1

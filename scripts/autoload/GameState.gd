@@ -71,10 +71,22 @@ func _create_placeholder_ingredient(data: Dictionary) -> Ingredient:
 	ing.sprite = _create_color_texture(data["color"] as Color)
 	ing.icon_sprite = ing.sprite
 	ing.preview_icon_sprite = ing.icon_sprite
+	ing.slot_button_normal = _create_slot_button_texture(Color(0.38, 0.30, 0.18), data["color"] as Color)
+	ing.slot_button_focused = _create_slot_button_texture(Color(0.48, 0.40, 0.26), data["color"] as Color)
+	ing.slot_button_pressed = _create_slot_button_texture(Color(0.30, 0.24, 0.14), data["color"] as Color)
+	ing.slot_button_hover = _create_slot_button_texture(Color(0.52, 0.42, 0.26), data["color"] as Color)
 	return ing
 
 
 func _create_color_texture(color: Color) -> Texture2D:
 	var image := Image.create(48, 18, false, Image.FORMAT_RGBA8)
 	image.fill(color)
+	return ImageTexture.create_from_image(image)
+
+
+func _create_slot_button_texture(base_color: Color, ingredient_color: Color) -> Texture2D:
+	var image := Image.create(50, 50, false, Image.FORMAT_RGBA8)
+	image.fill(base_color)
+	image.fill_rect(Rect2i(4, 4, 42, 42), base_color.lightened(0.1))
+	image.fill_rect(Rect2i(11, 17, 28, 16), ingredient_color)
 	return ImageTexture.create_from_image(image)

@@ -9,10 +9,11 @@ func add_ingredient(ing: Ingredient) -> void:
 	var sprite = Sprite2D.new()
 	sprite.texture = ing.sprite
 	sprite.centered = false
+	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 
 	var sprite_width = ing.sprite.get_width()
 	var sprite_height = ing.sprite.get_height()
-	sprite.offset = Vector2(-sprite_width / 2.0, -sprite_height)
+	sprite.offset = Vector2(-floori(sprite_width / 2.0), -sprite_height)
 
 	var target_y = STACK_BASE_Y - current_height - ing.stack_height + ing.stack_offset_y
 
