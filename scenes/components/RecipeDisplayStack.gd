@@ -14,29 +14,24 @@ const RECIPE_PREVIEW_SCENE := preload("res://scenes/components/RecipePreview.tsc
 @export var progress_label_height: float = 12.0
 @export var progress_label_gap: float = 2.0
 
-@onready var progress_label: Label = $ProgressLabel
-
 var _ticket_views: Array[RecipePreview] = []
+var _recipes: Array = []
+var _current_recipe_index: int = 0
 var _animation_token: int = 0
 
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_update_ticket_progress()
 
 
 func show_recipes(recipe_list: Array) -> void:
 	clear_recipes()
+	_recipes = recipe_list.duplicate()
+	_current_recipe_index = 0
 	var token := _animation_token
 
-	for recipe in recipe_list:
-		var ticket := RECIPE_PREVIEW_SCENE.instantiate() as RecipePreview
-		add_child(ticket)
-		ticket.set_recipe(recipe)
-		#ticket.modulate.a = 0.0
-		_ticket_views.append(ticket)
+	_show_current_recipe()
 
-	_update_ticket_progress()
 	_prepare_entry_layout()
 	_play_entry_sequence(token)
 
@@ -45,9 +40,28 @@ func clear_recipes() -> void:
 	_animation_token += 1
 	for ticket in _ticket_views:
 		if is_instance_valid(ticket):
+			if ticket.get_parent() == self:
+				remove_child(ticket)
 			ticket.queue_free()
 	_ticket_views.clear()
-	_update_ticket_progress()
+	_recipes.clear()
+	_current_recipe_index = 0
+
+
+func set_current_step(step: int) -> void:
+	for index in range(_ticket_views.size()):
+		var ticket := _ticket_views[index]
+		if is_instance_valid(ticket):
+			ticket.set_active_step(step if index == 0 else -1)
+
+
+func play_current_indicator_shake() -> void:
+	if _ticket_views.is_empty():
+		return
+
+	var ticket := _ticket_views[0]
+	if is_instance_valid(ticket):
+		ticket.play_indicator_shake()
 
 
 func complete_current_recipe() -> void:
@@ -55,6 +69,7 @@ func complete_current_recipe() -> void:
 		return
 
 	_animation_token += 1
+	var token := _animation_token
 	var ticket := _ticket_views[0]
 	_ticket_views.remove_at(0)
 
@@ -64,10 +79,28 @@ func complete_current_recipe() -> void:
 		#tween.tween_property(ticket, "modulate:a", 0.0, exit_duration)
 		await tween.finished
 		if is_instance_valid(ticket):
+			if ticket.get_parent() == self:
+				remove_child(ticket)
 			ticket.queue_free()
 
-	_update_ticket_progress()
+	_current_recipe_index += 1
+	if _current_recipe_index < _recipes.size():
+		_show_current_recipe()
+		_prepare_entry_layout()
+		_play_entry_sequence(token)
+		return
+
 	_position_tickets(true)
+
+
+func _show_current_recipe() -> void:
+	if _current_recipe_index < 0 or _current_recipe_index >= _recipes.size():
+		return
+
+	var ticket := RECIPE_PREVIEW_SCENE.instantiate() as RecipePreview
+	add_child(ticket)
+	ticket.set_recipe(_recipes[_current_recipe_index])
+	_ticket_views.append(ticket)
 
 
 func _play_entry_sequence(token: int) -> void:
@@ -153,18 +186,3 @@ func _get_ticket_alpha(index: int) -> float:
 func _on_ticket_entry_finished(ticket: RecipePreview) -> void:
 	if is_instance_valid(ticket):
 		ticket.set_ingredients_visible(true)
-
-
-func _update_ticket_progress() -> void:
-	var total := _ticket_views.size()
-
-	if progress_label == null:
-		return
-
-	progress_label.visible = total > 0
-	if total > 0:
-		progress_label.text = "( 1 / %d )" % total
-	else:
-		progress_label.text = ""
-
-	progress_label.size = Vector2(size.x, progress_label_height)

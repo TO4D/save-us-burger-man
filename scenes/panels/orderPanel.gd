@@ -7,7 +7,11 @@ const EATING_PARTICLE_SCENE = preload("res://resources/particles/Eating.tscn")
 const CUSTOMER_HUNGRY_TEXTURE = preload("res://assets/sprites/customers/knight1.png")
 const CUSTOMER_FULL_TEXTURE = preload("res://assets/sprites/customers/knight2.png")
 const BURGER_SERVE_DELAY_SECONDS := 0.35
+const RESULT_RANK_DISPLAY_SECONDS := 0.55
 const SCREEN_SHAKE_STEP_DURATION := 0.04
+const ORDER_PROGRESS_DOT_SIZE := Vector2(8.0, 8.0)
+const ORDER_PROGRESS_PENDING_COLOR := Color(0.48, 0.48, 0.48, 1.0)
+const ORDER_PROGRESS_COMPLETE_COLOR := Color(1.0, 0.86, 0.18, 1.0)
 
 enum Phase { IDLE, CUSTOMER_ENTERING, PLAYING, SERVING, CUSTOMER_EXITING, COMPLETE }
 
@@ -27,13 +31,20 @@ var panel_home_position: Vector2 = Vector2.ZERO
 var screen_shake_interval_seconds: float = 0.0
 var screen_shake_offset: float = 0.0
 var is_mobile_input: bool = false
+var mistake_count: int = 0
+var result_rank_tween: Tween = null
 
 @onready var distance_gauge: DistanceGauge = $DistanceGauge
 @onready var recipe_display_stack: RecipeDisplayStack = $PlayArea/RecipeDisplayStack
 @onready var customer_area: Control = $PlayArea/CustomerArea
 @onready var burger_stack: Node2D = $PlayArea/PlateArea/BurgerStack
+@onready var order_progress_dots: HBoxContainer = $PlayArea/PlateArea/OrderProgressDots
 @onready var ingredient_slots: IngredientSlotGrid = $IngredientSlots
 @onready var status_label: Label = $StatusLabel
+@onready var result_rank: Control = $ResultRank
+@onready var result_good: TextureRect = $ResultRank/Good
+@onready var result_great: TextureRect = $ResultRank/Great
+@onready var result_perfect: TextureRect = $ResultRank/Perfect
 @onready var blackout_overlay: ColorRect = $BlackoutOverlay
 @onready var blackout_label: Label = $BlackoutOverlay/BlackoutLabel
 
@@ -70,12 +81,15 @@ func on_show(data: Dictionary = {}) -> void:
 
 	current_recipe_index = 0
 	current_step = 0
+	mistake_count = 0
 	blackout_overlay.visible = false
+	_hide_result_rank()
 	burger_stack.clear_stack()
 	_setup_ingredient_slots(false)
 	_clear_customer()
 	_reset_screen_shake_position()
 	screen_shake_elapsed = 0.0
+	_setup_order_progress_dots()
 	_on_distance_changed(DistanceManager.distance, DistanceManager.MAX_DISTANCE)
 	distance_gauge.show_customer_queue()
 	_start_customer(round_token)
@@ -85,7 +99,9 @@ func on_hide() -> void:
 	round_token += 1
 	current_phase = Phase.IDLE
 	blackout_overlay.visible = false
+	_hide_result_rank()
 	recipe_display_stack.clear_recipes()
+	_clear_order_progress_dots()
 	ingredient_slots.set_interaction_enabled(false)
 	ingredient_slots.clear_slots()
 	burger_stack.clear_stack()
@@ -152,6 +168,7 @@ func _on_ingredient_picked(ingredient: Ingredient) -> void:
 
 	var expected: Ingredient = current_recipe.ingredients[current_step]
 	if ingredient.id != expected.id:
+		mistake_count += 1
 		ComboManager.reset_combo()
 		_show_wrong_input_feedback()
 		return
@@ -161,8 +178,10 @@ func _on_ingredient_picked(ingredient: Ingredient) -> void:
 	burger_stack.add_ingredient(ingredient)
 	current_step += 1
 	status_label.text = "%d / %d" % [current_step, current_recipe.ingredients.size()]
+	recipe_display_stack.set_current_step(current_step)
 
 	if current_step >= current_recipe.ingredients.size():
+		_update_order_progress_dots(current_recipe_index + 1)
 		_finish_current_burger()
 
 
@@ -174,8 +193,12 @@ func _finish_current_burger() -> void:
 	await _play_eating_particles(eat_position)
 	await recipe_display_stack.complete_current_recipe()
 	current_recipe_index += 1
+	_update_order_progress_dots()
 
 	if current_recipe_index >= recipes.size():
+		_show_result_rank()
+		await get_tree().create_timer(RESULT_RANK_DISPLAY_SECONDS).timeout
+		_hide_result_rank()
 		await _exit_customer()
 		_play_customer_attack_and_recover()
 		current_phase = Phase.COMPLETE
@@ -184,10 +207,48 @@ func _finish_current_burger() -> void:
 
 	current_recipe = recipes[current_recipe_index]
 	current_step = 0
+	recipe_display_stack.set_current_step(current_step)
 	burger_stack.clear_stack()
 	status_label.text = "Next burger"
 	current_phase = Phase.PLAYING
 	_setup_ingredient_slots(true)
+
+
+func _setup_order_progress_dots() -> void:
+	_clear_order_progress_dots()
+	order_progress_dots.visible = not recipes.is_empty()
+
+	for i in range(recipes.size()):
+		var dot := Panel.new()
+		dot.custom_minimum_size = ORDER_PROGRESS_DOT_SIZE
+		dot.size = ORDER_PROGRESS_DOT_SIZE
+		dot.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		dot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		order_progress_dots.add_child(dot)
+
+	_update_order_progress_dots()
+
+
+func _clear_order_progress_dots() -> void:
+	for child in order_progress_dots.get_children():
+		order_progress_dots.remove_child(child)
+		child.queue_free()
+
+
+func _update_order_progress_dots(completed_count: int = -1) -> void:
+	var filled_count := current_recipe_index if completed_count < 0 else completed_count
+	for index in range(order_progress_dots.get_child_count()):
+		var dot := order_progress_dots.get_child(index) as Panel
+		if dot == null:
+			continue
+		var style := StyleBoxFlat.new()
+		style.bg_color = ORDER_PROGRESS_COMPLETE_COLOR if index < filled_count else ORDER_PROGRESS_PENDING_COLOR
+		style.corner_radius_top_left = int(ORDER_PROGRESS_DOT_SIZE.x * 0.5)
+		style.corner_radius_top_right = int(ORDER_PROGRESS_DOT_SIZE.x * 0.5)
+		style.corner_radius_bottom_left = int(ORDER_PROGRESS_DOT_SIZE.x * 0.5)
+		style.corner_radius_bottom_right = int(ORDER_PROGRESS_DOT_SIZE.x * 0.5)
+		dot.add_theme_stylebox_override("panel", style)
 
 
 func _fail_customer() -> void:
@@ -207,6 +268,7 @@ func _play_customer_attack_and_recover() -> void:
 
 func _show_wrong_input_feedback() -> void:
 	status_label.text = "Wrong ingredient"
+	recipe_display_stack.play_current_indicator_shake()
 	var original_position: Vector2 = ingredient_slots.position
 	var tween: Tween = create_tween()
 	tween.tween_property(ingredient_slots, "position:x", original_position.x - 5.0, 0.04)
@@ -224,6 +286,47 @@ func _flash_wrong_input() -> void:
 	var tween: Tween = create_tween()
 	tween.tween_property(flash, "modulate:a", 0.0, 0.22)
 	tween.tween_callback(flash.queue_free)
+
+
+func _show_result_rank() -> void:
+	_hide_result_rank_images()
+	var target := _get_result_rank_texture()
+	target.visible = true
+
+	if result_rank_tween != null and result_rank_tween.is_valid():
+		result_rank_tween.kill()
+
+	result_rank.visible = true
+	result_rank.pivot_offset = result_rank.size * 0.5
+	result_rank.scale = Vector2(1.2, 1.2)
+	result_rank.modulate.a = 0.0
+	result_rank_tween = create_tween().set_parallel(true)
+	result_rank_tween.tween_property(result_rank, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	result_rank_tween.tween_property(result_rank, "modulate:a", 1.0, 0.08)
+
+
+func _hide_result_rank() -> void:
+	if result_rank_tween != null and result_rank_tween.is_valid():
+		result_rank_tween.kill()
+	result_rank_tween = null
+	result_rank.visible = false
+	result_rank.scale = Vector2.ONE
+	result_rank.modulate.a = 1.0
+	_hide_result_rank_images()
+
+
+func _hide_result_rank_images() -> void:
+	result_good.visible = false
+	result_great.visible = false
+	result_perfect.visible = false
+
+
+func _get_result_rank_texture() -> TextureRect:
+	if mistake_count == 0:
+		return result_perfect
+	if mistake_count <= 3:
+		return result_great
+	return result_good
 
 
 func _on_ultimate_triggered(recovery_amount: float, freeze_duration: float) -> void:
@@ -353,6 +456,7 @@ func _snapshot_burger() -> Node2D:
 
 func _display_current_recipes() -> void:
 	recipe_display_stack.show_recipes(recipes.slice(current_recipe_index, recipes.size()))
+	recipe_display_stack.set_current_step(current_step)
 
 
 func _create_customer_sprite(full: bool) -> Node2D:

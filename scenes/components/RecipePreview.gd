@@ -1,15 +1,29 @@
 extends Control
 class_name RecipePreview
 
+const INDICATOR_TEXTURE := preload("res://assets/sprites/ui/indicator.png")
+
 @export var background_padding: Vector2 = Vector2(5.0, 5.0)
-@export var icon_size: Vector2 = Vector2(36.0, 18.0)
+#@export var icon_size: Vector2 = Vector2(36.0, 18.0)
+@export var icon_size: Vector2 = Vector2(70.0, 22.0)
 @export var icon_overlap: float = 5.0
+@export var indicator_size: Vector2 = Vector2(8.0, 8.0)
+@export var indicator_gap: float = 0.0
+@export var indicator_shake_offset: float = 3.0
+@export var indicator_shake_step_duration: float = 0.04
+@export var completed_ingredient_modulate: Color = Color(1, 1, 1, 0.5)
+@export var complete_stamp_size: Vector2 = Vector2(88.0, 88.0)
 
 @onready var background: NinePatchRect = $RecipeDisplayBackground
 @onready var items_root: Control = $ItemsRoot
+@onready var complete_stamp: TextureRect = $ItemsRoot/CompleteStamp
 
 var recipe: Recipe = null
 var ingredients_visible: bool = true
+var active_step: int = -1
+var _indicator_root: Control = null
+var _indicator_shake_tween: Tween = null
+var _complete_stamp_tween: Tween = null
 
 
 func _ready() -> void:
@@ -27,10 +41,29 @@ func clear_recipe() -> void:
 	_render_recipe()
 
 
+func set_active_step(value: int) -> void:
+	active_step = value
+	_render_recipe()
+
+
 func set_ingredients_visible(value: bool) -> void:
 	ingredients_visible = value
 	if is_node_ready():
 		items_root.visible = ingredients_visible
+
+
+func play_indicator_shake() -> void:
+	if _indicator_root == null or not is_instance_valid(_indicator_root):
+		return
+
+	if _indicator_shake_tween != null and _indicator_shake_tween.is_valid():
+		_indicator_shake_tween.kill()
+
+	var original_position := _indicator_root.position
+	_indicator_shake_tween = create_tween()
+	_indicator_shake_tween.tween_property(_indicator_root, "position:x", original_position.x - indicator_shake_offset, indicator_shake_step_duration)
+	_indicator_shake_tween.tween_property(_indicator_root, "position:x", original_position.x + indicator_shake_offset, indicator_shake_step_duration * 2.0)
+	_indicator_shake_tween.tween_property(_indicator_root, "position:x", original_position.x, indicator_shake_step_duration)
 
 
 func _render_recipe() -> void:
@@ -39,19 +72,26 @@ func _render_recipe() -> void:
 
 	items_root.visible = ingredients_visible
 
+	if _indicator_shake_tween != null and _indicator_shake_tween.is_valid():
+		_indicator_shake_tween.kill()
+	_indicator_shake_tween = null
+	_indicator_root = null
+
 	for child in items_root.get_children():
-		child.queue_free()
+		if child != complete_stamp:
+			child.queue_free()
 
 	if recipe == null or recipe.ingredients.is_empty():
 		custom_minimum_size = Vector2.ZERO
 		size = Vector2.ZERO
 		background.visible = false
+		_set_complete_stamp_visible(false, Vector2.ZERO)
 		return
 
 	var ingredient_count := recipe.ingredients.size()
 	var step_y := maxf(icon_size.y - icon_overlap, 1.0)
 	var content_size := Vector2(
-		icon_size.x + 34,
+		icon_size.x,
 		icon_size.y + step_y * float(maxi(ingredient_count - 1, 0))
 	)
 	var total_size := Vector2(
@@ -69,12 +109,74 @@ func _render_recipe() -> void:
 
 	for i in range(ingredient_count):
 		var ingredient: Ingredient = recipe.ingredients[i]
+		var icon_position := Vector2(0.0, content_size.y - icon_size.y - step_y * float(i))
 		var icon := TextureRect.new()
 		icon.texture = ingredient.preview_icon_sprite if ingredient.preview_icon_sprite != null else ingredient.icon_sprite if ingredient.icon_sprite != null else ingredient.sprite
-		icon.position = Vector2(0.0, content_size.y - icon_size.y - step_y * float(i))
+		icon.position = icon_position
 		icon.custom_minimum_size = icon_size
 		icon.size = icon_size
 		icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		if i < active_step:
+			icon.modulate = completed_ingredient_modulate
 		items_root.add_child(icon)
+
+		if i == active_step:
+			_add_indicators(icon_position)
+
+	_set_complete_stamp_visible(active_step >= ingredient_count, content_size)
+
+
+func _add_indicators(icon_position: Vector2) -> void:
+	_indicator_root = Control.new()
+	_indicator_root.position = icon_position
+	_indicator_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	items_root.add_child(_indicator_root)
+
+	var indicator_y := (icon_size.y - indicator_size.y) * 0.5
+	var left_indicator := _create_indicator()
+	left_indicator.position = Vector2(-indicator_size.x - indicator_gap, indicator_y)
+	_indicator_root.add_child(left_indicator)
+
+	var right_indicator := _create_indicator()
+	right_indicator.flip_h = true
+	right_indicator.position = Vector2(icon_size.x + indicator_gap, indicator_y)
+	_indicator_root.add_child(right_indicator)
+
+
+func _create_indicator() -> TextureRect:
+	var indicator := TextureRect.new()
+	indicator.texture = INDICATOR_TEXTURE
+	indicator.custom_minimum_size = indicator_size
+	indicator.size = indicator_size
+	indicator.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	indicator.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	indicator.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return indicator
+
+
+func _set_complete_stamp_visible(value: bool, content_size: Vector2) -> void:
+	complete_stamp.custom_minimum_size = complete_stamp_size
+	complete_stamp.size = complete_stamp_size
+	complete_stamp.position = (content_size - complete_stamp_size) * 0.5
+	complete_stamp.pivot_offset = complete_stamp_size * 0.5
+	items_root.move_child(complete_stamp, items_root.get_child_count() - 1)
+
+	if complete_stamp.visible == value:
+		return
+
+	if _complete_stamp_tween != null and _complete_stamp_tween.is_valid():
+		_complete_stamp_tween.kill()
+	_complete_stamp_tween = null
+
+	complete_stamp.visible = value
+	if value:
+		complete_stamp.scale = Vector2(1.25, 1.25)
+		complete_stamp.modulate.a = 0.0
+		_complete_stamp_tween = create_tween().set_parallel(true)
+		_complete_stamp_tween.tween_property(complete_stamp, "scale", Vector2.ONE, 0.14).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		_complete_stamp_tween.tween_property(complete_stamp, "modulate:a", 1.0, 0.08)
+	else:
+		complete_stamp.scale = Vector2.ONE
+		complete_stamp.modulate.a = 1.0

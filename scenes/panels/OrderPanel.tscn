@@ -11,6 +11,9 @@
 [ext_resource type="Script" uid="uid://bkg1316f80lh8" path="res://scenes/components/RecipeDisplayStack.gd" id="6_stack"]
 [ext_resource type="PackedScene" uid="uid://dcyr7651s66f" path="res://scenes/components/IngredientSlot.tscn" id="7_slot"]
 [ext_resource type="Script" uid="uid://b20bp6pi5tbgd" path="res://scenes/components/IngredientSlotGrid.gd" id="8_grid"]
+[ext_resource type="Texture2D" uid="uid://c2d1t47najpt0" path="res://assets/sprites/ui/result_good.png" id="12_good"]
+[ext_resource type="Texture2D" uid="uid://bkfi5byfv6pqs" path="res://assets/sprites/ui/result_great.png" id="13_great"]
+[ext_resource type="Texture2D" uid="uid://c4ygqskfjim15" path="res://assets/sprites/ui/result_perfect.png" id="14_perfect"]
 
 [node name="OrderPanel" type="Control" unique_id=890599604]
 layout_mode = 3
@@ -73,7 +76,7 @@ anchor_right = 0.34300002
 anchor_bottom = 0.62600005
 offset_left = -92.61001
 offset_top = -85.98001
-offset_right = 92.38999
+offset_right = 87.38999
 offset_bottom = 86.01999
 grow_horizontal = 2
 grow_vertical = 2
@@ -86,6 +89,28 @@ centered = false
 [node name="BurgerStack" parent="PlayArea/PlateArea" unique_id=235041741 instance=ExtResource("2")]
 position = Vector2(90, 168)
 
+[node name="ColorRect" type="ColorRect" parent="PlayArea/PlateArea" unique_id=1646500549]
+layout_mode = 0
+offset_left = 180.0
+offset_top = 156.0
+offset_right = 270.0
+offset_bottom = 172.0
+color = Color(0.29380536, 0.283413, 0.26955554, 1)
+
+[node name="OrderProgressDots" type="HBoxContainer" parent="PlayArea/PlateArea" unique_id=1839407412]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = 70.0
+offset_right = 90.0
+offset_bottom = 86.0
+grow_horizontal = 0
+grow_vertical = 2
+alignment = 1
+
 [node name="RecipeDisplayStack" type="Control" parent="PlayArea" unique_id=1423463867]
 layout_mode = 1
 anchors_preset = 3
@@ -94,23 +119,12 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -90.0
-offset_top = -160.0
+offset_top = -176.0
+offset_bottom = -16.0
 grow_horizontal = 0
 grow_vertical = 0
 mouse_filter = 2
 script = ExtResource("6_stack")
-
-[node name="ProgressLabel" type="Label" parent="PlayArea/RecipeDisplayStack" unique_id=912036052]
-z_index = 1000
-layout_mode = 0
-offset_left = -1.0
-offset_top = 157.0
-offset_right = 89.0
-offset_bottom = 174.0
-theme_override_colors/font_color = Color(0.051970966, 0.05197096, 0.05197095, 1)
-theme_override_font_sizes/font_size = 12
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="IngredientSlots" type="GridContainer" parent="." unique_id=49289063]
 layout_mode = 1
@@ -187,6 +201,53 @@ theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 12
 text = "Memorize the recipe"
 horizontal_alignment = 1
+
+[node name="ResultRank" type="Control" parent="." unique_id=1902987360]
+visible = false
+z_index = 15
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -131.0
+offset_top = -154.0
+offset_right = -46.0
+offset_bottom = -130.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Good" type="TextureRect" parent="ResultRank" unique_id=454209822]
+visible = false
+layout_mode = 1
+offset_right = 51.0
+offset_bottom = 24.0
+mouse_filter = 2
+texture = ExtResource("12_good")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Great" type="TextureRect" parent="ResultRank" unique_id=1211702972]
+visible = false
+layout_mode = 1
+offset_right = 61.0
+offset_bottom = 24.0
+mouse_filter = 2
+texture = ExtResource("13_great")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Perfect" type="TextureRect" parent="ResultRank" unique_id=1832580181]
+visible = false
+layout_mode = 1
+offset_right = 83.0
+offset_bottom = 24.0
+mouse_filter = 2
+texture = ExtResource("14_perfect")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="BlackoutOverlay" type="ColorRect" parent="." unique_id=1651185138]
 visible = false
