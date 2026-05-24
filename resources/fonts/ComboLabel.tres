@@ -1,0 +1,11 @@
+[gd_resource type="LabelSettings" format=3 uid="uid://bbx0n2c7skyw8"]
+
+[ext_resource type="FontFile" uid="uid://bivsctx4h0jw" path="res://fonts/Jersey25-Regular.ttf" id="1_ipoxu"]
+
+[resource]
+font = ExtResource("1_ipoxu")
+font_size = 30
+font_color = Color(1, 0.74509805, 0.19215687, 1)
+outline_size = 1
+outline_color = Color(0.38039216, 0.2784314, 0.05882353, 1)
+shadow_size = 0

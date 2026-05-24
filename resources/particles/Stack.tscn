@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://d0g8pus8mnbjw"]
+
+[ext_resource type="Texture2D" uid="uid://cw3nhv4plfppt" path="res://assets/sprites/particle/vfx_particle_2.png" id="1_4d65v"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_sfjuh"]
+particle_flag_disable_z = true
+direction = Vector3(0, -1, 0)
+spread = 66.123
+initial_velocity_min = 50.0
+initial_velocity_max = 100.0
+gravity = Vector3(0, 800, 0)
+color = Color(0.74235195, 0.52486414, 0.21413952, 1)
+
+[node name="Eating" type="Node2D" unique_id=741946946]
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="." unique_id=467899468]
+emitting = false
+amount = 20
+texture = ExtResource("1_4d65v")
+lifetime = 0.8
+one_shot = true
+explosiveness = 1.0
+randomness = 0.34
+process_material = SubResource("ParticleProcessMaterial_sfjuh")

@@ -9,9 +9,9 @@ const CUSTOMER_FULL_TEXTURE = preload("res://assets/sprites/customers/knight2.pn
 const BURGER_SERVE_DELAY_SECONDS := 0.35
 const RESULT_RANK_DISPLAY_SECONDS := 0.55
 const SCREEN_SHAKE_STEP_DURATION := 0.04
-const ORDER_PROGRESS_DOT_SIZE := Vector2(8.0, 8.0)
-const ORDER_PROGRESS_PENDING_COLOR := Color(0.48, 0.48, 0.48, 1.0)
-const ORDER_PROGRESS_COMPLETE_COLOR := Color(1.0, 0.86, 0.18, 1.0)
+const ORDER_PROGRESS_ICON_SIZE := Vector2(16.0, 16.0)
+const ORDER_PROGRESS_FILL_TEXTURE := preload("res://assets/sprites/ui/order_icon.1.png")
+const ORDER_PROGRESS_EMPTY_TEXTURE := preload("res://assets/sprites/ui/order_icon.2.png")
 
 enum Phase { IDLE, CUSTOMER_ENTERING, PLAYING, SERVING, CUSTOMER_EXITING, COMPLETE }
 
@@ -33,11 +33,13 @@ var screen_shake_offset: float = 0.0
 var is_mobile_input: bool = false
 var mistake_count: int = 0
 var result_rank_tween: Tween = null
+var stack_landing_token: int = 0
+var pending_stack_landing_tokens: Array[int] = []
 
 @onready var distance_gauge: DistanceGauge = $DistanceGauge
 @onready var recipe_display_stack: RecipeDisplayStack = $PlayArea/RecipeDisplayStack
 @onready var customer_area: Control = $PlayArea/CustomerArea
-@onready var burger_stack: Node2D = $PlayArea/PlateArea/BurgerStack
+@onready var burger_stack: BurgerStack = $PlayArea/PlateArea/BurgerStack
 @onready var order_progress_dots: HBoxContainer = $PlayArea/PlateArea/OrderProgressDots
 @onready var ingredient_slots: IngredientSlotGrid = $IngredientSlots
 @onready var status_label: Label = $StatusLabel
@@ -47,6 +49,7 @@ var result_rank_tween: Tween = null
 @onready var result_perfect: TextureRect = $ResultRank/Perfect
 @onready var blackout_overlay: ColorRect = $BlackoutOverlay
 @onready var blackout_label: Label = $BlackoutOverlay/BlackoutLabel
+@onready var combo_counter: ComboCounter = $ComboCounter
 
 
 func _ready() -> void:
@@ -54,6 +57,7 @@ func _ready() -> void:
 	is_mobile_input = OS.has_feature("mobile")
 	UltimateManager.triggered.connect(_on_ultimate_triggered)
 	DistanceManager.distance_changed.connect(_on_distance_changed)
+	burger_stack.ingredient_landed.connect(_on_stack_ingredient_landed)
 	ingredient_slots.ingredient_picked.connect(_on_ingredient_picked)
 	_on_distance_changed(DistanceManager.distance, DistanceManager.MAX_DISTANCE)
 
@@ -82,6 +86,7 @@ func on_show(data: Dictionary = {}) -> void:
 	current_recipe_index = 0
 	current_step = 0
 	mistake_count = 0
+	pending_stack_landing_tokens.clear()
 	blackout_overlay.visible = false
 	_hide_result_rank()
 	burger_stack.clear_stack()
@@ -105,6 +110,7 @@ func on_hide() -> void:
 	ingredient_slots.set_interaction_enabled(false)
 	ingredient_slots.clear_slots()
 	burger_stack.clear_stack()
+	pending_stack_landing_tokens.clear()
 	_clear_customer()
 	screen_shake_active = false
 	screen_shake_elapsed = 0.0
@@ -169,13 +175,14 @@ func _on_ingredient_picked(ingredient: Ingredient) -> void:
 	var expected: Ingredient = current_recipe.ingredients[current_step]
 	if ingredient.id != expected.id:
 		mistake_count += 1
+		pending_stack_landing_tokens.clear()
 		ComboManager.reset_combo()
 		_show_wrong_input_feedback()
 		return
 
-	ComboManager.add_combo()
-	UltimateManager.add_gauge_for_combo(ComboManager.combo)
-	burger_stack.add_ingredient(ingredient)
+	stack_landing_token += 1
+	pending_stack_landing_tokens.append(stack_landing_token)
+	burger_stack.add_ingredient(ingredient, stack_landing_token)
 	current_step += 1
 	status_label.text = "%d / %d" % [current_step, current_recipe.ingredients.size()]
 	recipe_display_stack.set_current_step(current_step)
@@ -183,6 +190,16 @@ func _on_ingredient_picked(ingredient: Ingredient) -> void:
 	if current_step >= current_recipe.ingredients.size():
 		_update_order_progress_dots(current_recipe_index + 1)
 		_finish_current_burger()
+
+
+func _on_stack_ingredient_landed(stack_position: Vector2, token: int) -> void:
+	var token_index: int = pending_stack_landing_tokens.find(token)
+	if token_index < 0:
+		return
+	pending_stack_landing_tokens.remove_at(token_index)
+	ComboManager.add_combo()
+	UltimateManager.add_gauge_for_combo(ComboManager.combo)
+	combo_counter.show_at_stack_position(stack_position)
 
 
 func _finish_current_burger() -> void:
@@ -196,9 +213,7 @@ func _finish_current_burger() -> void:
 	_update_order_progress_dots()
 
 	if current_recipe_index >= recipes.size():
-		_show_result_rank()
-		await get_tree().create_timer(RESULT_RANK_DISPLAY_SECONDS).timeout
-		_hide_result_rank()
+		_play_result_rank_display(round_token)
 		await _exit_customer()
 		_play_customer_attack_and_recover()
 		current_phase = Phase.COMPLETE
@@ -219,13 +234,15 @@ func _setup_order_progress_dots() -> void:
 	order_progress_dots.visible = not recipes.is_empty()
 
 	for i in range(recipes.size()):
-		var dot := Panel.new()
-		dot.custom_minimum_size = ORDER_PROGRESS_DOT_SIZE
-		dot.size = ORDER_PROGRESS_DOT_SIZE
-		dot.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		dot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		order_progress_dots.add_child(dot)
+		var icon := TextureRect.new()
+		icon.custom_minimum_size = ORDER_PROGRESS_ICON_SIZE
+		icon.size = ORDER_PROGRESS_ICON_SIZE
+		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		order_progress_dots.add_child(icon)
 
 	_update_order_progress_dots()
 
@@ -239,16 +256,10 @@ func _clear_order_progress_dots() -> void:
 func _update_order_progress_dots(completed_count: int = -1) -> void:
 	var filled_count := current_recipe_index if completed_count < 0 else completed_count
 	for index in range(order_progress_dots.get_child_count()):
-		var dot := order_progress_dots.get_child(index) as Panel
-		if dot == null:
+		var icon := order_progress_dots.get_child(index) as TextureRect
+		if icon == null:
 			continue
-		var style := StyleBoxFlat.new()
-		style.bg_color = ORDER_PROGRESS_COMPLETE_COLOR if index < filled_count else ORDER_PROGRESS_PENDING_COLOR
-		style.corner_radius_top_left = int(ORDER_PROGRESS_DOT_SIZE.x * 0.5)
-		style.corner_radius_top_right = int(ORDER_PROGRESS_DOT_SIZE.x * 0.5)
-		style.corner_radius_bottom_left = int(ORDER_PROGRESS_DOT_SIZE.x * 0.5)
-		style.corner_radius_bottom_right = int(ORDER_PROGRESS_DOT_SIZE.x * 0.5)
-		dot.add_theme_stylebox_override("panel", style)
+		icon.texture = ORDER_PROGRESS_FILL_TEXTURE if index < filled_count else ORDER_PROGRESS_EMPTY_TEXTURE
 
 
 func _fail_customer() -> void:
@@ -303,6 +314,14 @@ func _show_result_rank() -> void:
 	result_rank_tween = create_tween().set_parallel(true)
 	result_rank_tween.tween_property(result_rank, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	result_rank_tween.tween_property(result_rank, "modulate:a", 1.0, 0.08)
+
+
+func _play_result_rank_display(token: int) -> void:
+	_show_result_rank()
+	await get_tree().create_timer(RESULT_RANK_DISPLAY_SECONDS).timeout
+	if token != round_token:
+		return
+	_hide_result_rank()
 
 
 func _hide_result_rank() -> void:
@@ -460,41 +479,6 @@ func _display_current_recipes() -> void:
 
 
 func _create_customer_sprite(full: bool) -> Node2D:
-	#var root: Node2D = Node2D.new()
-	#root.name = "CustomerSprite"
-#
-	#var body: Polygon2D = Polygon2D.new()
-	#body.name = "Body"
-	#body.polygon = PackedVector2Array([
-		#Vector2(-28, 44),
-		#Vector2(28, 44),
-		#Vector2(22, -10),
-		#Vector2(-22, -10),
-	#])
-	#body.color = Color(0.25, 0.46, 0.82) if not full else Color(0.28, 0.68, 0.38)
-	#root.add_child(body)
-#
-	#var head: Polygon2D = Polygon2D.new()
-	#head.name = "Head"
-	#head.polygon = PackedVector2Array([
-		#Vector2(-22, -8),
-		#Vector2(22, -8),
-		#Vector2(22, -48),
-		#Vector2(-22, -48),
-	#])
-	#head.color = Color(0.95, 0.72, 0.48)
-	#root.add_child(head)
-#
-	#var face: Label = Label.new()
-	#face.name = "Face"
-	#face.text = ":)" if full else ":("
-	#face.position = Vector2(-12, -42)
-	#face.size = Vector2(40, 28)
-	#root.add_child(face)
-	
-
-	#return root
-	
 	var sprite: Sprite2D = Sprite2D.new()
 	sprite.name = "CustomerSprite"
 	sprite.texture = CUSTOMER_FULL_TEXTURE if full else CUSTOMER_HUNGRY_TEXTURE
@@ -502,14 +486,6 @@ func _create_customer_sprite(full: bool) -> Node2D:
 
 
 func _set_customer_full() -> void:
-	#if customer_sprite == null:
-		#return
-	#var body: Polygon2D = customer_sprite.get_node_or_null("Body") as Polygon2D
-	#if body != null:
-		#body.color = Color(0.28, 0.68, 0.38)
-	#var face: Label = customer_sprite.get_node_or_null("Face") as Label
-	#if face != null:
-		#face.text = ":)"
 	var sprite := customer_sprite as Sprite2D
 	if sprite != null:
 		sprite.texture = CUSTOMER_FULL_TEXTURE

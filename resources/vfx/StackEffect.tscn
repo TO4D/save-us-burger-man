@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://cfprmsr5q4vgu"]
+
+[ext_resource type="SpriteFrames" uid="uid://bop6u4k7hsxlw" path="res://resources/vfx/SpriteFrame/stackImpact.tres" id="1_1p3os"]
+
+[node name="StackEffect" type="AnimatedSprite2D" unique_id=1059558295]
+z_index = 10
+texture_filter = 1
+sprite_frames = ExtResource("1_1p3os")
+autoplay = "default"

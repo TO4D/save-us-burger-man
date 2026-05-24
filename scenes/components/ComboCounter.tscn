@@ -1,17 +1,27 @@
 [gd_scene format=3 uid="uid://7coxq8bafj1k"]
 
-[ext_resource type="Script" path="res://scenes/components/ComboCounter.gd" id="1_scl1t"]
+[ext_resource type="Script" uid="uid://cro2fw484baa5" path="res://scenes/components/ComboCounter.gd" id="1_scl1t"]
+[ext_resource type="FontFile" uid="uid://bivsctx4h0jw" path="res://fonts/Jersey25-Regular.ttf" id="2_tm550"]
+[ext_resource type="LabelSettings" uid="uid://bbx0n2c7skyw8" path="res://resources/fonts/ComboLabel.tres" id="3_cpi34"]
 
-[node name="ComboCounter" type="Control"]
+[node name="ComboCounter" type="Control" unique_id=1333201636]
+layout_mode = 3
+anchors_preset = 0
 offset_right = 48.0
 offset_bottom = 22.0
 mouse_filter = 2
 script = ExtResource("1_scl1t")
 
-[node name="ValueLabel" type="Label" parent="."]
-layout_mode = 0
-offset_right = 48.0
-offset_bottom = 22.0
+[node name="ValueLabel" type="Label" parent="." unique_id=677590061]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 0.55)
+theme_override_fonts/font = ExtResource("2_tm550")
 theme_override_font_sizes/font_size = 18
-text = "x0"
+text = "0 Combo"
+label_settings = ExtResource("3_cpi34")
+horizontal_alignment = 2

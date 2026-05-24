@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://dcyr7651s66f" path="res://scenes/components/IngredientSlot.tscn" id="7_slot"]
 [ext_resource type="Script" uid="uid://b20bp6pi5tbgd" path="res://scenes/components/IngredientSlotGrid.gd" id="8_grid"]
 [ext_resource type="Texture2D" uid="uid://c2d1t47najpt0" path="res://assets/sprites/ui/result_good.png" id="12_good"]
+[ext_resource type="FontFile" uid="uid://bivsctx4h0jw" path="res://fonts/Jersey25-Regular.ttf" id="12_l4fm3"]
 [ext_resource type="Texture2D" uid="uid://bkfi5byfv6pqs" path="res://assets/sprites/ui/result_great.png" id="13_great"]
 [ext_resource type="Texture2D" uid="uid://c4ygqskfjim15" path="res://assets/sprites/ui/result_perfect.png" id="14_perfect"]
 
@@ -92,10 +93,10 @@ position = Vector2(90, 168)
 [node name="ColorRect" type="ColorRect" parent="PlayArea/PlateArea" unique_id=1646500549]
 layout_mode = 0
 offset_left = 180.0
-offset_top = 156.0
+offset_top = 152.0
 offset_right = 270.0
 offset_bottom = 172.0
-color = Color(0.29380536, 0.283413, 0.26955554, 1)
+color = Color(0.21279216, 0.20355874, 0.1943241, 1)
 
 [node name="OrderProgressDots" type="HBoxContainer" parent="PlayArea/PlateArea" unique_id=1839407412]
 layout_mode = 1
@@ -104,7 +105,7 @@ anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
-offset_top = 70.0
+offset_top = 66.0
 offset_right = 90.0
 offset_bottom = 86.0
 grow_horizontal = 0
@@ -119,8 +120,8 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -90.0
-offset_top = -176.0
-offset_bottom = -16.0
+offset_top = -180.0
+offset_bottom = -20.0
 grow_horizontal = 0
 grow_vertical = 0
 mouse_filter = 2
@@ -170,17 +171,9 @@ layout_mode = 2
 
 [node name="ComboCounter" parent="." unique_id=1534753254 instance=ExtResource("4_combo")]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -24.0
-offset_top = -140.0
-offset_right = 24.0
-offset_bottom = -118.000046
-grow_horizontal = 2
-grow_vertical = 2
+offset_top = 80.0
+offset_bottom = 101.99996
+pivot_offset = Vector2(24, 11)
 
 [node name="UltimateBell" parent="." unique_id=1684200322 instance=ExtResource("5_bell")]
 visible = false
@@ -198,6 +191,7 @@ offset_top = 455.0
 offset_bottom = 479.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("12_l4fm3")
 theme_override_font_sizes/font_size = 12
 text = "Memorize the recipe"
 horizontal_alignment = 1
@@ -206,15 +200,14 @@ horizontal_alignment = 1
 visible = false
 z_index = 15
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -131.0
-offset_top = -154.0
-offset_right = -46.0
-offset_bottom = -130.0
+anchor_left = 0.335
+anchor_top = 0.551
+anchor_right = 0.335
+anchor_bottom = 0.551
+offset_left = -69.450005
+offset_top = -79.48001
+offset_right = 70.549995
+offset_bottom = -29.480011
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -222,8 +215,11 @@ mouse_filter = 2
 [node name="Good" type="TextureRect" parent="ResultRank" unique_id=454209822]
 visible = false
 layout_mode = 1
-offset_right = 51.0
-offset_bottom = 24.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("12_good")
 expand_mode = 1
@@ -232,8 +228,11 @@ stretch_mode = 5
 [node name="Great" type="TextureRect" parent="ResultRank" unique_id=1211702972]
 visible = false
 layout_mode = 1
-offset_right = 61.0
-offset_bottom = 24.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("13_great")
 expand_mode = 1
@@ -242,8 +241,11 @@ stretch_mode = 5
 [node name="Perfect" type="TextureRect" parent="ResultRank" unique_id=1832580181]
 visible = false
 layout_mode = 1
-offset_right = 83.0
-offset_bottom = 24.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("14_perfect")
 expand_mode = 1

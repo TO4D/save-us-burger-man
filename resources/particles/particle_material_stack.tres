@@ -1,0 +1,23 @@
+[gd_resource type="ParticleProcessMaterial" format=3 uid="uid://bnbygrtvi0ntt"]
+
+[sub_resource type="Curve" id="Curve_ycubc"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -3.0216033, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_83kkq"]
+curve = SubResource("Curve_ycubc")
+
+[resource]
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(80, 1, 1)
+angle_min = 1.0728835e-05
+angle_max = 180.00002
+direction = Vector3(0, 1, 0)
+spread = 0.0
+initial_velocity_min = 80.0
+initial_velocity_max = 100.0
+gravity = Vector3(0, 0, 0)
+damping_min = 90.00001
+damping_max = 100.00001
+alpha_curve = SubResource("CurveTexture_83kkq")
