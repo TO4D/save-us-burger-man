@@ -35,7 +35,7 @@ func _ready() -> void:
 	_default_texture_pressed = texture_pressed
 	_default_texture_hover = texture_hover
 	pressed.connect(_on_pressed)
-	focus_entered.connect(_update_visuals)
+	focus_entered.connect(_on_focus_entered)
 	focus_exited.connect(_update_visuals)
 	_update_visuals()
 
@@ -177,3 +177,10 @@ func _on_pressed() -> void:
 		return
 	show_pressed_visual()
 	ingredient_picked.emit(ingredient)
+
+
+func _on_focus_entered() -> void:
+	_update_visuals()
+	if ingredient == null or not interaction_enabled:
+		return
+	AudioManager.play_sfx(AudioManager.Sfx.INGREDIENT_SLOT_FOCUS)

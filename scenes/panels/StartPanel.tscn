@@ -39,13 +39,14 @@ alignment = 1
 [node name="TitleLabel" type="Label" parent="Center" unique_id=563294702]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "The beast is approaching town"
+text = "Save Us,
+Burger Man"
 horizontal_alignment = 1
 autowrap_mode = 3
 
 [node name="SubtitleLabel" type="Label" parent="Center" unique_id=17944893]
 layout_mode = 2
-text = "Survive for 60 seconds"
+text = "Defeat the Monster"
 horizontal_alignment = 1
 
 [node name="StartButton" type="Button" parent="Center" unique_id=400919795]

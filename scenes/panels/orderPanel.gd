@@ -1,12 +1,14 @@
 extends Control
 
-signal order_completed(success: bool, recovery: float)
+signal order_completed(success: bool)
 
 const EATING_PARTICLE_SCENE = preload("res://resources/particles/Eating.tscn")
 
 const CUSTOMER_HUNGRY_TEXTURE = preload("res://assets/sprites/customers/knight1.png")
 const CUSTOMER_FULL_TEXTURE = preload("res://assets/sprites/customers/knight2.png")
 const BURGER_SERVE_DELAY_SECONDS := 0.35
+const READY_OVERLAY_SECONDS := 2.0
+const GO_OVERLAY_SECONDS := 0.6
 const RESULT_RANK_DISPLAY_SECONDS := 0.55
 const SCREEN_SHAKE_STEP_DURATION := 0.04
 const ORDER_PROGRESS_ICON_SIZE := Vector2(16.0, 16.0)
@@ -21,7 +23,8 @@ var recipes: Array = []
 var current_recipe: Recipe = null
 var current_recipe_index: int = 0
 var current_step: int = 0
-var recovery: float = 0.0
+var damage: float = 0.0
+var knockback: float = 0.0
 var round_token: int = 0
 var customer_sprite: Node2D = null
 var screen_shake_elapsed: float = 0.0
@@ -35,8 +38,9 @@ var mistake_count: int = 0
 var result_rank_tween: Tween = null
 var stack_landing_token: int = 0
 var pending_stack_landing_tokens: Array[int] = []
+var ready_go_active: bool = false
 
-@onready var distance_gauge: DistanceGauge = $DistanceGauge
+@onready var battle_gauge: BattleGauge = $BattleGauge
 @onready var recipe_display_stack: RecipeDisplayStack = $PlayArea/RecipeDisplayStack
 @onready var customer_area: Control = $PlayArea/CustomerArea
 @onready var burger_stack: BurgerStack = $PlayArea/PlateArea/BurgerStack
@@ -50,6 +54,8 @@ var pending_stack_landing_tokens: Array[int] = []
 @onready var blackout_overlay: ColorRect = $BlackoutOverlay
 @onready var blackout_label: Label = $BlackoutOverlay/BlackoutLabel
 @onready var combo_counter: ComboCounter = $ComboCounter
+@onready var ready_go_overlay: ColorRect = $ReadyGoOverlay
+@onready var ready_go_label: Label = $ReadyGoOverlay/Label
 
 
 func _ready() -> void:
@@ -74,11 +80,23 @@ func _process(delta: float) -> void:
 	_play_screen_shake()
 
 
+func _unhandled_input(event: InputEvent) -> void:
+	if not ready_go_active:
+		return
+	if event is not InputEventKey:
+		return
+
+	var key_event := event as InputEventKey
+	if key_event.pressed:
+		get_viewport().set_input_as_handled()
+
+
 func on_show(data: Dictionary = {}) -> void:
 	round_token += 1
 	customer = data.get("customer", {})
 	recipes = customer.get("recipes", [])
-	recovery = customer.get("recovery", 0.0) as float
+	damage = customer.get("damage", 0.0) as float
+	knockback = customer.get("knockback", 0.0) as float
 	if recipes.is_empty():
 		push_error("[OrderPanel] No recipes provided.")
 		return
@@ -96,8 +114,13 @@ func on_show(data: Dictionary = {}) -> void:
 	screen_shake_elapsed = 0.0
 	_setup_order_progress_dots()
 	_on_distance_changed(DistanceManager.distance, DistanceManager.MAX_DISTANCE)
-	distance_gauge.show_customer_queue()
-	_start_customer(round_token)
+	battle_gauge.show_customer_queue(customer.get("variants", []).has("multi"))
+	var token := round_token
+	if data.get("show_ready_go", false):
+		await _run_ready_go_overlay(token)
+		if token != round_token:
+			return
+	_start_customer(token)
 
 
 func on_hide() -> void:
@@ -113,6 +136,10 @@ func on_hide() -> void:
 	pending_stack_landing_tokens.clear()
 	_clear_customer()
 	screen_shake_active = false
+	ready_go_active = false
+	ready_go_overlay.visible = false
+	ingredient_slots.set_process_unhandled_input(true)
+	GameRun.set_start_blocked(false)
 	screen_shake_elapsed = 0.0
 	_reset_screen_shake_position()
 
@@ -162,6 +189,33 @@ func _schedule_blackout(token: int) -> void:
 	blackout_overlay.visible = false
 
 
+func _run_ready_go_overlay(token: int) -> void:
+	ready_go_active = true
+	GameRun.set_start_blocked(true)
+	ingredient_slots.set_process_unhandled_input(false)
+	ingredient_slots.set_interaction_enabled(false)
+	ready_go_overlay.modulate.a = 1.0
+	ready_go_label.scale = Vector2.ONE
+	ready_go_label.text = "Ready..."
+	ready_go_overlay.visible = true
+	await get_tree().create_timer(READY_OVERLAY_SECONDS).timeout
+	if token != round_token:
+		return
+
+	ready_go_label.text = "Go"
+	ready_go_label.scale = Vector2(1.18, 1.18)
+	var tween := create_tween()
+	tween.tween_property(ready_go_label, "scale", Vector2.ONE, GO_OVERLAY_SECONDS * 0.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	await get_tree().create_timer(GO_OVERLAY_SECONDS).timeout
+	if token != round_token:
+		return
+
+	ready_go_overlay.visible = false
+	ready_go_active = false
+	ingredient_slots.set_process_unhandled_input(true)
+	GameRun.set_start_blocked(false)
+
+
 func _setup_ingredient_slots(enabled: bool) -> void:
 	var stage: int = customer.get("stage", 1) as int
 	var ingredients: Array[Ingredient] = GameState.get_slot_ingredients(stage)
@@ -169,7 +223,7 @@ func _setup_ingredient_slots(enabled: bool) -> void:
 
 
 func _on_ingredient_picked(ingredient: Ingredient) -> void:
-	if current_phase != Phase.PLAYING or current_recipe == null:
+	if ready_go_active or current_phase != Phase.PLAYING or current_recipe == null:
 		return
 
 	var expected: Ingredient = current_recipe.ingredients[current_step]
@@ -215,9 +269,9 @@ func _finish_current_burger() -> void:
 	if current_recipe_index >= recipes.size():
 		_play_result_rank_display(round_token)
 		await _exit_customer()
-		_play_customer_attack_and_recover()
+		_play_customer_attack()
 		current_phase = Phase.COMPLETE
-		order_completed.emit(true, 0.0)
+		order_completed.emit(true)
 		return
 
 	current_recipe = recipes[current_recipe_index]
@@ -266,15 +320,19 @@ func _fail_customer() -> void:
 	current_phase = Phase.COMPLETE
 	_disable_slots()
 	status_label.text = "Failed"
-	order_completed.emit(false, 0.0)
+	order_completed.emit(false)
 
 
-func _play_customer_attack_and_recover() -> void:
-	var recover_distance := func() -> void:
-		DistanceManager.recover(recovery)
-		distance_gauge.refresh_monster_icon_position_immediately()
-	distance_gauge.customer_attack_hit.connect(recover_distance, CONNECT_ONE_SHOT)
-	distance_gauge.play_customer_attack(false)
+func _play_customer_attack() -> void:
+	var attack_damage := damage
+	var attack_knockback := knockback
+	var hit_monster := func() -> void:
+		MonsterManager.apply_damage(attack_damage)
+		DistanceManager.recover(attack_knockback)
+		battle_gauge.play_damage_number(attack_damage)
+		battle_gauge.refresh_monster_icon_position_immediately()
+	battle_gauge.customer_attack_hit.connect(hit_monster, CONNECT_ONE_SHOT)
+	battle_gauge.play_customer_attack(false)
 
 
 func _show_wrong_input_feedback() -> void:
@@ -353,11 +411,11 @@ func _on_ultimate_triggered(recovery_amount: float, freeze_duration: float) -> v
 		return
 
 	status_label.text = "Ultimate! +%d / %.1fs freeze" % [int(round(recovery_amount)), freeze_duration]
-	distance_gauge.play_ultimate_barrage()
+	battle_gauge.play_ultimate_barrage()
 
 
 func _on_distance_changed(value: float, _max_value: float) -> void:
-	var distance_meters := value * distance_gauge.distance_display_scale
+	var distance_meters := value * battle_gauge.distance_display_scale
 	var should_shake := false
 	var next_interval := 0.0
 	var next_offset := 0.0

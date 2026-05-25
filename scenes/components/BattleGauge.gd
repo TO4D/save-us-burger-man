@@ -1,34 +1,35 @@
 extends Control
-class_name DistanceGauge
+class_name BattleGauge
 
 signal customer_attack_hit
 
-@export var attacker_texture: Texture2D
+const CUSTOMER_ATTACK_START_POSITION := Vector2(52.0, 65.0)
+const SINGLE_CUSTOMER_TEXTURE := preload("res://assets/sprites/customers/16soldier.png")
+const MULTI_CUSTOMER_TEXTURE := preload("res://assets/sprites/customers/16knight.png")
+
 @export var distance_display_scale: float = 10.0
 @export var monster_icon_update_interval: float = 1.0
 
 @onready var bar: ProgressBar = $Bar
 @onready var monster_icon: Sprite2D = $MonsterIcon
-@onready var current_customer_icon: Sprite2D = $CurrentCustomerIcon
-@onready var queue_icon_a: Sprite2D = $QueueIconA
-@onready var queue_icon_b: Sprite2D = $QueueIconB
-@onready var time_label: Label = $TimeLabel
+#@onready var time_label: Label = $TimeLabel
 @onready var stage_label: Label = $StageLabel
-@onready var distance_label: Label = $DistanceLabel
+@onready var health_label: Label = $DistanceLabel
 @onready var freeze_overlay: ColorRect = $FreezeOverlay
 
-var current_customer_home: Vector2 = Vector2.ZERO
 var pending_monster_icon_x: float = 310.0
 var monster_icon_update_elapsed: float = 0.0
+var customer_texture: Texture2D = SINGLE_CUSTOMER_TEXTURE
 
 
 func _ready() -> void:
-	current_customer_home = current_customer_icon.position
 	DistanceManager.distance_changed.connect(_on_distance_changed)
 	DistanceManager.freeze_changed.connect(_on_freeze_changed)
-	GameRun.time_changed.connect(_on_time_changed)
+	MonsterManager.health_changed.connect(_on_monster_health_changed)
+	#GameRun.time_changed.connect(_on_time_changed)
 	GameRun.stage_changed.connect(_on_stage_changed)
 	_on_distance_changed(DistanceManager.distance, DistanceManager.MAX_DISTANCE)
+	_on_monster_health_changed(MonsterManager.health, MonsterManager.MAX_HEALTH)
 	_apply_monster_icon_position()
 	_on_freeze_changed(false, 0.0)
 
@@ -42,33 +43,17 @@ func _process(delta: float) -> void:
 	_apply_monster_icon_position()
 
 
-func show_customer_queue() -> void:
-	queue_icon_a.visible = true
-	queue_icon_b.visible = true
-	current_customer_icon.visible = true
-	current_customer_icon.position = current_customer_home
-	current_customer_icon.modulate = Color.WHITE
-	current_customer_icon.scale = Vector2.ONE
+func show_customer_queue(is_multi_customer: bool = false) -> void:
+	customer_texture = MULTI_CUSTOMER_TEXTURE if is_multi_customer else SINGLE_CUSTOMER_TEXTURE
 
 
 func play_customer_attack(restore_queue_at_end: bool = true) -> void:
-	var attacker: Sprite2D = current_customer_icon.duplicate() as Sprite2D
-	if attacker == null:
-		push_error("[DistanceGauge] CurrentCustomerIcon must be a Sprite2D.")
-		return
-		
-	if attacker_texture != null:
-		attacker.texture = attacker_texture
-
+	var attacker := _create_customer_icon()
 	add_child(attacker)
-	attacker.global_position = current_customer_icon.global_position
-	attacker.visible = true
-	current_customer_icon.visible = false
 
-	var target_position: Vector2 = monster_icon.global_position + Vector2(6.0, 0.0)
-	var tween: Tween = create_tween().set_parallel(true)
+	var target_position := Vector2(monster_icon.global_position.x + 6.0, attacker.global_position.y)
+	var tween: Tween = create_tween()
 	tween.tween_property(attacker, "global_position", target_position, 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tween.tween_property(attacker, "scale", Vector2(1.5, 1.5), 0.18)
 	await tween.finished
 	customer_attack_hit.emit()
 
@@ -90,6 +75,27 @@ func play_ultimate_barrage(projectile_count: int = 6) -> void:
 		await get_tree().create_timer(0.06).timeout
 
 
+func play_damage_number(amount: float) -> void:
+	var label := Label.new()
+	label.text = "-%d" % roundi(amount)
+	label.add_theme_font_size_override("font_size", 14)
+	label.add_theme_color_override("font_color", Color(1.0, 0.18, 0.08, 1.0))
+	label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.75))
+	label.add_theme_constant_override("shadow_offset_x", 1)
+	label.add_theme_constant_override("shadow_offset_y", 1)
+	label.position = monster_icon.position + Vector2(10.0, -20.0)
+	label.scale = Vector2(1.25, 1.25)
+	label.z_index = 20
+	add_child(label)
+
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(label, "position", label.position + Vector2(randf_range(-4.0, 8.0), -24.0), 0.45).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(label, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(label, "modulate:a", 0.0, 0.45).set_delay(0.12)
+	await tween.finished
+	label.queue_free()
+
+
 func _bounce_attacker_away(attacker: Sprite2D) -> void:
 	var elapsed: float = 0.0
 	var duration: float = 0.75
@@ -107,12 +113,25 @@ func _bounce_attacker_away(attacker: Sprite2D) -> void:
 		await get_tree().process_frame
 
 
+func _create_customer_icon() -> Sprite2D:
+	var icon := Sprite2D.new()
+	icon.texture = customer_texture
+	icon.position = CUSTOMER_ATTACK_START_POSITION
+	icon.modulate = Color.WHITE
+	icon.scale = Vector2.ONE
+	return icon
+
+
 func _on_distance_changed(value: float, max_value: float) -> void:
 	var ratio: float = value / max_value if max_value > 0.0 else 0.0
-	bar.value = ratio * 100.0
-	distance_label.text = "%dm" % roundi(value * distance_display_scale)
-	bar.modulate = Color(1.0, 0.25, 0.2) if ratio <= 0.3 else Color.WHITE
 	pending_monster_icon_x = lerpf(48.0, 250.0, ratio)
+
+
+func _on_monster_health_changed(value: float, max_value: float) -> void:
+	var ratio: float = value / max_value if max_value > 0.0 else 0.0
+	bar.value = ratio * 100.0
+	health_label.text = "HP %d/%d" % [ceili(value), ceili(max_value)]
+	bar.modulate = Color(1.0, 0.25, 0.2) if ratio <= 0.3 else Color.WHITE
 
 
 func _apply_monster_icon_position() -> void:
@@ -124,8 +143,8 @@ func refresh_monster_icon_position_immediately() -> void:
 	_apply_monster_icon_position()
 
 
-func _on_time_changed(remaining: float) -> void:
-	time_label.text = "남은 시간: %02d초" % int(ceil(remaining))
+#func _on_time_changed(elapsed: float) -> void:
+	#time_label.text = "TIME %02d" % int(floor(elapsed))
 
 
 func _on_stage_changed(stage: int) -> void:
@@ -136,14 +155,14 @@ func _on_freeze_changed(active: bool, remaining: float) -> void:
 	freeze_overlay.visible = active
 	freeze_overlay.modulate.a = 0.22 if active else 0.0
 	if active:
-		stage_label.text = "FREEZE %.1f" % remaining
+		stage_label.text = "STUN %.1f" % remaining
 	else:
 		stage_label.text = "STAGE %d" % GameRun.current_stage
 
 
 func _spawn_ultimate_projectile(origin: Vector2) -> void:
 	var projectile := Sprite2D.new()
-	projectile.texture = attacker_texture
+	projectile.texture = customer_texture
 	projectile.position = origin
 	projectile.scale = Vector2(0.4, 0.4)
 	add_child(projectile)

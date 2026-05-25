@@ -1,44 +1,45 @@
-[gd_scene format=3 uid="uid://bd0hxdjgb8p2u"]
+[gd_scene format=3 uid="uid://f81sdvkvyogq"]
 
-[ext_resource type="Script" uid="uid://cfoee8j2l2bpe" path="res://scenes/components/DistanceGauge.gd" id="1"]
+[ext_resource type="Script" uid="uid://cfoee8j2l2bpe" path="res://scenes/components/BattleGauge.gd" id="1_g2r14"]
+[ext_resource type="Texture2D" uid="uid://bsr7r68ii64jw" path="res://assets/sprites/store/store_new.png" id="3_g2r14"]
 [ext_resource type="Texture2D" uid="uid://hvspgdua73v5" path="res://assets/sprites/distance/distance_background.png" id="3_xmndb"]
-[ext_resource type="Texture2D" uid="uid://kcsd8bxiye07" path="res://assets/sprites/distance/distance_shop.png" id="4_lkd7u"]
 [ext_resource type="Texture2D" uid="uid://be4osif2byu2k" path="res://assets/sprites/distance/distance_evilmonster.png" id="5_f50tn"]
-[ext_resource type="Texture2D" uid="uid://bb50shlic0cs5" path="res://assets/sprites/distance/distance_warrior.png" id="6_0flot"]
 
-[node name="DistanceGauge" type="Control" unique_id=1309183552]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g2r14"]
+bg_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+corner_detail = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iod1h"]
+bg_color = Color(0.9372549, 0.28627452, 0.28627452, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[node name="BattleGauge" type="Control" unique_id=1309183552]
 custom_minimum_size = Vector2(270, 90)
 layout_mode = 3
 anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 90.0
 grow_horizontal = 2
-script = ExtResource("1")
-attacker_texture = ExtResource("6_0flot")
+script = ExtResource("1_g2r14")
 
 [node name="Background" type="Sprite2D" parent="." unique_id=74392598]
 texture = ExtResource("3_xmndb")
 centered = false
 
 [node name="ShopIcon" type="Sprite2D" parent="." unique_id=461974474]
-position = Vector2(36, 69)
-texture = ExtResource("4_lkd7u")
+position = Vector2(35, 58)
+texture = ExtResource("3_g2r14")
 
 [node name="MonsterIcon" type="Sprite2D" parent="." unique_id=7079341]
-position = Vector2(250, 54)
+position = Vector2(250, 51)
 texture = ExtResource("5_f50tn")
-
-[node name="QueueIconB" type="Sprite2D" parent="." unique_id=480824845]
-position = Vector2(15, 71)
-texture = ExtResource("6_0flot")
-
-[node name="QueueIconA" type="Sprite2D" parent="." unique_id=305898871]
-position = Vector2(22, 71)
-texture = ExtResource("6_0flot")
-
-[node name="CurrentCustomerIcon" type="Sprite2D" parent="." unique_id=46443876]
-position = Vector2(50, 71)
-texture = ExtResource("6_0flot")
 
 [node name="Bar" type="ProgressBar" parent="." unique_id=1938841943]
 layout_mode = 1
@@ -47,12 +48,15 @@ anchor_right = 1.0
 offset_left = 10.0
 offset_top = 8.0
 offset_right = -10.0
-offset_bottom = 18.0
+offset_bottom = 23.0
 grow_horizontal = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_g2r14")
+theme_override_styles/fill = SubResource("StyleBoxFlat_iod1h")
 value = 100.0
 show_percentage = false
 
 [node name="TimeLabel" type="Label" parent="." unique_id=1714281882]
+visible = false
 layout_mode = 1
 offset_left = 8.0
 offset_top = 21.0
@@ -60,8 +64,7 @@ offset_right = 92.0
 offset_bottom = 59.0
 theme_override_colors/font_color = Color(0.71, 0.61391336, 0.5041, 1)
 theme_override_font_sizes/font_size = 10
-text = "남은 시간: 60초
-"
+text = "TIME 00"
 
 [node name="StageLabel" type="Label" parent="." unique_id=917639190]
 visible = false
@@ -88,13 +91,13 @@ color = Color(0.4, 0.85, 1, 0.18)
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_left = 20.0
-offset_top = 4.0
-offset_right = -20.0
-offset_bottom = 21.0
+offset_left = 19.0
+offset_top = 7.0
+offset_right = -21.0
+offset_bottom = 24.0
 grow_horizontal = 2
-theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_color = Color(0.099985994, 0.099985994, 0.099985994, 1)
 theme_override_font_sizes/font_size = 10
-text = "1000m"
+text = "HP 300/300"
 horizontal_alignment = 1
 vertical_alignment = 1

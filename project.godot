@@ -21,9 +21,11 @@ config/icon="res://icon.svg"
 GameState="*res://scripts/autoload/GameState.gd"
 PanelManager="*res://scripts/autoload/PanelManager.gd"
 DistanceManager="*res://scripts/autoload/DistanceManager.gd"
+MonsterManager="*res://scripts/autoload/MonsterManager.gd"
 GameRun="*res://scripts/autoload/GameRun.gd"
 ComboManager="*res://scripts/autoload/ComboManager.gd"
 UltimateManager="*res://scripts/autoload/UltimateManager.gd"
+AudioManager="*res://scripts/autoload/AudioManager.gd"
 
 [display]
 

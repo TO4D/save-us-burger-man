@@ -5,6 +5,9 @@ signal game_over
 signal freeze_changed(active: bool, remaining: float)
 
 const MAX_DISTANCE := 100.0
+const MAX_STAGE := 10
+const MIN_DECAY_PER_SECOND := 1.75
+const MAX_DECAY_PER_SECOND := 4.75
 
 var distance := MAX_DISTANCE
 var decay_per_second := 1.0
@@ -44,7 +47,9 @@ func stop() -> void:
 
 
 func set_stage(stage: int) -> void:
-	decay_per_second = 1.0 + float(clamp(stage, 1, 5)) * 0.75
+	var clamped_stage := clampi(stage, 1, MAX_STAGE)
+	var stage_ratio := float(clamped_stage - 1) / float(MAX_STAGE - 1)
+	decay_per_second = lerpf(MIN_DECAY_PER_SECOND, MAX_DECAY_PER_SECOND, stage_ratio)
 
 
 func recover(amount: float) -> void:

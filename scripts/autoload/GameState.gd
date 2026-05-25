@@ -21,9 +21,11 @@ const STAGE_INGREDIENT_COUNTS := {
 	3: 7,
 	4: 7,
 	5: 7,
-	#3: 8,
-	#4: 12,
-	#5: 15,
+	6: 7,
+	7: 7,
+	8: 7,
+	9: 7,
+	10: 7,
 }
 
 const PLACEHOLDER_INGREDIENTS := [

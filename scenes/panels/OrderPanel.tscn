@@ -3,9 +3,9 @@
 [ext_resource type="Script" uid="uid://ybh8i7vrjpp3" path="res://scenes/panels/orderPanel.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://bxs2t76pgylko" path="res://scenes/components/BurgerStack.tscn" id="2"]
 [ext_resource type="Texture2D" uid="uid://d0r1i1ea72pn2" path="res://assets/sprites/cook/cook_background.png" id="2_edvyg"]
-[ext_resource type="PackedScene" uid="uid://bd0hxdjgb8p2u" path="res://scenes/components/DistanceGauge.tscn" id="3"]
 [ext_resource type="Texture2D" uid="uid://baf1m3n16xgxd" path="res://assets/sprites/cook/cook_slot_background.png" id="3_aryf5"]
 [ext_resource type="PackedScene" uid="uid://7coxq8bafj1k" path="res://scenes/components/ComboCounter.tscn" id="4_combo"]
+[ext_resource type="PackedScene" uid="uid://f81sdvkvyogq" path="res://scenes/components/BattleGauge.tscn" id="4_l4fm3"]
 [ext_resource type="PackedScene" uid="uid://dwkpv5wbo3tqm" path="res://scenes/components/UltimateBell.tscn" id="5_bell"]
 [ext_resource type="Texture2D" uid="uid://j6p63de0a6w7" path="res://assets/sprites/cook/cook_doma.png" id="5_ja0vj"]
 [ext_resource type="Script" uid="uid://bkg1316f80lh8" path="res://scenes/components/RecipeDisplayStack.gd" id="6_stack"]
@@ -43,7 +43,7 @@ centered = false
 texture = ExtResource("3_aryf5")
 centered = false
 
-[node name="DistanceGauge" parent="." unique_id=1635089826 instance=ExtResource("3")]
+[node name="BattleGauge" parent="." unique_id=1309183552 instance=ExtResource("4_l4fm3")]
 layout_mode = 1
 
 [node name="PlayArea" type="Control" parent="." unique_id=1325333956]
@@ -278,5 +278,36 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 30
 text = "BLACKOUT!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ReadyGoOverlay" type="ColorRect" parent="." unique_id=100287123]
+visible = false
+z_index = 30
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.4)
+
+[node name="Label" type="Label" parent="ReadyGoOverlay" unique_id=836220494]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -48.0
+offset_right = 160.0
+offset_bottom = 48.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 42
+text = "Ready..."
 horizontal_alignment = 1
 vertical_alignment = 1

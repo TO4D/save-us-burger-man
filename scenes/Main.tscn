@@ -12,8 +12,6 @@
 
 [node name="Main" type="Node2D" unique_id=1284514419]
 script = ExtResource("1")
-skip_intro_cutscene = true
-skip_start_overlay = true
 
 [node name="PanelLayer" type="CanvasLayer" parent="." unique_id=1261506663]
 
@@ -27,31 +25,3 @@ cutscene_images = Array[Texture2D]([ExtResource("4_q8u5g"), ExtResource("5_lhr70
 [node name="GameOverPanel" parent="PanelLayer" unique_id=1639389488 instance=ExtResource("5")]
 
 [node name="VictoryPanel" parent="PanelLayer" unique_id=1262721713 instance=ExtResource("6")]
-
-[node name="StartOverlay" type="ColorRect" parent="PanelLayer" unique_id=14120114]
-visible = false
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(0, 0, 0, 0.4)
-
-[node name="Label" type="Label" parent="PanelLayer/StartOverlay" unique_id=1998772821]
-layout_mode = 0
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -160.0
-offset_top = -48.0
-offset_right = 160.0
-offset_bottom = 48.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 42
-text = "Ready"
-horizontal_alignment = 1
-vertical_alignment = 1

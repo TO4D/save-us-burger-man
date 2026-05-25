@@ -29,7 +29,7 @@ static func generate_for_stage(stage: int) -> Recipe:
 
 
 static func _get_middle_length(stage: int) -> int:
-	match clamp(stage, 1, 5):
+	match clamp(stage, 1, 10):
 		1:
 			return 2
 		2:
@@ -38,8 +38,18 @@ static func _get_middle_length(stage: int) -> int:
 			return 3
 		4:
 			return randi_range(4, 8)
-		_:
+		5:
 			return 4
+		6:
+			return randi_range(4, 6)
+		7:
+			return 5
+		8:
+			return randi_range(5, 7)
+		9:
+			return 6
+		_:
+			return randi_range(6, 8)
 
 
 static func _find_ingredient(pool: Array[Ingredient], id: String) -> Ingredient:

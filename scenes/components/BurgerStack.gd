@@ -37,6 +37,7 @@ func add_ingredient(ing: Ingredient, token: int = 0) -> void:
 	stacked_ingredients.append(ing)
 
 func _emit_ingredient_landed(stack_global_position: Vector2, token: int) -> void:
+	AudioManager.play_sfx(AudioManager.Sfx.INGREDIENT_STACK)
 	ingredient_landed.emit(stack_global_position, token)
 
 func _spawn_stack_effect(local_position: Vector2) -> void:
