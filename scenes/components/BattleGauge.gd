@@ -14,7 +14,6 @@ const MULTI_CUSTOMER_TEXTURE := preload("res://assets/sprites/customers/16knight
 @onready var monster_icon: Sprite2D = $MonsterIcon
 #@onready var time_label: Label = $TimeLabel
 @onready var stage_label: Label = $StageLabel
-@onready var health_label: Label = $DistanceLabel
 @onready var freeze_overlay: ColorRect = $FreezeOverlay
 
 var pending_monster_icon_x: float = 310.0
@@ -75,27 +74,6 @@ func play_ultimate_barrage(projectile_count: int = 6) -> void:
 		await get_tree().create_timer(0.06).timeout
 
 
-func play_damage_number(amount: float) -> void:
-	var label := Label.new()
-	label.text = "-%d" % roundi(amount)
-	label.add_theme_font_size_override("font_size", 14)
-	label.add_theme_color_override("font_color", Color(1.0, 0.18, 0.08, 1.0))
-	label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.75))
-	label.add_theme_constant_override("shadow_offset_x", 1)
-	label.add_theme_constant_override("shadow_offset_y", 1)
-	label.position = monster_icon.position + Vector2(10.0, -20.0)
-	label.scale = Vector2(1.25, 1.25)
-	label.z_index = 20
-	add_child(label)
-
-	var tween := create_tween().set_parallel(true)
-	tween.tween_property(label, "position", label.position + Vector2(randf_range(-4.0, 8.0), -24.0), 0.45).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(label, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tween.tween_property(label, "modulate:a", 0.0, 0.45).set_delay(0.12)
-	await tween.finished
-	label.queue_free()
-
-
 func _bounce_attacker_away(attacker: Sprite2D) -> void:
 	var elapsed: float = 0.0
 	var duration: float = 0.75
@@ -130,8 +108,6 @@ func _on_distance_changed(value: float, max_value: float) -> void:
 func _on_monster_health_changed(value: float, max_value: float) -> void:
 	var ratio: float = value / max_value if max_value > 0.0 else 0.0
 	bar.value = ratio * 100.0
-	health_label.text = "HP %d/%d" % [ceili(value), ceili(max_value)]
-	bar.modulate = Color(1.0, 0.25, 0.2) if ratio <= 0.3 else Color.WHITE
 
 
 func _apply_monster_icon_position() -> void:

@@ -6,9 +6,12 @@
 
 [node name="ComboCounter" type="Control" unique_id=1333201636]
 layout_mode = 3
-anchors_preset = 0
-offset_right = 48.0
+anchor_left = 0.66700006
+anchor_right = 0.66700006
+offset_left = -180.09001
+offset_right = -0.0900116
 offset_bottom = 22.0
+pivot_offset = Vector2(180, 0)
 mouse_filter = 2
 script = ExtResource("1_scl1t")
 

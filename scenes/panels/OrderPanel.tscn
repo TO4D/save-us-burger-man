@@ -11,9 +11,8 @@
 [ext_resource type="Script" uid="uid://bkg1316f80lh8" path="res://scenes/components/RecipeDisplayStack.gd" id="6_stack"]
 [ext_resource type="PackedScene" uid="uid://dcyr7651s66f" path="res://scenes/components/IngredientSlot.tscn" id="7_slot"]
 [ext_resource type="Script" uid="uid://b20bp6pi5tbgd" path="res://scenes/components/IngredientSlotGrid.gd" id="8_grid"]
-[ext_resource type="Texture2D" uid="uid://c2d1t47najpt0" path="res://assets/sprites/ui/result_good.png" id="12_good"]
+[ext_resource type="PackedScene" uid="uid://cx4wtpu6m3qdr" path="res://scenes/components/MultiOrder.tscn" id="9_multi"]
 [ext_resource type="FontFile" uid="uid://bivsctx4h0jw" path="res://fonts/Jersey25-Regular.ttf" id="12_l4fm3"]
-[ext_resource type="Texture2D" uid="uid://bkfi5byfv6pqs" path="res://assets/sprites/ui/result_great.png" id="13_great"]
 [ext_resource type="Texture2D" uid="uid://c4ygqskfjim15" path="res://assets/sprites/ui/result_perfect.png" id="14_perfect"]
 
 [node name="OrderPanel" type="Control" unique_id=890599604]
@@ -171,9 +170,14 @@ layout_mode = 2
 
 [node name="ComboCounter" parent="." unique_id=1534753254 instance=ExtResource("4_combo")]
 layout_mode = 1
-offset_top = 80.0
-offset_bottom = 101.99996
-pivot_offset = Vector2(24, 11)
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -183.0
+offset_top = 89.0
+offset_right = -3.0
+offset_bottom = 117.0
+grow_horizontal = 0
 
 [node name="UltimateBell" parent="." unique_id=1684200322 instance=ExtResource("5_bell")]
 visible = false
@@ -211,32 +215,6 @@ offset_bottom = -29.480011
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-
-[node name="Good" type="TextureRect" parent="ResultRank" unique_id=454209822]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-texture = ExtResource("12_good")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Great" type="TextureRect" parent="ResultRank" unique_id=1211702972]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-texture = ExtResource("13_great")
-expand_mode = 1
-stretch_mode = 5
 
 [node name="Perfect" type="TextureRect" parent="ResultRank" unique_id=1832580181]
 visible = false
@@ -311,3 +289,7 @@ theme_override_font_sizes/font_size = 42
 text = "Ready..."
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="MultiOrder" parent="." unique_id=1478787284 instance=ExtResource("9_multi")]
+visible = false
+position = Vector2(139, 145)

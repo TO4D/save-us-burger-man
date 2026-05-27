@@ -4,7 +4,7 @@
 
 [resource]
 font = ExtResource("1_ipoxu")
-font_size = 20
+font_size = 42
 font_color = Color(1, 0.74509805, 0.19215687, 1)
 outline_size = 1
 outline_color = Color(0.38039216, 0.2784314, 0.05882353, 1)

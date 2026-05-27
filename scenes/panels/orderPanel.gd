@@ -48,12 +48,11 @@ var ready_go_active: bool = false
 @onready var ingredient_slots: IngredientSlotGrid = $IngredientSlots
 @onready var status_label: Label = $StatusLabel
 @onready var result_rank: Control = $ResultRank
-@onready var result_good: TextureRect = $ResultRank/Good
-@onready var result_great: TextureRect = $ResultRank/Great
 @onready var result_perfect: TextureRect = $ResultRank/Perfect
 @onready var blackout_overlay: ColorRect = $BlackoutOverlay
 @onready var blackout_label: Label = $BlackoutOverlay/BlackoutLabel
 @onready var combo_counter: ComboCounter = $ComboCounter
+@onready var multi_order: MultiOrder = $MultiOrder
 @onready var ready_go_overlay: ColorRect = $ReadyGoOverlay
 @onready var ready_go_label: Label = $ReadyGoOverlay/Label
 
@@ -97,6 +96,7 @@ func on_show(data: Dictionary = {}) -> void:
 	recipes = customer.get("recipes", [])
 	damage = customer.get("damage", 0.0) as float
 	knockback = customer.get("knockback", 0.0) as float
+	multi_order.hide_order_count()
 	if recipes.is_empty():
 		push_error("[OrderPanel] No recipes provided.")
 		return
@@ -127,6 +127,7 @@ func on_hide() -> void:
 	round_token += 1
 	current_phase = Phase.IDLE
 	blackout_overlay.visible = false
+	multi_order.hide_order_count()
 	_hide_result_rank()
 	recipe_display_stack.clear_recipes()
 	_clear_order_progress_dots()
@@ -159,6 +160,7 @@ func _start_customer(token: int) -> void:
 	await tween.finished
 	if token != round_token:
 		return
+	multi_order.show_order_count(recipes.size())
 	_start_play(token)
 
 func _start_play(token: int) -> void:
@@ -246,14 +248,14 @@ func _on_ingredient_picked(ingredient: Ingredient) -> void:
 		_finish_current_burger()
 
 
-func _on_stack_ingredient_landed(stack_position: Vector2, token: int) -> void:
+func _on_stack_ingredient_landed(_stack_position: Vector2, token: int) -> void:
 	var token_index: int = pending_stack_landing_tokens.find(token)
 	if token_index < 0:
 		return
 	pending_stack_landing_tokens.remove_at(token_index)
 	ComboManager.add_combo()
 	UltimateManager.add_gauge_for_combo(ComboManager.combo)
-	combo_counter.show_at_stack_position(stack_position)
+	combo_counter.show_at_fixed_position()
 
 
 func _finish_current_burger() -> void:
@@ -329,7 +331,6 @@ func _play_customer_attack() -> void:
 	var hit_monster := func() -> void:
 		MonsterManager.apply_damage(attack_damage)
 		DistanceManager.recover(attack_knockback)
-		battle_gauge.play_damage_number(attack_damage)
 		battle_gauge.refresh_monster_icon_position_immediately()
 	battle_gauge.customer_attack_hit.connect(hit_monster, CONNECT_ONE_SHOT)
 	battle_gauge.play_customer_attack(false)
@@ -358,9 +359,10 @@ func _flash_wrong_input() -> void:
 
 
 func _show_result_rank() -> void:
-	_hide_result_rank_images()
-	var target := _get_result_rank_texture()
-	target.visible = true
+	if mistake_count > 0:
+		return
+
+	result_perfect.visible = true
 
 	if result_rank_tween != null and result_rank_tween.is_valid():
 		result_rank_tween.kill()
@@ -375,6 +377,9 @@ func _show_result_rank() -> void:
 
 
 func _play_result_rank_display(token: int) -> void:
+	if mistake_count > 0:
+		return
+
 	_show_result_rank()
 	await get_tree().create_timer(RESULT_RANK_DISPLAY_SECONDS).timeout
 	if token != round_token:
@@ -393,17 +398,7 @@ func _hide_result_rank() -> void:
 
 
 func _hide_result_rank_images() -> void:
-	result_good.visible = false
-	result_great.visible = false
 	result_perfect.visible = false
-
-
-func _get_result_rank_texture() -> TextureRect:
-	if mistake_count == 0:
-		return result_perfect
-	if mistake_count <= 3:
-		return result_great
-	return result_good
 
 
 func _on_ultimate_triggered(recovery_amount: float, freeze_duration: float) -> void:

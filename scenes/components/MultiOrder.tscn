@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://cx4wtpu6m3qdr"]
+
+[ext_resource type="Script" path="res://scenes/components/MultiOrder.gd" id="1_multi"]
+[ext_resource type="Texture2D" uid="uid://cfhdnb8bl1xaj" path="res://assets/sprites/ui/message_buble.png" id="2_bubble"]
+[ext_resource type="Texture2D" uid="uid://76c4ewjj0sgk" path="res://assets/sprites/ui/order_icon.1.png" id="3_icon"]
+[ext_resource type="FontFile" uid="uid://bivsctx4h0jw" path="res://fonts/Jersey25-Regular.ttf" id="4_font"]
+
+[node name="MultiOrder" type="Sprite2D" unique_id=885601769]
+visible = false
+texture = ExtResource("2_bubble")
+script = ExtResource("1_multi")
+
+[node name="Icon" type="Sprite2D" parent="." unique_id=1559345998]
+position = Vector2(-8, -1)
+texture = ExtResource("3_icon")
+
+[node name="Count" type="Label" parent="." unique_id=35454341]
+offset_left = -1.0
+offset_top = -9.0
+offset_right = 17.0
+offset_bottom = 8.0
+theme_override_colors/font_color = Color(0.08468992, 0.08468992, 0.08468992, 1)
+theme_override_fonts/font = ExtResource("4_font")
+text = "x2"
