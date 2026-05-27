@@ -12,6 +12,8 @@
 
 [node name="Main" type="Node2D" unique_id=1284514419]
 script = ExtResource("1")
+skip_intro_cutscene = true
+skip_start_overlay = true
 
 [node name="PanelLayer" type="CanvasLayer" parent="." unique_id=1261506663]
 

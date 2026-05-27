@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="BurgerWhat"
+config/name="Save Us, BurgerMan"
 run/main_scene="uid://fum35x6wo2a6"
 config/quit_on_go_back=false
 config/features=PackedStringArray("4.6", "GL Compatibility")
@@ -21,11 +21,11 @@ config/icon="res://icon.svg"
 GameState="*res://scripts/autoload/GameState.gd"
 PanelManager="*res://scripts/autoload/PanelManager.gd"
 DistanceManager="*res://scripts/autoload/DistanceManager.gd"
-MonsterManager="*res://scripts/autoload/MonsterManager.gd"
 GameRun="*res://scripts/autoload/GameRun.gd"
 ComboManager="*res://scripts/autoload/ComboManager.gd"
 UltimateManager="*res://scripts/autoload/UltimateManager.gd"
 AudioManager="*res://scripts/autoload/AudioManager.gd"
+MonsterManager="*res://scripts/autoload/MonsterManager.gd"
 
 [display]
 
