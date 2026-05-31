@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d4hjtbohtuymd"
-path="res://.godot/imported/cheese.png-93deb2bad28a897428c33728c3dd413e.ctex"
+uid="uid://b62o1q7o1ii1w"
+path="res://.godot/imported/slot_bacon1.png-858f41ea373d01160f74c93711d3bc73.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/ingredients/cheese.png"
-dest_files=["res://.godot/imported/cheese.png-93deb2bad28a897428c33728c3dd413e.ctex"]
+source_file="res://assets/sprites/ingredients/slots/slot_bacon1.png"
+dest_files=["res://.godot/imported/slot_bacon1.png-858f41ea373d01160f74c93711d3bc73.ctex"]
 
 [params]
 

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cvxjv7k40fn34" path="res://scenes/components/RecipePreview.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://dbf786n33o8at" path="res://assets/sprites/cook/cook_recipe.png" id="2_lr08r"]
-[ext_resource type="Texture2D" uid="uid://c3ipai8s45adi" path="res://assets/sprites/ui/result_complete_2.png" id="3_6fg68"]
+[ext_resource type="Texture2D" uid="uid://bhabav8fkl6in" path="res://assets/sprites/ui/result_ok.png" id="3_fqe5q"]
 
 [node name="RecipePreview" type="Control" unique_id=525001118]
 custom_minimum_size = Vector2(90, 100)
@@ -11,6 +11,7 @@ anchors_preset = 0
 mouse_filter = 2
 script = ExtResource("1")
 background_padding = Vector2(10, 10)
+complete_stamp_size = Vector2(74, 74)
 
 [node name="RecipeDisplayBackground" type="NinePatchRect" parent="." unique_id=1198540343]
 layout_mode = 1
@@ -38,5 +39,5 @@ layout_mode = 1
 offset_right = 42.0
 offset_bottom = 42.0
 mouse_filter = 2
-texture = ExtResource("3_6fg68")
+texture = ExtResource("3_fqe5q")
 stretch_mode = 5

@@ -13,6 +13,7 @@ const INDICATOR_TEXTURE := preload("res://assets/sprites/ui/indicator.png")
 @export var indicator_shake_step_duration: float = 0.04
 @export var completed_ingredient_modulate: Color = Color(1, 1, 1, 0.5)
 @export var complete_stamp_size: Vector2 = Vector2(88.0, 88.0)
+@export var sliding_window_start_step: int = 4
 
 @onready var background: NinePatchRect = $RecipeDisplayBackground
 @onready var items_root: Control = $ItemsRoot
@@ -21,6 +22,7 @@ const INDICATOR_TEXTURE := preload("res://assets/sprites/ui/indicator.png")
 var recipe: Recipe = null
 var ingredients_visible: bool = true
 var active_step: int = -1
+var visible_height: float = 0.0
 var _indicator_root: Control = null
 var _indicator_shake_tween: Tween = null
 var _complete_stamp_tween: Tween = null
@@ -43,6 +45,11 @@ func clear_recipe() -> void:
 
 func set_active_step(value: int) -> void:
 	active_step = value
+	_render_recipe()
+
+
+func set_visible_height(value: float) -> void:
+	visible_height = value
 	_render_recipe()
 
 
@@ -104,7 +111,7 @@ func _render_recipe() -> void:
 	background.visible = true
 	background.position = Vector2.ZERO
 	background.size = total_size
-	items_root.position = Vector2(background_padding.x, background_padding.y)
+	items_root.position = Vector2(background_padding.x, background_padding.y + _get_sliding_window_offset(total_size, step_y))
 	items_root.size = content_size
 
 	for i in range(ingredient_count):
@@ -126,6 +133,22 @@ func _render_recipe() -> void:
 			_add_indicators(icon_position)
 
 	_set_complete_stamp_visible(active_step >= ingredient_count, content_size)
+
+
+func _get_sliding_window_offset(total_size: Vector2, step_y: float) -> float:
+	if visible_height <= 0.0:
+		return 0.0
+
+	var overflow := total_size.y - visible_height
+	if overflow <= 0.0:
+		return 0.0
+
+	var start_step := maxi(sliding_window_start_step, 1)
+	if active_step < start_step:
+		return 0.0
+
+	var steps_past_anchor := active_step - start_step + 1
+	return minf(step_y * float(steps_past_anchor), overflow)
 
 
 func _add_indicators(icon_position: Vector2) -> void:

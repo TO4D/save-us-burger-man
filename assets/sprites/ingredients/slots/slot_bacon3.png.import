@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c42tgx0shdx8g"
-path="res://.godot/imported/pickle.png-81245bb82c383cb8613d1e313f4c554a.ctex"
+uid="uid://dnpdi6x3ymico"
+path="res://.godot/imported/slot_bacon3.png-d1178ee12b31a499f2d1d713b0608e5c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/ingredients/pickle.png"
-dest_files=["res://.godot/imported/pickle.png-81245bb82c383cb8613d1e313f4c554a.ctex"]
+source_file="res://assets/sprites/ingredients/slots/slot_bacon3.png"
+dest_files=["res://.godot/imported/slot_bacon3.png-d1178ee12b31a499f2d1d713b0608e5c.ctex"]
 
 [params]
 

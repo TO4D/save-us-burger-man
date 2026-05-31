@@ -13,6 +13,7 @@ const RECIPE_PREVIEW_SCENE := preload("res://scenes/components/RecipePreview.tsc
 @export var background_alpha_falloff: float = 0.08
 @export var progress_label_height: float = 12.0
 @export var progress_label_gap: float = 2.0
+@export var max_display_height: float = 215.0
 
 var _ticket_views: Array[RecipePreview] = []
 var _recipes: Array = []
@@ -22,6 +23,14 @@ var _animation_token: int = 0
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	clip_contents = true
+	if max_display_height > 0.0:
+		custom_minimum_size.y = minf(custom_minimum_size.y, max_display_height)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED:
+		_refresh_ticket_viewports()
 
 
 func show_recipes(recipe_list: Array) -> void:
@@ -99,6 +108,7 @@ func _show_current_recipe() -> void:
 
 	var ticket := RECIPE_PREVIEW_SCENE.instantiate() as RecipePreview
 	add_child(ticket)
+	ticket.set_visible_height(_get_visible_height())
 	ticket.set_recipe(_recipes[_current_recipe_index])
 	_ticket_views.append(ticket)
 
@@ -125,6 +135,8 @@ func _play_entry_sequence(token: int) -> void:
 
 
 func _position_tickets(animated: bool) -> void:
+	_refresh_ticket_viewports()
+
 	for index in range(_ticket_views.size()):
 		var ticket := _ticket_views[index]
 		if not is_instance_valid(ticket):
@@ -145,6 +157,8 @@ func _position_tickets(animated: bool) -> void:
 	_reorder_ticket_children()
 
 func _prepare_entry_layout() -> void:
+	_refresh_ticket_viewports()
+
 	for index in range(_ticket_views.size()):
 		var ticket := _ticket_views[index]
 		if not is_instance_valid(ticket):
@@ -168,11 +182,25 @@ func _get_ticket_position(ticket: RecipePreview, index: int) -> Vector2:
 	var ticket_size := ticket.size
 	if ticket_size == Vector2.ZERO:
 		ticket_size = ticket.custom_minimum_size
+	var display_height := _get_visible_height()
 
 	return Vector2(
 		size.x - ticket_size.x + stack_offset.x * index,
-		size.y - ticket_size.y + stack_offset.y * index
+		display_height - ticket_size.y + stack_offset.y * index
 	)
+
+
+func _get_visible_height() -> float:
+	if max_display_height <= 0.0:
+		return size.y
+	return minf(size.y, max_display_height)
+
+
+func _refresh_ticket_viewports() -> void:
+	var visible_height := _get_visible_height()
+	for ticket in _ticket_views:
+		if is_instance_valid(ticket):
+			ticket.set_visible_height(visible_height)
 
 
 func _get_ticket_z_index(index: int) -> int:

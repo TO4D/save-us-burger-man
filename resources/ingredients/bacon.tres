@@ -1,13 +1,21 @@
 [gd_resource type="Resource" script_class="Ingredient" format=3 uid="uid://bdt1yeou2xt3x"]
 
+[ext_resource type="Texture2D" uid="uid://cy0xfgwjuq167" path="res://assets/sprites/ingredients/preview/pre_bacon.png" id="1_c3usv"]
 [ext_resource type="Script" uid="uid://cpbwt2jx44ei" path="res://scripts/data/Ingredient.gd" id="1_uv43v"]
-[ext_resource type="Texture2D" uid="uid://c2ce8a7kmjmpg" path="res://assets/sprites/ingredients/bacon.png" id="2_uv43v"]
+[ext_resource type="Texture2D" uid="uid://bf7dfkawp1cmc" path="res://assets/sprites/ingredients/bacon.png" id="2_uv43v"]
+[ext_resource type="Texture2D" uid="uid://3qihyvvnayk4" path="res://assets/sprites/ingredients/slots/slot_bacon2.png" id="3_awcuv"]
+[ext_resource type="Texture2D" uid="uid://b62o1q7o1ii1w" path="res://assets/sprites/ingredients/slots/slot_bacon1.png" id="4_3bt6o"]
+[ext_resource type="Texture2D" uid="uid://dnpdi6x3ymico" path="res://assets/sprites/ingredients/slots/slot_bacon3.png" id="5_b3afv"]
 
 [resource]
 script = ExtResource("1_uv43v")
 id = "bacon"
 display_name = "bacon"
 sprite = ExtResource("2_uv43v")
+preview_icon_sprite = ExtResource("1_c3usv")
+slot_button_normal = ExtResource("4_3bt6o")
+slot_button_pressed = ExtResource("5_b3afv")
+slot_button_hover = ExtResource("3_awcuv")
 stack_height = 10
-stack_offset_y = 2
+stack_offset_y = 6
 metadata/_custom_type_script = "uid://cpbwt2jx44ei"

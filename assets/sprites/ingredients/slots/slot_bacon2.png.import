@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://duq0s60qd7b31"
-path="res://.godot/imported/tomato.png-14420ff138c0f9930bc53caa7e6eb945.ctex"
+uid="uid://3qihyvvnayk4"
+path="res://.godot/imported/slot_bacon2.png-7349f86f9e302180a1f951a3082b6dc8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/ingredients/tomato.png"
-dest_files=["res://.godot/imported/tomato.png-14420ff138c0f9930bc53caa7e6eb945.ctex"]
+source_file="res://assets/sprites/ingredients/slots/slot_bacon2.png"
+dest_files=["res://.godot/imported/slot_bacon2.png-7349f86f9e302180a1f951a3082b6dc8.ctex"]
 
 [params]
 

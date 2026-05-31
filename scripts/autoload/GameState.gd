@@ -6,26 +6,22 @@ const INGREDIENT_RESOURCE_PATHS: Array[String] = [
 	"res://resources/ingredients/patty.tres",
 	"res://resources/ingredients/lettuce.tres",
 	"res://resources/ingredients/cheese.tres",
-	#"res://resources/ingredients/bacon.tres",
-	#"res://resources/ingredients/hashbrown.tres",
-	#"res://resources/ingredients/mushroom.tres",
+	"res://resources/ingredients/bacon.tres",
 	"res://resources/ingredients/onion.tres",
-	#"res://resources/ingredients/pickle.tres",
-	#"res://resources/ingredients/shrimp.tres",
 	"res://resources/ingredients/tomato.tres",
 ]
 
 const STAGE_INGREDIENT_COUNTS := {
 	1: 4,
-	2: 7,
-	3: 7,
-	4: 7,
-	5: 7,
-	6: 7,
-	7: 7,
-	8: 7,
-	9: 7,
-	10: 7,
+	2: 8,
+	3: 8,
+	4: 8,
+	5: 8,
+	6: 8,
+	7: 8,
+	8: 8,
+	9: 8,
+	10: 8,
 }
 
 const PLACEHOLDER_INGREDIENTS := [

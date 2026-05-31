@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://5la33pbkv8rg"
-path="res://.godot/imported/lettuce.png-12a87de88ebb42b8d35944be4e7cc825.ctex"
+uid="uid://cy0xfgwjuq167"
+path="res://.godot/imported/pre_bacon.png-906dd01377944371f3c64061a01edb1d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/ingredients/lettuce.png"
-dest_files=["res://.godot/imported/lettuce.png-12a87de88ebb42b8d35944be4e7cc825.ctex"]
+source_file="res://assets/sprites/ingredients/preview/pre_bacon.png"
+dest_files=["res://.godot/imported/pre_bacon.png-906dd01377944371f3c64061a01edb1d.ctex"]
 
 [params]
 
