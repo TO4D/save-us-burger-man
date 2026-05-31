@@ -39,7 +39,7 @@ func show_at_fixed_position() -> void:
 
 
 func _on_combo_changed(value: int) -> void:
-	value_label.text = "%d Combo" % value
+	value_label.text = "%d" % value
 	value_label.modulate = NORMAL_COLOR if value > 0 else Color(0.9, 0.9, 0.9, 0.55)
 	if value <= 0:
 		_reset_visibility_tween()

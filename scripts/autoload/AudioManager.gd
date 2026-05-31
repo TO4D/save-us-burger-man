@@ -7,6 +7,12 @@ enum Sfx {
 	WRONG_INGREDIENT,
 	CUSTOMER_ENTER,
 	BURGER_EAT,
+	LIGHT_OFF,
+	LIGHT_ON,
+	LIGHT_SPARK,
+	ORDER_SUCCESS,
+	ORDER_SUCCESS_PERFECT,
+	ATTACK,
 }
 
 enum Bgm {
@@ -16,12 +22,18 @@ enum Bgm {
 }
 
 const SFX_PATHS := {
-	Sfx.INGREDIENT_STACK: "res://assets/audio/sfx/ingredient_stack.ogg",
-	Sfx.INGREDIENT_SLOT_FOCUS: "res://assets/audio/sfx/ingredient_slot_focus.ogg",
-	Sfx.INGREDIENT_SLOT_SELECT: "res://assets/audio/sfx/ingredient_slot_select.wav",
+	Sfx.INGREDIENT_STACK: "res://assets/audio/sfx/ingredient_stack2.ogg",
+	Sfx.INGREDIENT_SLOT_FOCUS: "res://assets/audio/sfx/ingredient_slot_focus2.ogg",
+	Sfx.INGREDIENT_SLOT_SELECT: "res://assets/audio/sfx/ingredient_slot_select2.ogg",
 	Sfx.WRONG_INGREDIENT: "res://assets/audio/sfx/wrong_ingredient.wav",
 	Sfx.CUSTOMER_ENTER: "res://assets/audio/sfx/customer_enter.wav",
 	Sfx.BURGER_EAT: "res://assets/audio/sfx/burger_eat.wav",
+	Sfx.LIGHT_OFF: "res://assets/audio/sfx/light_off.ogg",
+	Sfx.LIGHT_ON: "res://assets/audio/sfx/light_on.ogg",
+	Sfx.LIGHT_SPARK: "res://assets/audio/sfx/light_spark.ogg",
+	Sfx.ORDER_SUCCESS: "res://assets/audio/sfx/order_success2.ogg",
+	Sfx.ORDER_SUCCESS_PERFECT: "res://assets/audio/sfx/order_success_perfect.ogg",
+	Sfx.ATTACK: "res://assets/audio/sfx/attack.ogg",
 }
 
 const BGM_PATHS := {

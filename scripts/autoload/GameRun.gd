@@ -6,6 +6,7 @@ signal stage_changed(stage: int)
 signal run_failed(stats: Dictionary)
 signal run_victory(stats: Dictionary)
 signal time_changed(elapsed: float)
+signal blackout_requested
 
 const CUSTOMERS_PER_STAGE := 2
 const MAX_STAGE := 10
@@ -32,6 +33,12 @@ const MULTI_ORDER_CHANCE := {
 	9: 0.80,
 	10: 0.90,
 }
+const BLACKOUT_ROLL_INTERVAL_SECONDS := 5.0
+const BLACKOUT_COOLDOWN_SECONDS := 30.0
+const BLACKOUT_CHANCE_DISTANCE_80 := 0.9
+const BLACKOUT_CHANCE_DISTANCE_60 := 0.01
+const BLACKOUT_CHANCE_DISTANCE_40 := 0.02
+const BLACKOUT_CHANCE_DISTANCE_20 := 0.04
 
 var running := false
 var elapsed_time := 0.0
@@ -40,6 +47,10 @@ var served_customers := 0
 var failed_customers := 0
 var start_blocked := false
 var _customer_index := 0
+var _blackout_roll_elapsed := 0.0
+var _blackout_cooldown_remaining := 0.0
+var _blackout_active := false
+var _blackout_request_pending := false
 
 
 func _ready() -> void:
@@ -53,6 +64,7 @@ func _process(delta: float) -> void:
 
 	elapsed_time += delta
 	time_changed.emit(elapsed_time)
+	_update_blackout_roll(delta)
 
 
 func start() -> void:
@@ -64,6 +76,7 @@ func start() -> void:
 	served_customers = 0
 	failed_customers = 0
 	_customer_index = 0
+	_reset_blackout_state()
 	ComboManager.reset()
 	UltimateManager.reset()
 	DistanceManager.reset()
@@ -110,6 +123,7 @@ func on_order_completed(success: bool) -> void:
 func abort() -> void:
 	running = false
 	start_blocked = false
+	_reset_blackout_state()
 	DistanceManager.stop()
 	MonsterManager.stop()
 	ComboManager.reset()
@@ -126,8 +140,6 @@ func _create_customer(index: int, stage: int) -> Dictionary:
 	var variants: Array[String] = []
 	if burger_count > 1:
 		variants.append("multi")
-	if _has_blackout(stage):
-		variants.append("blackout")
 
 	return {
 		"index": index,
@@ -164,28 +176,70 @@ func _burger_count_for_stage(stage: int) -> int:
 	return 4
 
 
-func _has_blackout(stage: int) -> bool:
-	match stage:
-		1:
-			return false
-		2:
-			return randf() < 0.02
-		3:
-			return randf() < 0.04
-		4:
-			return randf() < 0.06
-		5:
-			return randf() < 0.08
-		6:
-			return randf() < 0.10
-		7:
-			return randf() < 0.12
-		8:
-			return randf() < 0.14
-		9:
-			return randf() < 0.16
-		_:
-			return randf() < 0.18
+func accept_blackout_request() -> bool:
+	if not _blackout_request_pending or _blackout_active:
+		return false
+
+	_blackout_request_pending = false
+	_blackout_active = true
+	return true
+
+
+func reject_blackout_request() -> void:
+	_blackout_request_pending = false
+
+
+func complete_blackout() -> void:
+	if not _blackout_active:
+		return
+
+	_blackout_active = false
+	_blackout_cooldown_remaining = BLACKOUT_COOLDOWN_SECONDS
+	_blackout_roll_elapsed = 0.0
+
+
+func _reset_blackout_state() -> void:
+	_blackout_roll_elapsed = 0.0
+	_blackout_cooldown_remaining = 0.0
+	_blackout_active = false
+	_blackout_request_pending = false
+
+
+func _update_blackout_roll(delta: float) -> void:
+	if _blackout_cooldown_remaining > 0.0:
+		_blackout_cooldown_remaining = maxf(_blackout_cooldown_remaining - delta, 0.0)
+
+	if _blackout_active or _blackout_request_pending or _blackout_cooldown_remaining > 0.0:
+		return
+
+	_blackout_roll_elapsed += delta
+	if _blackout_roll_elapsed < BLACKOUT_ROLL_INTERVAL_SECONDS:
+		return
+
+	_blackout_roll_elapsed = 0.0
+	var blackout_chance := _blackout_chance_for_distance()
+	if blackout_chance <= 0.0:
+		return
+	if randf() >= blackout_chance:
+		return
+
+	_blackout_request_pending = true
+	blackout_requested.emit()
+
+
+func _blackout_chance_for_distance() -> float:
+	var distance_ratio := DistanceManager.distance / DistanceManager.MAX_DISTANCE
+
+	if distance_ratio <= 0.2:
+		return BLACKOUT_CHANCE_DISTANCE_20
+	elif distance_ratio <= 0.4:
+		return BLACKOUT_CHANCE_DISTANCE_40
+	elif distance_ratio <= 0.6:
+		return BLACKOUT_CHANCE_DISTANCE_60
+	elif distance_ratio <= 0.8:
+		return BLACKOUT_CHANCE_DISTANCE_80
+
+	return 0.0
 
 
 func _damage_for(stage: int, burger_count: int) -> float:
@@ -204,6 +258,7 @@ func _on_distance_game_over() -> void:
 
 	running = false
 	start_blocked = false
+	_reset_blackout_state()
 	MonsterManager.stop()
 	ComboManager.reset()
 	UltimateManager.reset()
@@ -216,6 +271,7 @@ func _on_monster_defeated() -> void:
 
 	running = false
 	start_blocked = false
+	_reset_blackout_state()
 	DistanceManager.stop()
 	ComboManager.reset()
 	UltimateManager.reset()

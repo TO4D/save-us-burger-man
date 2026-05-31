@@ -175,6 +175,7 @@ func _update_visuals() -> void:
 func _on_pressed() -> void:
 	if ingredient == null or not interaction_enabled:
 		return
+	AudioManager.play_sfx(AudioManager.Sfx.INGREDIENT_SLOT_SELECT)
 	show_pressed_visual()
 	ingredient_picked.emit(ingredient)
 

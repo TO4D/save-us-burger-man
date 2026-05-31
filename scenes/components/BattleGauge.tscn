@@ -3,7 +3,19 @@
 [ext_resource type="Script" uid="uid://cfoee8j2l2bpe" path="res://scenes/components/BattleGauge.gd" id="1_g2r14"]
 [ext_resource type="Texture2D" uid="uid://bsr7r68ii64jw" path="res://assets/sprites/store/store_new.png" id="3_g2r14"]
 [ext_resource type="Texture2D" uid="uid://hvspgdua73v5" path="res://assets/sprites/distance/distance_background.png" id="3_xmndb"]
-[ext_resource type="Texture2D" uid="uid://be4osif2byu2k" path="res://assets/sprites/distance/distance_evilmonster.png" id="5_f50tn"]
+[ext_resource type="Texture2D" uid="uid://c133hm3v6pclp" path="res://assets/sprites/monster/monster_hit.png" id="4_pchdm"]
+[ext_resource type="SpriteFrames" uid="uid://bh3vdhoj2v0t3" path="res://resources/animations/monster_walk.tres" id="5_f50tn"]
+
+[sub_resource type="Shader" id="Shader_7tkdo"]
+code = "shader_type canvas_item;
+
+void fragment() {
+	float alpha = texture(TEXTURE, UV).a * COLOR.a;
+	COLOR = vec4(1.0, 1.0, 1.0, alpha);
+}"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4p7wu"]
+shader = SubResource("Shader_7tkdo")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g2r14"]
 bg_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
@@ -37,9 +49,23 @@ centered = false
 position = Vector2(35, 58)
 texture = ExtResource("3_g2r14")
 
-[node name="MonsterIcon" type="Sprite2D" parent="." unique_id=7079341]
+[node name="MonsterIcon" type="Node2D" parent="." unique_id=7079341]
 position = Vector2(250, 51)
-texture = ExtResource("5_f50tn")
+
+[node name="WalkSprite" type="AnimatedSprite2D" parent="MonsterIcon" unique_id=1078545169]
+sprite_frames = ExtResource("5_f50tn")
+animation = &"walk"
+autoplay = "walk"
+
+[node name="HitSprite" type="Sprite2D" parent="MonsterIcon" unique_id=1904226389]
+visible = false
+texture = ExtResource("4_pchdm")
+
+[node name="HitFlashSprite" type="Sprite2D" parent="MonsterIcon" unique_id=1889397213]
+visible = false
+z_index = 1
+material = SubResource("ShaderMaterial_4p7wu")
+texture = ExtResource("4_pchdm")
 
 [node name="Bar" type="ProgressBar" parent="." unique_id=1938841943]
 layout_mode = 1
@@ -54,6 +80,14 @@ theme_override_styles/background = SubResource("StyleBoxFlat_g2r14")
 theme_override_styles/fill = SubResource("StyleBoxFlat_iod1h")
 value = 100.0
 show_percentage = false
+
+[node name="DamagePreview" type="ColorRect" parent="Bar" unique_id=1832510232]
+visible = false
+layout_mode = 1
+offset_right = 1.0
+offset_bottom = 15.0
+mouse_filter = 2
+color = Color(1, 0.4862745, 0.04313726, 1)
 
 [node name="TimeLabel" type="Label" parent="." unique_id=1714281882]
 visible = false

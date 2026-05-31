@@ -14,6 +14,11 @@ const SCREEN_SHAKE_STEP_DURATION := 0.04
 const ORDER_PROGRESS_ICON_SIZE := Vector2(16.0, 16.0)
 const ORDER_PROGRESS_FILL_TEXTURE := preload("res://assets/sprites/ui/order_icon.1.png")
 const ORDER_PROGRESS_EMPTY_TEXTURE := preload("res://assets/sprites/ui/order_icon.2.png")
+const STORE_LIGHT_ON_TEXTURE := preload("res://assets/sprites/store/light_on.png")
+const STORE_LIGHT_OFF_TEXTURE := preload("res://assets/sprites/store/light_off.png")
+const STORE_LIGHT_FAIL_TEXTURE := preload("res://assets/sprites/store/light_fail.png")
+const BLACKOUT_WARNING_STEP_SECONDS := 0.2
+const BLACKOUT_WARNING_PAUSE_SECONDS := 0.6
 
 enum Phase { IDLE, CUSTOMER_ENTERING, PLAYING, SERVING, CUSTOMER_EXITING, COMPLETE }
 
@@ -39,28 +44,31 @@ var result_rank_tween: Tween = null
 var stack_landing_token: int = 0
 var pending_stack_landing_tokens: Array[int] = []
 var ready_go_active: bool = false
+var blackout_event_active: bool = false
+var blackout_used_for_customer: bool = false
 
 @onready var battle_gauge: BattleGauge = $BattleGauge
 @onready var recipe_display_stack: RecipeDisplayStack = $PlayArea/RecipeDisplayStack
 @onready var customer_area: Control = $PlayArea/CustomerArea
 @onready var burger_stack: BurgerStack = $PlayArea/PlateArea/BurgerStack
-@onready var order_progress_dots: HBoxContainer = $PlayArea/PlateArea/OrderProgressDots
+@onready var order_progress_dots: VBoxContainer = $PlayArea/PlateArea/OrderProgressDots
 @onready var ingredient_slots: IngredientSlotGrid = $IngredientSlots
 @onready var status_label: Label = $StatusLabel
 @onready var result_rank: Control = $ResultRank
 @onready var result_perfect: TextureRect = $ResultRank/Perfect
 @onready var blackout_overlay: ColorRect = $BlackoutOverlay
-@onready var blackout_label: Label = $BlackoutOverlay/BlackoutLabel
 @onready var combo_counter: ComboCounter = $ComboCounter
 @onready var multi_order: MultiOrder = $MultiOrder
 @onready var ready_go_overlay: ColorRect = $ReadyGoOverlay
 @onready var ready_go_label: Label = $ReadyGoOverlay/Label
+@onready var store_light: TextureRect = $StoreLight
 
 
 func _ready() -> void:
 	panel_home_position = position
 	is_mobile_input = OS.has_feature("mobile")
 	UltimateManager.triggered.connect(_on_ultimate_triggered)
+	GameRun.blackout_requested.connect(_on_blackout_requested)
 	DistanceManager.distance_changed.connect(_on_distance_changed)
 	burger_stack.ingredient_landed.connect(_on_stack_ingredient_landed)
 	ingredient_slots.ingredient_picked.connect(_on_ingredient_picked)
@@ -104,8 +112,11 @@ func on_show(data: Dictionary = {}) -> void:
 	current_recipe_index = 0
 	current_step = 0
 	mistake_count = 0
+	blackout_event_active = false
+	blackout_used_for_customer = false
 	pending_stack_landing_tokens.clear()
 	blackout_overlay.visible = false
+	store_light.texture = STORE_LIGHT_ON_TEXTURE
 	_hide_result_rank()
 	burger_stack.clear_stack()
 	_setup_ingredient_slots(false)
@@ -126,7 +137,12 @@ func on_show(data: Dictionary = {}) -> void:
 func on_hide() -> void:
 	round_token += 1
 	current_phase = Phase.IDLE
+	if blackout_event_active:
+		GameRun.complete_blackout()
+	blackout_event_active = false
+	blackout_used_for_customer = false
 	blackout_overlay.visible = false
+	store_light.texture = STORE_LIGHT_ON_TEXTURE
 	multi_order.hide_order_count()
 	_hide_result_rank()
 	recipe_display_stack.clear_recipes()
@@ -169,26 +185,84 @@ func _start_play(token: int) -> void:
 	current_phase = Phase.PLAYING
 	status_label.text = "Tap ingredients in order"
 	_setup_ingredient_slots(true)
-	if customer.get("variants", []).has("blackout"):
-		_schedule_blackout(token)
 
 
-func _schedule_blackout(token: int) -> void:
-	await get_tree().create_timer(1.5).timeout
-	if token != round_token or current_phase != Phase.PLAYING:
+func _on_blackout_requested() -> void:
+	if not _can_start_blackout():
+		GameRun.reject_blackout_request()
 		return
-	blackout_label.text = "BLACKOUT!"
-	blackout_overlay.color = Color(0, 0, 0, 0.25)
-	blackout_overlay.visible = true
-	await get_tree().create_timer(0.5).timeout
-	if token != round_token or current_phase != Phase.PLAYING:
+
+	if not GameRun.accept_blackout_request():
 		return
-	blackout_label.text = ""
+
+	blackout_event_active = true
+	blackout_used_for_customer = true
+	_run_blackout(round_token)
+
+
+func _can_start_blackout() -> bool:
+	if not visible:
+		return false
+	if current_phase != Phase.PLAYING:
+		return false
+	if ready_go_active or blackout_event_active or blackout_used_for_customer:
+		return false
+	return true
+
+
+func _run_blackout(token: int) -> void:
+	var warning_completed: bool = await _play_blackout_warning(token)
+	if token != round_token or current_phase != Phase.PLAYING:
+		_finish_blackout_event()
+		return
+	if not warning_completed:
+		_finish_blackout_event()
+		return
+
+	store_light.texture = STORE_LIGHT_OFF_TEXTURE
+	AudioManager.play_sfx(AudioManager.Sfx.LIGHT_OFF)
 	blackout_overlay.color = Color(0, 0, 0, 0.95)
+	blackout_overlay.visible = true
 	await get_tree().create_timer(3.0).timeout
 	if token != round_token:
+		_finish_blackout_event()
 		return
 	blackout_overlay.visible = false
+	store_light.texture = STORE_LIGHT_ON_TEXTURE
+	AudioManager.play_sfx(AudioManager.Sfx.LIGHT_ON)
+	_finish_blackout_event()
+
+
+func _finish_blackout_event() -> void:
+	if not blackout_event_active:
+		return
+
+	blackout_event_active = false
+	blackout_overlay.visible = false
+	store_light.texture = STORE_LIGHT_ON_TEXTURE
+	GameRun.complete_blackout()
+
+
+func _play_blackout_warning(token: int) -> bool:
+	for i in range(2):
+		AudioManager.play_sfx(AudioManager.Sfx.LIGHT_SPARK)
+		for j in range(2):
+			store_light.texture = STORE_LIGHT_FAIL_TEXTURE
+			await get_tree().create_timer(BLACKOUT_WARNING_STEP_SECONDS).timeout
+			if token != round_token or current_phase != Phase.PLAYING:
+				return false
+
+			store_light.texture = STORE_LIGHT_ON_TEXTURE
+			await get_tree().create_timer(BLACKOUT_WARNING_STEP_SECONDS).timeout
+			if token != round_token or current_phase != Phase.PLAYING:
+				return false
+
+		if i == 0:
+			await get_tree().create_timer(BLACKOUT_WARNING_PAUSE_SECONDS).timeout
+			if token != round_token or current_phase != Phase.PLAYING:
+				return false
+
+	return true
 
 
 func _run_ready_go_overlay(token: int) -> void:
@@ -258,8 +332,18 @@ func _on_stack_ingredient_landed(_stack_position: Vector2, token: int) -> void:
 	combo_counter.show_at_fixed_position()
 
 
+func _wait_for_pending_stack_landings() -> void:
+	while not pending_stack_landing_tokens.is_empty():
+		await burger_stack.ingredient_landed
+		await get_tree().process_frame
+
+
 func _finish_current_burger() -> void:
 	current_phase = Phase.SERVING
+	status_label.text = "Burger complete"
+	await _wait_for_pending_stack_landings()
+	_play_recipe_completion_feedback(round_token)
+
 	status_label.text = "Burger served"
 	await get_tree().create_timer(BURGER_SERVE_DELAY_SECONDS).timeout
 	var eat_position: Vector2 = await _fly_burger_to_customer()
@@ -269,7 +353,6 @@ func _finish_current_burger() -> void:
 	_update_order_progress_dots()
 
 	if current_recipe_index >= recipes.size():
-		_play_result_rank_display(round_token)
 		await _exit_customer()
 		_play_customer_attack()
 		current_phase = Phase.COMPLETE
@@ -288,6 +371,9 @@ func _finish_current_burger() -> void:
 func _setup_order_progress_dots() -> void:
 	_clear_order_progress_dots()
 	order_progress_dots.visible = not recipes.is_empty()
+
+	if recipes.size() <= 1:
+		return
 
 	for i in range(recipes.size()):
 		var icon := TextureRect.new()
@@ -329,6 +415,7 @@ func _play_customer_attack() -> void:
 	var attack_damage := damage
 	var attack_knockback := knockback
 	var hit_monster := func() -> void:
+		AudioManager.play_sfx(AudioManager.Sfx.ATTACK)
 		MonsterManager.apply_damage(attack_damage)
 		DistanceManager.recover(attack_knockback)
 		battle_gauge.refresh_monster_icon_position_immediately()
@@ -376,10 +463,12 @@ func _show_result_rank() -> void:
 	result_rank_tween.tween_property(result_rank, "modulate:a", 1.0, 0.08)
 
 
-func _play_result_rank_display(token: int) -> void:
-	if mistake_count > 0:
+func _play_recipe_completion_feedback(token: int) -> void:
+	if current_recipe_index + 1 < recipes.size() or mistake_count > 0:
+		AudioManager.play_sfx(AudioManager.Sfx.ORDER_SUCCESS)
 		return
 
+	AudioManager.play_sfx(AudioManager.Sfx.ORDER_SUCCESS_PERFECT)
 	_show_result_rank()
 	await get_tree().create_timer(RESULT_RANK_DISPLAY_SECONDS).timeout
 	if token != round_token:
