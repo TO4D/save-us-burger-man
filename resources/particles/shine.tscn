@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://dwsgavjw1akoj"]
+
+[ext_resource type="Texture2D" uid="uid://vw1nsgiofuf8" path="res://assets/sprites/particle/vfx_particle_shine.png" id="1_6lokg"]
+[ext_resource type="Material" uid="uid://djnbno1857n8b" path="res://resources/particles/particle_material_shine.tres" id="2_8v7rs"]
+
+[node name="Shine" type="Node2D" unique_id=853804238]
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="." unique_id=95174106]
+emitting = false
+amount = 20
+texture = ExtResource("1_6lokg")
+lifetime = 0.8
+one_shot = true
+explosiveness = 1.0
+randomness = 0.18
+process_material = ExtResource("2_8v7rs")

@@ -38,6 +38,14 @@ func show_at_fixed_position() -> void:
 	_visibility_tween.tween_callback(_hide_after_fade)
 
 
+func keep_visible() -> void:
+	position = _display_position
+	visible = ComboManager.combo > 0
+	modulate.a = 1.0 if visible else 0.0
+	scale = Vector2.ONE
+	_reset_visibility_tween()
+
+
 func _on_combo_changed(value: int) -> void:
 	value_label.text = "%d" % value
 	value_label.modulate = NORMAL_COLOR if value > 0 else Color(0.9, 0.9, 0.9, 0.55)

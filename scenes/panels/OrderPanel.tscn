@@ -5,14 +5,16 @@
 [ext_resource type="Texture2D" uid="uid://d0r1i1ea72pn2" path="res://assets/sprites/cook/cook_background.png" id="2_edvyg"]
 [ext_resource type="Texture2D" uid="uid://baf1m3n16xgxd" path="res://assets/sprites/cook/cook_slot_background.png" id="3_aryf5"]
 [ext_resource type="PackedScene" uid="uid://7coxq8bafj1k" path="res://scenes/components/ComboCounter.tscn" id="4_combo"]
-[ext_resource type="PackedScene" uid="uid://f81sdvkvyogq" path="res://scenes/components/BattleGauge.tscn" id="4_l4fm3"]
+[ext_resource type="LabelSettings" uid="uid://5se3eg4or83r" path="res://resources/fonts/TimerLabel.tres" id="5_8lfvp"]
 [ext_resource type="PackedScene" uid="uid://dwkpv5wbo3tqm" path="res://scenes/components/UltimateBell.tscn" id="5_bell"]
-[ext_resource type="Texture2D" uid="uid://j6p63de0a6w7" path="res://assets/sprites/cook/cook_doma.png" id="5_ja0vj"]
+[ext_resource type="LabelSettings" uid="uid://bd0iuv8k61dvn" path="res://resources/fonts/MedalTargetLabel.tres" id="6_ayopg"]
 [ext_resource type="Script" uid="uid://bkg1316f80lh8" path="res://scenes/components/RecipeDisplayStack.gd" id="6_stack"]
+[ext_resource type="Texture2D" uid="uid://br7a6eslknmd5" path="res://assets/sprites/cook/cook_area_jori2.png" id="6_t7gr7"]
+[ext_resource type="Texture2D" uid="uid://dg745mhbduwe2" path="res://assets/sprites/cook/cook_area_doma.png" id="7_ayopg"]
 [ext_resource type="PackedScene" uid="uid://dcyr7651s66f" path="res://scenes/components/IngredientSlot.tscn" id="7_slot"]
 [ext_resource type="Script" uid="uid://b20bp6pi5tbgd" path="res://scenes/components/IngredientSlotGrid.gd" id="8_grid"]
-[ext_resource type="PackedScene" uid="uid://cx4wtpu6m3qdr" path="res://scenes/components/MultiOrder.tscn" id="9_multi"]
 [ext_resource type="FontFile" uid="uid://bivsctx4h0jw" path="res://fonts/Jersey25-Regular.ttf" id="12_l4fm3"]
+[ext_resource type="LabelSettings" uid="uid://lvq58fhwk3m4" path="res://resources/fonts/nextLabel.tres" id="13_t7gr7"]
 [ext_resource type="Texture2D" uid="uid://c4ygqskfjim15" path="res://assets/sprites/ui/result_perfect.png" id="14_perfect"]
 [ext_resource type="Texture2D" uid="uid://dbsxpj7ft5qqc" path="res://assets/sprites/store/light_on.png" id="15_l4fm3"]
 
@@ -43,9 +45,37 @@ centered = false
 texture = ExtResource("3_aryf5")
 centered = false
 
-[node name="BattleGauge" parent="." unique_id=1309183552 instance=ExtResource("4_l4fm3")]
-z_index = 50
+[node name="StageTimerLabel" type="Label" parent="." unique_id=2077378913]
+z_index = 55
 layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 8.0
+offset_bottom = 32.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.12, 0.08, 0.05, 1)
+theme_override_fonts/font = ExtResource("12_l4fm3")
+theme_override_font_sizes/font_size = 18
+text = "0.000"
+label_settings = ExtResource("5_8lfvp")
+horizontal_alignment = 1
+
+[node name="MedalTargetLabel" type="Label" parent="." unique_id=1226415800]
+z_index = 55
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 54.0
+offset_bottom = 112.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.12, 0.08, 0.05, 1)
+theme_override_fonts/font = ExtResource("12_l4fm3")
+theme_override_font_sizes/font_size = 12
+text = "Gold 0.0s
+Silver 0.0s
+Bronze 0.0s"
+label_settings = ExtResource("6_ayopg")
+horizontal_alignment = 1
 
 [node name="PlayArea" type="Control" parent="." unique_id=1325333956]
 layout_mode = 1
@@ -55,20 +85,34 @@ offset_top = 90.0
 offset_bottom = 320.0
 grow_horizontal = 2
 
-[node name="CustomerArea" type="Control" parent="PlayArea" unique_id=703238416]
+[node name="cookArea" type="TextureRect" parent="PlayArea" unique_id=1736362409]
+z_index = 1
 layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -252.0
-offset_top = -90.0
-offset_right = -152.0
-offset_bottom = 70.0
-grow_horizontal = 0
-grow_vertical = 2
-mouse_filter = 2
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -135.0
+offset_top = -56.000153
+offset_right = 135.0
+grow_horizontal = 2
+grow_vertical = 0
+texture = ExtResource("6_t7gr7")
+stretch_mode = 2
+
+[node name="OrderProgressDots" type="HBoxContainer" parent="PlayArea" unique_id=1530382508]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -78.0
+offset_top = -30.0
+offset_right = 78.0
+offset_bottom = 18.0
+grow_horizontal = 2
+theme_override_constants/separation = 0
+alignment = 1
 
 [node name="PlateArea" type="Control" parent="PlayArea" unique_id=1139684568]
 layout_mode = 1
@@ -84,11 +128,13 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Cook_jori" type="Sprite2D" parent="PlayArea/PlateArea" unique_id=1137743715]
-position = Vector2(0, 116)
-texture = ExtResource("5_ja0vj")
+z_index = 1
+position = Vector2(6, 121)
+texture = ExtResource("7_ayopg")
 centered = false
 
 [node name="BurgerStack" parent="PlayArea/PlateArea" unique_id=235041741 instance=ExtResource("2")]
+z_index = 21
 position = Vector2(90, 168)
 
 [node name="ColorRect" type="ColorRect" parent="PlayArea/PlateArea" unique_id=1646500549]
@@ -99,20 +145,6 @@ offset_top = 152.0
 offset_right = 270.0
 offset_bottom = 172.0
 color = Color(0.21279216, 0.20355874, 0.1943241, 1)
-
-[node name="OrderProgressDots" type="VBoxContainer" parent="PlayArea/PlateArea" unique_id=718414979]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 1.0
-anchor_top = 0.41300002
-anchor_right = 1.0
-anchor_bottom = 0.41300002
-offset_left = -20.0
-offset_top = -45.036003
-offset_bottom = 44.963997
-grow_horizontal = 0
-grow_vertical = 2
-alignment = 2
 
 [node name="RecipeDisplayStack" type="Control" parent="PlayArea" unique_id=1423463867]
 layout_mode = 1
@@ -180,6 +212,7 @@ offset_right = 126.0
 offset_bottom = 138.00003
 
 [node name="StatusLabel" type="Label" parent="." unique_id=91600267]
+visible = false
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -193,22 +226,23 @@ text = "Memorize the recipe"
 horizontal_alignment = 1
 
 [node name="ResultRank" type="Control" parent="." unique_id=1902987360]
-visible = false
 z_index = 21
 layout_mode = 1
-anchor_left = 0.335
-anchor_top = 0.551
-anchor_right = 0.335
-anchor_bottom = 0.551
-offset_left = -84.450005
-offset_top = -140.48001
-offset_right = 15.549995
-offset_bottom = -110.48001
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -50.0
+offset_top = 80.0
+offset_right = 50.0
+offset_bottom = 110.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
 [node name="Perfect" type="TextureRect" parent="ResultRank" unique_id=1832580181]
+z_index = 2
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -263,24 +297,56 @@ text = "Ready..."
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="MultiOrder" parent="." unique_id=1478787284 instance=ExtResource("9_multi")]
-position = Vector2(139, 145)
+[node name="NextStageOverlay" type="ColorRect" parent="." unique_id=781976474]
+visible = false
+z_index = 20
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.5647059)
+
+[node name="Label" type="Label" parent="NextStageOverlay" unique_id=1552172850]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -130.0
+offset_top = 135.0
+offset_right = 130.0
+offset_bottom = 175.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "Press Spacebar to Next Level"
+label_settings = ExtResource("13_t7gr7")
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="ComboCounter" parent="." unique_id=1534753254 instance=ExtResource("4_combo")]
 z_index = 21
 layout_mode = 1
-anchor_left = 0.0
-anchor_top = 0.177
-anchor_right = 0.0
-anchor_bottom = 0.177
-offset_left = 5.0
-offset_top = 0.040000916
-offset_right = 125.0
-offset_bottom = 50.04
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -41.0
+offset_top = -106.61
+offset_right = 41.0
+offset_bottom = -56.610077
 grow_horizontal = 2
-pivot_offset = Vector2(0, 0)
+grow_vertical = 2
+pivot_offset = Vector2(41, 25)
 
 [node name="StoreLight" type="TextureRect" parent="." unique_id=570496574]
+visible = false
 z_index = 21
 layout_mode = 1
 anchors_preset = 5

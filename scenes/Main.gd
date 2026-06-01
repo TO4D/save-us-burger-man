@@ -13,7 +13,7 @@ func _ready() -> void:
 	$PanelLayer/CutscenePanel.cutscene_finished.connect(_on_cutscene_finished)
 	$PanelLayer/OrderPanel.order_completed.connect(_on_order_completed)
 	$PanelLayer/GameOverPanel.restart_pressed.connect(start_run)
-	$PanelLayer/VictoryPanel.restart_pressed.connect(start_run)
+	$PanelLayer/VictoryPanel.restart_pressed.connect(_on_stage_result_continue_pressed)
 	GameRun.customer_ready.connect(_on_customer_ready)
 	GameRun.run_failed.connect(_on_run_failed)
 	GameRun.run_victory.connect(_on_run_victory)
@@ -53,6 +53,10 @@ func _on_run_failed(stats: Dictionary) -> void:
 
 func _on_run_victory(stats: Dictionary) -> void:
 	PanelManager.show_panel(PanelManager.PanelType.VICTORY, stats)
+
+
+func _on_stage_result_continue_pressed() -> void:
+	GameRun.continue_to_next_stage()
 
 
 func _begin_run_after_intro() -> void:

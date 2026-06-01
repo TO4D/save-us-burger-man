@@ -2,25 +2,30 @@ extends Control
 
 signal order_completed(success: bool)
 
-const EATING_PARTICLE_SCENE = preload("res://resources/particles/Eating.tscn")
-
-const CUSTOMER_HUNGRY_TEXTURE = preload("res://assets/sprites/customers/knight1.png")
-const CUSTOMER_FULL_TEXTURE = preload("res://assets/sprites/customers/knight2.png")
 const BURGER_SERVE_DELAY_SECONDS := 0.35
+const STAGE_COMPLETE_PRESENTATION_SECONDS := 0.45
+const BURGER_TRANSITION_SECONDS := 0.2
 const READY_OVERLAY_SECONDS := 2.0
 const GO_OVERLAY_SECONDS := 0.6
 const RESULT_RANK_DISPLAY_SECONDS := 0.55
 const SCREEN_SHAKE_STEP_DURATION := 0.04
-const ORDER_PROGRESS_ICON_SIZE := Vector2(16.0, 16.0)
-const ORDER_PROGRESS_FILL_TEXTURE := preload("res://assets/sprites/ui/order_icon.1.png")
-const ORDER_PROGRESS_EMPTY_TEXTURE := preload("res://assets/sprites/ui/order_icon.2.png")
+const ORDER_PROGRESS_ICON_SIZE := Vector2(48.0, 48.0)
+const ORDER_PROGRESS_TEXTURE := preload("res://assets/sprites/ui/order_icon_big.png")
+const ORDER_PROGRESS_FILLED_ALPHA := 1.0
+const ORDER_PROGRESS_EMPTY_ALPHA := 0.3
 const STORE_LIGHT_ON_TEXTURE := preload("res://assets/sprites/store/light_on.png")
 const STORE_LIGHT_OFF_TEXTURE := preload("res://assets/sprites/store/light_off.png")
 const STORE_LIGHT_FAIL_TEXTURE := preload("res://assets/sprites/store/light_fail.png")
+const PERFECT_SHINE_SCENE := preload("res://resources/particles/shine.tscn")
+const NEXT_STAGE_HALO_SCENE := preload("res://resources/vfx/NextStageBurgerHalo.tscn")
+const PERFECT_SHINE_INGREDIENT_ID := "bun_top"
+const INTER_ORDER_SLIDE_DISTANCE := 320.0
+const NEXT_STAGE_OVERLAY_TARGET_ALPHA := 144.0 / 255.0
+const NEXT_STAGE_OVERLAY_FADE_SECONDS := 0.18
 const BLACKOUT_WARNING_STEP_SECONDS := 0.2
 const BLACKOUT_WARNING_PAUSE_SECONDS := 0.6
 
-enum Phase { IDLE, CUSTOMER_ENTERING, PLAYING, SERVING, CUSTOMER_EXITING, COMPLETE }
+enum Phase { IDLE, ORDER_STARTING, PLAYING, SERVING, COMPLETE }
 
 var current_phase: Phase = Phase.IDLE
 var customer: Dictionary = {}
@@ -28,10 +33,8 @@ var recipes: Array = []
 var current_recipe: Recipe = null
 var current_recipe_index: int = 0
 var current_step: int = 0
-var damage: float = 0.0
-var knockback: float = 0.0
+var medal_targets: Dictionary = {}
 var round_token: int = 0
-var customer_sprite: Node2D = null
 var screen_shake_elapsed: float = 0.0
 var screen_shake_active: bool = false
 var screen_shake_tween: Tween = null
@@ -41,41 +44,57 @@ var screen_shake_offset: float = 0.0
 var is_mobile_input: bool = false
 var mistake_count: int = 0
 var result_rank_tween: Tween = null
+var next_stage_overlay_tween: Tween = null
+var next_stage_halo: Node2D = null
+var next_stage_halo_elapsed: float = 0.0
 var stack_landing_token: int = 0
 var pending_stack_landing_tokens: Array[int] = []
+var perfect_shine_landing_tokens: Array[int] = []
+var next_stage_overlay_landing_tokens: Array[int] = []
 var ready_go_active: bool = false
 var blackout_event_active: bool = false
 var blackout_used_for_customer: bool = false
+var timer_frozen: bool = false
+var next_stage_overlay_active: bool = false
+var recipe_display_home_position: Vector2 = Vector2.ZERO
+var burger_stack_home_position: Vector2 = Vector2.ZERO
+var cook_board_home_position: Vector2 = Vector2.ZERO
 
-@onready var battle_gauge: BattleGauge = $BattleGauge
+@onready var stage_timer_label: Label = $StageTimerLabel
+@onready var medal_target_label: Label = $MedalTargetLabel
 @onready var recipe_display_stack: RecipeDisplayStack = $PlayArea/RecipeDisplayStack
-@onready var customer_area: Control = $PlayArea/CustomerArea
+@onready var plate_area: Control = $PlayArea/PlateArea
+@onready var cook_board: Sprite2D = $PlayArea/PlateArea/Cook_jori
 @onready var burger_stack: BurgerStack = $PlayArea/PlateArea/BurgerStack
-@onready var order_progress_dots: VBoxContainer = $PlayArea/PlateArea/OrderProgressDots
+@onready var order_progress_dots: HBoxContainer = $PlayArea/OrderProgressDots
 @onready var ingredient_slots: IngredientSlotGrid = $IngredientSlots
 @onready var status_label: Label = $StatusLabel
 @onready var result_rank: Control = $ResultRank
 @onready var result_perfect: TextureRect = $ResultRank/Perfect
 @onready var blackout_overlay: ColorRect = $BlackoutOverlay
 @onready var combo_counter: ComboCounter = $ComboCounter
-@onready var multi_order: MultiOrder = $MultiOrder
 @onready var ready_go_overlay: ColorRect = $ReadyGoOverlay
 @onready var ready_go_label: Label = $ReadyGoOverlay/Label
+@onready var next_stage_overlay: ColorRect = $NextStageOverlay
 @onready var store_light: TextureRect = $StoreLight
 
 
 func _ready() -> void:
 	panel_home_position = position
+	recipe_display_home_position = recipe_display_stack.position
+	burger_stack_home_position = burger_stack.position
+	cook_board_home_position = cook_board.position
 	is_mobile_input = OS.has_feature("mobile")
 	UltimateManager.triggered.connect(_on_ultimate_triggered)
+	GameRun.time_changed.connect(_on_time_changed)
 	GameRun.blackout_requested.connect(_on_blackout_requested)
-	DistanceManager.distance_changed.connect(_on_distance_changed)
 	burger_stack.ingredient_landed.connect(_on_stack_ingredient_landed)
 	ingredient_slots.ingredient_picked.connect(_on_ingredient_picked)
-	_on_distance_changed(DistanceManager.distance, DistanceManager.MAX_DISTANCE)
 
 
 func _process(delta: float) -> void:
+	_animate_next_stage_halo(delta)
+
 	if not visible or not screen_shake_active:
 		return
 
@@ -88,6 +107,10 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if next_stage_overlay_active:
+		_handle_next_stage_overlay_input(event)
+		return
+
 	if not ready_go_active:
 		return
 	if event is not InputEventKey:
@@ -102,9 +125,7 @@ func on_show(data: Dictionary = {}) -> void:
 	round_token += 1
 	customer = data.get("customer", {})
 	recipes = customer.get("recipes", [])
-	damage = customer.get("damage", 0.0) as float
-	knockback = customer.get("knockback", 0.0) as float
-	multi_order.hide_order_count()
+	medal_targets = customer.get("medal_targets", {}) as Dictionary
 	if recipes.is_empty():
 		push_error("[OrderPanel] No recipes provided.")
 		return
@@ -112,26 +133,34 @@ func on_show(data: Dictionary = {}) -> void:
 	current_recipe_index = 0
 	current_step = 0
 	mistake_count = 0
+	timer_frozen = false
+	next_stage_overlay_active = false
 	blackout_event_active = false
 	blackout_used_for_customer = false
 	pending_stack_landing_tokens.clear()
+	perfect_shine_landing_tokens.clear()
+	next_stage_overlay_landing_tokens.clear()
+	_reset_next_stage_overlay_tween()
+	_clear_next_stage_halo()
 	blackout_overlay.visible = false
+	next_stage_overlay.visible = false
+	next_stage_overlay.color.a = 0.0
+	medal_target_label.visible = false
 	store_light.texture = STORE_LIGHT_ON_TEXTURE
 	_hide_result_rank()
 	burger_stack.clear_stack()
+	_reset_stage_completion_positions()
 	_setup_ingredient_slots(false)
-	_clear_customer()
 	_reset_screen_shake_position()
 	screen_shake_elapsed = 0.0
 	_setup_order_progress_dots()
-	_on_distance_changed(DistanceManager.distance, DistanceManager.MAX_DISTANCE)
-	battle_gauge.show_customer_queue(customer.get("variants", []).has("multi"))
+	_on_time_changed(GameRun.elapsed_time)
 	var token := round_token
 	if data.get("show_ready_go", false):
 		await _run_ready_go_overlay(token)
 		if token != round_token:
 			return
-	_start_customer(token)
+	_start_order(token)
 
 
 func on_hide() -> void:
@@ -142,8 +171,8 @@ func on_hide() -> void:
 	blackout_event_active = false
 	blackout_used_for_customer = false
 	blackout_overlay.visible = false
+	medal_target_label.visible = false
 	store_light.texture = STORE_LIGHT_ON_TEXTURE
-	multi_order.hide_order_count()
 	_hide_result_rank()
 	recipe_display_stack.clear_recipes()
 	_clear_order_progress_dots()
@@ -151,32 +180,32 @@ func on_hide() -> void:
 	ingredient_slots.clear_slots()
 	burger_stack.clear_stack()
 	pending_stack_landing_tokens.clear()
-	_clear_customer()
+	perfect_shine_landing_tokens.clear()
+	next_stage_overlay_landing_tokens.clear()
+	_reset_next_stage_overlay_tween()
+	_clear_next_stage_halo()
+	_reset_stage_completion_positions()
 	screen_shake_active = false
+	timer_frozen = false
+	next_stage_overlay_active = false
 	ready_go_active = false
 	ready_go_overlay.visible = false
+	next_stage_overlay.visible = false
+	next_stage_overlay.color.a = 0.0
 	ingredient_slots.set_process_unhandled_input(true)
 	GameRun.set_start_blocked(false)
 	screen_shake_elapsed = 0.0
 	_reset_screen_shake_position()
 
 
-func _start_customer(token: int) -> void:
-	current_phase = Phase.CUSTOMER_ENTERING
+func _start_order(token: int) -> void:
+	current_phase = Phase.ORDER_STARTING
 	current_recipe = recipes[0]
 
-	status_label.text = "New customer"
+	status_label.text = "New order"
 	_display_current_recipes()
-	customer_sprite = _create_customer_sprite(false)
-	customer_area.add_child(customer_sprite)
-	customer_sprite.position = Vector2(150.0, 88.0)
-
-	var tween: Tween = create_tween()
-	tween.tween_property(customer_sprite, "position:x", 50.0, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	await tween.finished
 	if token != round_token:
 		return
-	multi_order.show_order_count(recipes.size())
 	_start_play(token)
 
 func _start_play(token: int) -> void:
@@ -292,6 +321,25 @@ func _run_ready_go_overlay(token: int) -> void:
 	GameRun.set_start_blocked(false)
 
 
+func _handle_next_stage_overlay_input(event: InputEvent) -> void:
+	if event is not InputEventKey:
+		return
+
+	var key_event := event as InputEventKey
+	if not key_event.pressed or key_event.echo:
+		return
+	if key_event.keycode != KEY_SPACE:
+		return
+
+	get_viewport().set_input_as_handled()
+	next_stage_overlay_active = false
+	_reset_next_stage_overlay_tween()
+	_clear_next_stage_halo()
+	next_stage_overlay.visible = false
+	next_stage_overlay.color.a = 0.0
+	GameRun.continue_to_next_stage()
+
+
 func _setup_ingredient_slots(enabled: bool) -> void:
 	var stage: int = customer.get("stage", 1) as int
 	var ingredients: Array[Ingredient] = GameState.get_slot_ingredients(stage)
@@ -306,12 +354,18 @@ func _on_ingredient_picked(ingredient: Ingredient) -> void:
 	if ingredient.id != expected.id:
 		mistake_count += 1
 		pending_stack_landing_tokens.clear()
+		perfect_shine_landing_tokens.clear()
+		next_stage_overlay_landing_tokens.clear()
 		ComboManager.reset_combo()
 		_show_wrong_input_feedback()
 		return
 
 	stack_landing_token += 1
 	pending_stack_landing_tokens.append(stack_landing_token)
+	if _should_play_perfect_shine_on_landing(ingredient):
+		perfect_shine_landing_tokens.append(stack_landing_token)
+	if _should_show_next_stage_overlay_on_landing(ingredient):
+		next_stage_overlay_landing_tokens.append(stack_landing_token)
 	burger_stack.add_ingredient(ingredient, stack_landing_token)
 	current_step += 1
 	status_label.text = "%d / %d" % [current_step, current_recipe.ingredients.size()]
@@ -327,9 +381,38 @@ func _on_stack_ingredient_landed(_stack_position: Vector2, token: int) -> void:
 	if token_index < 0:
 		return
 	pending_stack_landing_tokens.remove_at(token_index)
+	var shine_token_index := perfect_shine_landing_tokens.find(token)
+	if shine_token_index >= 0:
+		perfect_shine_landing_tokens.remove_at(shine_token_index)
+		_show_result_rank()
+		_play_perfect_shine_behind_result_rank()
+	var overlay_token_index := next_stage_overlay_landing_tokens.find(token)
+	if overlay_token_index >= 0:
+		next_stage_overlay_landing_tokens.remove_at(overlay_token_index)
+		_show_next_stage_overlay(false)
 	ComboManager.add_combo()
 	UltimateManager.add_gauge_for_combo(ComboManager.combo)
 	combo_counter.show_at_fixed_position()
+
+
+func _should_play_perfect_shine_on_landing(ingredient: Ingredient) -> bool:
+	if mistake_count > 0:
+		return false
+	if ingredient.id != PERFECT_SHINE_INGREDIENT_ID:
+		return false
+	var is_final_recipe := current_recipe_index + 1 >= recipes.size()
+	var is_final_step := current_step + 1 >= current_recipe.ingredients.size()
+	return is_final_recipe and is_final_step
+
+
+func _should_show_next_stage_overlay_on_landing(ingredient: Ingredient) -> bool:
+	if ingredient.id != PERFECT_SHINE_INGREDIENT_ID:
+		return false
+	if (customer.get("stage", 1) as int) >= GameRun.MAX_STAGE:
+		return false
+	var is_final_recipe := current_recipe_index + 1 >= recipes.size()
+	var is_final_step := current_step + 1 >= current_recipe.ingredients.size()
+	return is_final_recipe and is_final_step
 
 
 func _wait_for_pending_stack_landings() -> void:
@@ -341,22 +424,36 @@ func _wait_for_pending_stack_landings() -> void:
 func _finish_current_burger() -> void:
 	current_phase = Phase.SERVING
 	status_label.text = "Burger complete"
+	var is_final_recipe := current_recipe_index + 1 >= recipes.size()
+	if is_final_recipe:
+		_freeze_stage_timer()
+		_disable_slots()
+
 	await _wait_for_pending_stack_landings()
+	if is_final_recipe:
+		combo_counter.keep_visible()
 	_play_recipe_completion_feedback(round_token)
 
-	status_label.text = "Burger served"
-	await get_tree().create_timer(BURGER_SERVE_DELAY_SECONDS).timeout
-	var eat_position: Vector2 = await _fly_burger_to_customer()
-	await _play_eating_particles(eat_position)
-	await recipe_display_stack.complete_current_recipe()
+	if is_final_recipe:
+		status_label.text = "Stage complete"
+		_show_medal_targets()
+		await _play_stage_complete_presentation()
+	else:
+		status_label.text = "Burger served"
+		await get_tree().create_timer(BURGER_SERVE_DELAY_SECONDS).timeout
+		await _play_inter_order_burger_transition()
+		await recipe_display_stack.complete_current_recipe()
+
 	current_recipe_index += 1
 	_update_order_progress_dots()
 
-	if current_recipe_index >= recipes.size():
-		await _exit_customer()
-		_play_customer_attack()
+	if is_final_recipe:
 		current_phase = Phase.COMPLETE
+		customer["mistakes"] = mistake_count
+		var should_show_next_stage_overlay := (customer.get("stage", 1) as int) < GameRun.MAX_STAGE
 		order_completed.emit(true)
+		if should_show_next_stage_overlay and visible:
+			_show_next_stage_overlay(true)
 		return
 
 	current_recipe = recipes[current_recipe_index]
@@ -379,10 +476,9 @@ func _setup_order_progress_dots() -> void:
 		var icon := TextureRect.new()
 		icon.custom_minimum_size = ORDER_PROGRESS_ICON_SIZE
 		icon.size = ORDER_PROGRESS_ICON_SIZE
-		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.texture = ORDER_PROGRESS_TEXTURE
+		icon.expand_mode = TextureRect.EXPAND_KEEP_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		order_progress_dots.add_child(icon)
 
@@ -401,7 +497,8 @@ func _update_order_progress_dots(completed_count: int = -1) -> void:
 		var icon := order_progress_dots.get_child(index) as TextureRect
 		if icon == null:
 			continue
-		icon.texture = ORDER_PROGRESS_FILL_TEXTURE if index < filled_count else ORDER_PROGRESS_EMPTY_TEXTURE
+		icon.texture = ORDER_PROGRESS_TEXTURE
+		icon.modulate.a = ORDER_PROGRESS_FILLED_ALPHA if index < filled_count else ORDER_PROGRESS_EMPTY_ALPHA
 
 
 func _fail_customer() -> void:
@@ -409,18 +506,6 @@ func _fail_customer() -> void:
 	_disable_slots()
 	status_label.text = "Failed"
 	order_completed.emit(false)
-
-
-func _play_customer_attack() -> void:
-	var attack_damage := damage
-	var attack_knockback := knockback
-	var hit_monster := func() -> void:
-		AudioManager.play_sfx(AudioManager.Sfx.ATTACK)
-		MonsterManager.apply_damage(attack_damage)
-		DistanceManager.recover(attack_knockback)
-		battle_gauge.refresh_monster_icon_position_immediately()
-	battle_gauge.customer_attack_hit.connect(hit_monster, CONNECT_ONE_SHOT)
-	battle_gauge.play_customer_attack(false)
 
 
 func _show_wrong_input_feedback() -> void:
@@ -469,7 +554,11 @@ func _play_recipe_completion_feedback(token: int) -> void:
 		return
 
 	AudioManager.play_sfx(AudioManager.Sfx.ORDER_SUCCESS_PERFECT)
-	_show_result_rank()
+	if not result_rank.visible:
+		_show_result_rank()
+	if current_recipe_index + 1 >= recipes.size():
+		return
+
 	await get_tree().create_timer(RESULT_RANK_DISPLAY_SECONDS).timeout
 	if token != round_token:
 		return
@@ -495,37 +584,27 @@ func _on_ultimate_triggered(recovery_amount: float, freeze_duration: float) -> v
 		return
 
 	status_label.text = "Ultimate! +%d / %.1fs freeze" % [int(round(recovery_amount)), freeze_duration]
-	battle_gauge.play_ultimate_barrage()
 
 
-func _on_distance_changed(value: float, _max_value: float) -> void:
-	var distance_meters := value * battle_gauge.distance_display_scale
-	var should_shake := false
-	var next_interval := 0.0
-	var next_offset := 0.0
-
-	if distance_meters <= 200.0:
-		should_shake = true
-		next_interval = 1.0
-		next_offset = 4.0
-	elif distance_meters <= 500.0:
-		should_shake = true
-		next_interval = 1.0
-		next_offset = 2.0
-	elif distance_meters <= 800.0:
-		should_shake = true
-		next_interval = 2.0
-		next_offset = 1.0
-
-	if should_shake == screen_shake_active and is_equal_approx(next_interval, screen_shake_interval_seconds) and is_equal_approx(next_offset, screen_shake_offset):
+func _on_time_changed(elapsed: float) -> void:
+	if stage_timer_label == null:
+		return
+	if timer_frozen:
 		return
 
-	screen_shake_active = should_shake
-	screen_shake_interval_seconds = next_interval
-	screen_shake_offset = next_offset
-	screen_shake_elapsed = 0.0
-	if not should_shake:
-		_reset_screen_shake_position()
+	stage_timer_label.text = "%.3f" % elapsed
+
+
+func _show_medal_targets() -> void:
+	if medal_target_label == null:
+		return
+
+	medal_target_label.text = "Gold %.1fs\nSilver %.1fs\nBronze %.1fs" % [
+		medal_targets.get("gold", 0.0),
+		medal_targets.get("silver", 0.0),
+		medal_targets.get("bronze", 0.0),
+	]
+	medal_target_label.visible = true
 
 
 func _play_screen_shake() -> void:
@@ -548,95 +627,142 @@ func _reset_screen_shake_tween() -> void:
 	screen_shake_tween = null
 
 
-func _fly_burger_to_customer() -> Vector2:
-	var flying_burger: Node2D = _snapshot_burger()
-	add_child(flying_burger)
-	flying_burger.global_position = burger_stack.global_position
+func _freeze_stage_timer() -> void:
+	timer_frozen = true
+	GameRun.set_start_blocked(true)
+	stage_timer_label.text = "%.3f" % GameRun.elapsed_time
+
+
+func _play_stage_complete_presentation() -> void:
+	var recipe_exit_x := recipe_display_home_position.x + size.x + 120.0
+	var burger_center_x := (global_position.x + size.x * 0.5) - plate_area.global_position.x
+	var cook_board_center_x := burger_center_x - burger_stack_home_position.x + cook_board_home_position.x
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(recipe_display_stack, "position:x", recipe_exit_x, STAGE_COMPLETE_PRESENTATION_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(burger_stack, "position:x", burger_center_x, STAGE_COMPLETE_PRESENTATION_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(cook_board, "position:x", cook_board_center_x, STAGE_COMPLETE_PRESENTATION_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	await tween.finished
+
+
+func _play_perfect_shine_behind_result_rank() -> void:
+	var shine := PERFECT_SHINE_SCENE.instantiate() as Node2D
+	result_rank.add_child(shine)
+	result_rank.move_child(shine, 0)
+	shine.position = result_rank.size * 0.5
+	shine.z_index = result_perfect.z_index - 1
+
+	var particles := shine.get_node_or_null("GPUParticles2D") as GPUParticles2D
+	if particles != null:
+		particles.restart()
+		particles.emitting = true
+
+	var cleanup_delay := 1.6
+	if particles != null:
+		cleanup_delay = particles.lifetime + 0.4
+	get_tree().create_timer(cleanup_delay).timeout.connect(_queue_free_if_valid.bind(shine), CONNECT_ONE_SHOT)
+
+
+func _queue_free_if_valid(node: Node) -> void:
+	if is_instance_valid(node):
+		node.queue_free()
+
+
+func _play_inter_order_burger_transition() -> void:
+	var outgoing := _snapshot_cook_and_burger()
+	plate_area.add_child(outgoing)
+
 	burger_stack.clear_stack()
+	cook_board.position = cook_board_home_position + Vector2(INTER_ORDER_SLIDE_DISTANCE, 0.0)
 
-	var target_position: Vector2 = customer_area.global_position + Vector2(50.0, 72.0)
-	var tween: Tween = create_tween().set_parallel(true)
-	tween.tween_property(flying_burger, "global_position", target_position, 0.25).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tween.tween_property(flying_burger, "scale", Vector2(0.35, 0.35), 0.25)
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(outgoing, "position:x", -INTER_ORDER_SLIDE_DISTANCE, BURGER_TRANSITION_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(cook_board, "position", cook_board_home_position, BURGER_TRANSITION_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	await tween.finished
-	flying_burger.queue_free()
-	return target_position
+
+	outgoing.queue_free()
+	cook_board.position = cook_board_home_position
 
 
-func _play_eating_particles(origin: Vector2) -> void:
-	for i in range(2):
-		_spawn_eating_particle(origin)
-		await get_tree().create_timer(0.2).timeout
+func _snapshot_cook_and_burger() -> Node2D:
+	var root := Node2D.new()
+	root.z_index = min(cook_board.z_index, burger_stack.z_index)
 
+	var cook_snapshot := cook_board.duplicate() as Sprite2D
+	root.add_child(cook_snapshot)
+	cook_snapshot.position = cook_board.position
 
-func _spawn_eating_particle(origin: Vector2) -> void:
-	var eating_particle: Node2D = EATING_PARTICLE_SCENE.instantiate() as Node2D
-	add_child(eating_particle)
-	eating_particle.global_position = origin
-	for child in eating_particle.get_children():
-		if child is GPUParticles2D:
-			child.emitting = true
-
-	var particle: Label = Label.new()
-	particle.text = "YUM"
-	particle.add_theme_font_size_override("font_size", 14)
-	particle.modulate = Color(1.0, 0.86, 0.25, 1.0)
-	particle.global_position = origin + Vector2(randf_range(-10.0, 10.0), randf_range(-8.0, 6.0))
-	add_child(particle)
-
-	var tween: Tween = create_tween().set_parallel(true)
-	tween.tween_property(particle, "global_position:y", particle.global_position.y - 18.0, 0.28)
-	tween.tween_property(particle, "modulate:a", 0.0, 0.28)
-	await tween.finished
-	particle.queue_free()
-	await get_tree().create_timer(0.6).timeout
-	if is_instance_valid(eating_particle):
-		eating_particle.queue_free()
-
-
-func _exit_customer() -> void:
-	current_phase = Phase.CUSTOMER_EXITING
-	_set_customer_full()
-	status_label.text = "Customer satisfied"
-	await get_tree().create_timer(0.12).timeout
-	if customer_sprite == null:
-		return
-	var tween: Tween = create_tween()
-	tween.tween_property(customer_sprite, "position:x", -150.0, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
-	await tween.finished
-	_clear_customer()
-
-
-func _snapshot_burger() -> Node2D:
-	var root: Node2D = Node2D.new()
+	var burger_snapshot := Node2D.new()
+	root.add_child(burger_snapshot)
+	burger_snapshot.position = burger_stack.position
+	burger_snapshot.z_index = burger_stack.z_index
 	for child in burger_stack.get_children():
-		var snapshot_child: Node = child.duplicate()
-		root.add_child(snapshot_child)
+		burger_snapshot.add_child(child.duplicate())
+
 	return root
+
+
+func _reset_stage_completion_positions() -> void:
+	recipe_display_stack.position = recipe_display_home_position
+	burger_stack.position = burger_stack_home_position
+	cook_board.position = cook_board_home_position
+
+
+func _show_next_stage_overlay(accept_input: bool = true) -> void:
+	next_stage_overlay_active = next_stage_overlay_active or accept_input
+	if next_stage_overlay.visible:
+		return
+
+	_show_next_stage_halo()
+	_reset_next_stage_overlay_tween()
+	next_stage_overlay.visible = true
+	next_stage_overlay.color.a = 0.0
+	next_stage_overlay_tween = create_tween()
+	next_stage_overlay_tween.tween_property(next_stage_overlay, "color:a", NEXT_STAGE_OVERLAY_TARGET_ALPHA, NEXT_STAGE_OVERLAY_FADE_SECONDS)
+
+
+func _reset_next_stage_overlay_tween() -> void:
+	if next_stage_overlay_tween != null and next_stage_overlay_tween.is_valid():
+		next_stage_overlay_tween.kill()
+	next_stage_overlay_tween = null
+
+
+func _show_next_stage_halo() -> void:
+	_clear_next_stage_halo()
+	next_stage_halo = NEXT_STAGE_HALO_SCENE.instantiate() as Node2D
+	next_stage_halo.z_index = -1
+	next_stage_halo.position = Vector2(0.0, -burger_stack.current_height * 0.5)
+	next_stage_halo.scale = Vector2(0.65, 0.65)
+	next_stage_halo.modulate.a = 0.0
+	burger_stack.add_child(next_stage_halo)
+
+	next_stage_halo_elapsed = 0.0
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(next_stage_halo, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(next_stage_halo, "modulate:a", 1.0, 0.12)
+
+
+func _clear_next_stage_halo() -> void:
+	if next_stage_halo != null and is_instance_valid(next_stage_halo):
+		next_stage_halo.queue_free()
+	next_stage_halo = null
+	next_stage_halo_elapsed = 0.0
+
+
+func _animate_next_stage_halo(delta: float) -> void:
+	if next_stage_halo == null or not is_instance_valid(next_stage_halo):
+		return
+
+	next_stage_halo_elapsed += delta
+	next_stage_halo.rotation += delta * 1.15
+	if next_stage_halo_elapsed < 0.18:
+		return
+	var pulse := 1.0 + sin(next_stage_halo_elapsed * 4.2) * 0.055
+	next_stage_halo.scale = Vector2(pulse, pulse)
 
 
 func _display_current_recipes() -> void:
 	recipe_display_stack.show_recipes(recipes.slice(current_recipe_index, recipes.size()))
 	recipe_display_stack.set_current_step(current_step)
-
-
-func _create_customer_sprite(full: bool) -> Node2D:
-	var sprite: Sprite2D = Sprite2D.new()
-	sprite.name = "CustomerSprite"
-	sprite.texture = CUSTOMER_FULL_TEXTURE if full else CUSTOMER_HUNGRY_TEXTURE
-	return sprite
-
-
-func _set_customer_full() -> void:
-	var sprite := customer_sprite as Sprite2D
-	if sprite != null:
-		sprite.texture = CUSTOMER_FULL_TEXTURE
-
-
-func _clear_customer() -> void:
-	if customer_sprite != null and is_instance_valid(customer_sprite):
-		customer_sprite.queue_free()
-	customer_sprite = null
 
 
 func _disable_slots() -> void:

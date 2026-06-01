@@ -7,12 +7,15 @@
 
 [node name="ComboCounter" type="HBoxContainer" unique_id=1689143140]
 anchors_preset = -1
-anchor_left = 0.148
-anchor_right = 0.148
-offset_left = -39.96
-offset_right = 80.04
-offset_bottom = 58.0
-pivot_offset = Vector2(40, 0)
+anchor_left = 0.22200002
+anchor_top = 0.060000002
+anchor_right = 0.22200002
+anchor_bottom = 0.060000002
+offset_left = -59.940006
+offset_top = -28.800001
+offset_right = 21.059994
+offset_bottom = 29.199999
+pivot_offset = Vector2(60, 29)
 mouse_filter = 2
 script = ExtResource("1_scl1t")
 
