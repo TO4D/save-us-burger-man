@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://dcyr7651s66f" path="res://scenes/components/IngredientSlot.tscn" id="7_slot"]
 [ext_resource type="Script" uid="uid://b20bp6pi5tbgd" path="res://scenes/components/IngredientSlotGrid.gd" id="8_grid"]
 [ext_resource type="PackedScene" uid="uid://cx4wtpu6m3qdr" path="res://scenes/components/MultiOrder.tscn" id="9_multi"]
+[ext_resource type="PackedScene" path="res://scenes/components/UltimateOverlay.tscn" id="10_ult_overlay"]
 [ext_resource type="Texture2D" uid="uid://c4ygqskfjim15" path="res://assets/sprites/ui/result_perfect.png" id="14_perfect"]
 [ext_resource type="Texture2D" uid="uid://dbsxpj7ft5qqc" path="res://assets/sprites/store/light_on.png" id="15_l4fm3"]
 [ext_resource type="PackedScene" path="res://scenes/components/PlateStackScene.tscn" id="16_plate_stack"]
@@ -162,12 +163,11 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="UltimateBell" parent="." unique_id=1684200322 instance=ExtResource("5_bell")]
-visible = false
 layout_mode = 0
-offset_left = 76.0
-offset_top = 88.0
-offset_right = 126.0
-offset_bottom = 138.00003
+offset_left = 3.0
+offset_top = 184.0
+offset_right = 53.0
+offset_bottom = 234.00003
 
 [node name="ResultRank" type="Control" parent="." unique_id=1902987360]
 visible = false
@@ -239,6 +239,8 @@ theme_override_font_sizes/font_size = 42
 text = "Ready..."
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="UltimateOverlay" parent="." unique_id=1157515607 instance=ExtResource("10_ult_overlay")]
 
 [node name="MultiOrder" parent="." unique_id=1478787284 instance=ExtResource("9_multi")]
 visible = true

@@ -68,6 +68,7 @@ func _process(delta: float) -> void:
 func play_burger_attack(knockback_amount: float = 0.0) -> void:
 	var projectile := _create_burger_projectile()
 	add_child(projectile)
+	AudioManager.play_sfx(AudioManager.Sfx.FIRE_BURGER)
 
 	var target_position := Vector2(monster_icon.global_position.x + 6.0, monster_icon.global_position.y - 110.0)
 	var tween: Tween = create_tween().set_parallel(true)

@@ -2,11 +2,9 @@ extends Node
 
 signal gauge_changed(value: int, max_value: int)
 signal ready_changed(ready: bool)
-signal triggered(recovery_amount: float, freeze_duration: float)
+signal triggered()
 
-const MAX_GAUGE := 72
-const RECOVERY_AMOUNT := 30.0
-const FREEZE_DURATION := 2.5
+const MAX_GAUGE := 144
 
 var gauge: int = 0
 var is_ready: bool = false
@@ -28,10 +26,8 @@ func trigger() -> bool:
 	if not is_ready:
 		return false
 
-	DistanceManager.recover(RECOVERY_AMOUNT)
-	DistanceManager.freeze(FREEZE_DURATION)
 	reset()
-	triggered.emit(RECOVERY_AMOUNT, FREEZE_DURATION)
+	triggered.emit()
 	return true
 
 

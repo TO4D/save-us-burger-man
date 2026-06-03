@@ -1,66 +1,69 @@
 [gd_scene format=3 uid="uid://dwkpv5wbo3tqm"]
 
 [ext_resource type="Script" uid="uid://bymkpapka0ms7" path="res://scenes/components/UltimateBell.gd" id="1_l2x7o"]
-[ext_resource type="Texture2D" uid="uid://dk4gua47jgvir" path="res://assets/sprites/store/bell_Glow_resize.png" id="2_fc3w5"]
-[ext_resource type="Texture2D" uid="uid://drhvp6jex30hx" path="res://assets/sprites/store/bell_fill_resize.png" id="2_tia2t"]
-[ext_resource type="Texture2D" uid="uid://big03haet5d17" path="res://assets/sprites/store/jar.png" id="4_fc3w5"]
 
 [node name="UltimateBell" type="Button" unique_id=384873118]
-custom_minimum_size = Vector2(50, 50)
-offset_right = 50.0
-offset_bottom = 50.0
+custom_minimum_size = Vector2(40, 104)
+offset_right = 40.0
+offset_bottom = 104.0
 focus_mode = 0
 mouse_default_cursor_shape = 2
 flat = true
 script = ExtResource("1_l2x7o")
 
-[node name="Glow" type="TextureRect" parent="." unique_id=1001365805]
+[node name="Glow" type="ColorRect" parent="." unique_id=1001365805]
 visible = false
-modulate = Color(1, 0.91933334, 0.56, 0.7647059)
+modulate = Color(1, 0.91933334, 0.56, 0.35)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = 11.0
-offset_right = -10.0
-offset_bottom = -9.0
+offset_left = -2.0
+offset_top = -2.0
+offset_right = 2.0
+offset_bottom = 2.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("2_fc3w5")
-expand_mode = 1
-stretch_mode = 5
+color = Color(1, 0.91933334, 0.56, 1)
 
-[node name="Fill" type="TextureProgressBar" parent="." unique_id=1853298063]
-visible = false
+[node name="Outline" type="Panel" parent="." unique_id=883407539]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 12.0
-offset_right = -11.999966
-offset_bottom = -10.0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -11.0
+offset_top = -42.0
+offset_right = 11.0
+offset_bottom = 30.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-value = 100.0
-fill_mode = 3
-texture_progress = ExtResource("2_tia2t")
-tint_progress = Color(1, 0.807843, 0.25098, 0.82)
 
-[node name="Outline" type="TextureRect" parent="." unique_id=883407539]
+[node name="BarBackground" type="ColorRect" parent="Outline" unique_id=595200111]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("4_fc3w5")
-expand_mode = 1
-stretch_mode = 5
+color = Color(0.18, 0.15, 0.13, 1)
+
+[node name="Fill" type="ColorRect" parent="Outline/BarBackground" unique_id=1853298063]
+layout_mode = 1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+color = Color(0.82, 0.52, 0.18, 1)
 
 [node name="Label" type="Label" parent="." unique_id=1697461998]
 layout_mode = 1
@@ -70,14 +73,14 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -16.0
-offset_top = -9.0
-offset_right = 18.0
-offset_bottom = 11.0
+offset_top = 34.0
+offset_right = 16.0
+offset_bottom = 48.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.12225217, 0.12225226, 0.12225223, 1)
-theme_override_font_sizes/font_size = 7
-text = "Gold"
+theme_override_colors/font_color = Color(0.82, 0.78, 0.7, 1)
+theme_override_font_sizes/font_size = 8
+text = "ULT"
 horizontal_alignment = 1
 
 [node name="GaugeLabel" type="Label" parent="." unique_id=656050770]
@@ -87,13 +90,13 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -7.0
-offset_top = -2.0
-offset_right = 8.0
-offset_bottom = 12.0
+offset_left = -16.0
+offset_top = 48.0
+offset_right = 16.0
+offset_bottom = 62.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.46, 0.43, 0.39, 1)
-theme_override_font_sizes/font_size = 10
+theme_override_font_sizes/font_size = 8
 text = "0%"
 horizontal_alignment = 1

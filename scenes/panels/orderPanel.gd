@@ -13,6 +13,10 @@ const STACK_VIEWPORT_SIZE := Vector2(180.0, 174.0)
 const STACK_CAMERA_DEFAULT_POSITION := STACK_VIEWPORT_SIZE * 0.5
 const STACK_CAMERA_TOP_MARGIN := 26.0
 const STACK_CAMERA_TWEEN_SECONDS := 0.16
+const STACK_CAMERA_RETURN_DELAY_SECONDS := 0.3
+const STACK_CAMERA_RETURN_SECONDS := 0.3
+const ULTIMATE_AUTO_STACK_DELAY_SECONDS := 0.01
+const ULTIMATE_STACK_SPEED_MULTIPLIER := 2.0
 const ORDER_PROGRESS_ICON_SIZE := Vector2(16.0, 16.0)
 const ORDER_PROGRESS_FILL_TEXTURE := preload("res://assets/sprites/ui/order_icon.1.png")
 const ORDER_PROGRESS_EMPTY_TEXTURE := preload("res://assets/sprites/ui/order_icon.2.png")
@@ -49,6 +53,7 @@ var stack_camera_tween: Tween = null
 var ready_go_active: bool = false
 var blackout_event_active: bool = false
 var blackout_used_for_customer: bool = false
+var ultimate_active: bool = false
 
 @onready var battle_gauge: BattleGauge = $BattleGauge
 @onready var recipe_display_stack: RecipeDisplayStack = $PlayArea/RecipeDisplayStack
@@ -66,8 +71,10 @@ var blackout_used_for_customer: bool = false
 @onready var combo_counter: ComboCounter = $ComboCounter
 @onready var multi_order: MultiOrder = $MultiOrder
 @onready var ready_go_overlay: ColorRect = $ReadyGoOverlay
+@onready var ultimate_overlay: UltimateOverlay = $UltimateOverlay
 @onready var ready_go_label: Label = $ReadyGoOverlay/Label
 @onready var store_light: TextureRect = $StoreLight
+@onready var ultimate_bell: UltimateBell = $UltimateBell
 
 
 func _ready() -> void:
@@ -81,6 +88,7 @@ func _ready() -> void:
 	ingredient_slots.ingredient_picked.connect(_on_ingredient_picked)
 	_reset_stack_camera()
 	_on_distance_changed(DistanceManager.distance, DistanceManager.MAX_DISTANCE)
+	_sync_player_controls()
 
 
 func _process(delta: float) -> void:
@@ -96,13 +104,18 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not ready_go_active:
-		return
 	if event is not InputEventKey:
 		return
 
 	var key_event := event as InputEventKey
-	if key_event.pressed:
+	if key_event.pressed and (ready_go_active or ultimate_active):
+		get_viewport().set_input_as_handled()
+		return
+
+	if not key_event.pressed or key_event.echo:
+		return
+
+	if key_event.keycode == KEY_Z and _can_trigger_ultimate() and UltimateManager.trigger():
 		get_viewport().set_input_as_handled()
 
 
@@ -122,6 +135,7 @@ func on_show(data: Dictionary = {}) -> void:
 	mistake_count = 0
 	blackout_event_active = false
 	blackout_used_for_customer = false
+	ultimate_active = false
 	pending_stack_landing_tokens.clear()
 	blackout_overlay.visible = false
 	store_light.texture = STORE_LIGHT_ON_TEXTURE
@@ -135,6 +149,7 @@ func on_show(data: Dictionary = {}) -> void:
 	screen_shake_elapsed = 0.0
 	_setup_order_progress_dots()
 	_on_distance_changed(DistanceManager.distance, DistanceManager.MAX_DISTANCE)
+	_sync_player_controls()
 	var token := round_token
 	if data.get("show_ready_go", false):
 		await _run_ready_go_overlay(token)
@@ -150,6 +165,7 @@ func on_hide() -> void:
 		GameRun.complete_blackout()
 	blackout_event_active = false
 	blackout_used_for_customer = false
+	ultimate_active = false
 	blackout_overlay.visible = false
 	store_light.texture = STORE_LIGHT_ON_TEXTURE
 	multi_order.hide_order_count()
@@ -165,10 +181,11 @@ func on_hide() -> void:
 	screen_shake_active = false
 	ready_go_active = false
 	ready_go_overlay.visible = false
-	ingredient_slots.set_process_unhandled_input(true)
+	ultimate_overlay.cancel()
 	GameRun.set_start_blocked(false)
 	screen_shake_elapsed = 0.0
 	_reset_screen_shake_position()
+	_sync_player_controls()
 
 
 func _start_order(token: int) -> void:
@@ -187,6 +204,7 @@ func _start_play(token: int) -> void:
 		return
 	current_phase = Phase.PLAYING
 	_setup_ingredient_slots(true)
+	_sync_player_controls()
 
 
 func _on_blackout_requested() -> void:
@@ -199,6 +217,7 @@ func _on_blackout_requested() -> void:
 
 	blackout_event_active = true
 	blackout_used_for_customer = true
+	_sync_player_controls()
 	_run_blackout(round_token)
 
 
@@ -243,6 +262,7 @@ func _finish_blackout_event() -> void:
 	blackout_overlay.visible = false
 	store_light.texture = STORE_LIGHT_ON_TEXTURE
 	GameRun.complete_blackout()
+	_sync_player_controls()
 
 
 func _play_blackout_warning(token: int) -> bool:
@@ -270,12 +290,11 @@ func _play_blackout_warning(token: int) -> bool:
 func _run_ready_go_overlay(token: int) -> void:
 	ready_go_active = true
 	GameRun.set_start_blocked(true)
-	ingredient_slots.set_process_unhandled_input(false)
-	ingredient_slots.set_interaction_enabled(false)
 	ready_go_overlay.modulate.a = 1.0
 	ready_go_label.scale = Vector2.ONE
 	ready_go_label.text = "Ready..."
 	ready_go_overlay.visible = true
+	_sync_player_controls()
 	await get_tree().create_timer(READY_OVERLAY_SECONDS).timeout
 	if token != round_token:
 		return
@@ -290,8 +309,8 @@ func _run_ready_go_overlay(token: int) -> void:
 
 	ready_go_overlay.visible = false
 	ready_go_active = false
-	ingredient_slots.set_process_unhandled_input(true)
 	GameRun.set_start_blocked(false)
+	_sync_player_controls()
 
 
 func _setup_ingredient_slots(enabled: bool) -> void:
@@ -301,7 +320,7 @@ func _setup_ingredient_slots(enabled: bool) -> void:
 
 
 func _on_ingredient_picked(ingredient: Ingredient) -> void:
-	if ready_go_active or current_phase != Phase.PLAYING or current_recipe == null:
+	if ready_go_active or ultimate_active or current_phase != Phase.PLAYING or current_recipe == null:
 		return
 
 	var expected: Ingredient = current_recipe.ingredients[current_step]
@@ -312,9 +331,7 @@ func _on_ingredient_picked(ingredient: Ingredient) -> void:
 		_show_wrong_input_feedback()
 		return
 
-	stack_landing_token += 1
-	pending_stack_landing_tokens.append(stack_landing_token)
-	burger_stack.add_ingredient(ingredient, stack_landing_token)
+	_queue_stack_ingredient(ingredient)
 	_update_stack_camera()
 	current_step += 1
 	recipe_display_stack.set_current_step(current_step)
@@ -330,7 +347,8 @@ func _on_stack_ingredient_landed(_stack_position: Vector2, token: int) -> void:
 		return
 	pending_stack_landing_tokens.remove_at(token_index)
 	ComboManager.add_combo()
-	UltimateManager.add_gauge_for_combo(ComboManager.combo)
+	if not ultimate_active:
+		UltimateManager.add_gauge_for_combo(ComboManager.combo)
 	combo_counter.show_at_fixed_position()
 
 
@@ -342,8 +360,10 @@ func _wait_for_pending_stack_landings() -> void:
 
 func _finish_current_burger() -> void:
 	current_phase = Phase.SERVING
+	_sync_player_controls()
 	await _wait_for_pending_stack_landings()
 	_play_recipe_completion_feedback(round_token)
+	await _return_stack_camera_to_default()
 
 	await _slide_completed_burger_left()
 	await _play_burger_throw_attack(_fullness_per_burger(), _knockback_per_burger())
@@ -353,6 +373,7 @@ func _finish_current_burger() -> void:
 
 	if current_recipe_index >= recipes.size():
 		current_phase = Phase.COMPLETE
+		_sync_player_controls()
 		order_completed.emit(true)
 		return
 
@@ -364,6 +385,7 @@ func _finish_current_burger() -> void:
 	await _enter_doma_from_right()
 	current_phase = Phase.PLAYING
 	_setup_ingredient_slots(true)
+	_sync_player_controls()
 
 
 func _setup_order_progress_dots() -> void:
@@ -405,6 +427,7 @@ func _update_order_progress_dots(completed_count: int = -1) -> void:
 func _fail_customer() -> void:
 	current_phase = Phase.COMPLETE
 	_disable_slots()
+	_sync_player_controls()
 	order_completed.emit(false)
 
 
@@ -493,11 +516,83 @@ func _hide_result_rank_images() -> void:
 	result_perfect.visible = false
 
 
-func _on_ultimate_triggered(recovery_amount: float, freeze_duration: float) -> void:
-	if not visible:
+func _on_ultimate_triggered() -> void:
+	if not _can_run_ultimate():
 		return
 
-	battle_gauge.play_ultimate_barrage()
+	# 필살기 연출
+	#battle_gauge.play_ultimate_barrage()
+
+	_run_ultimate_sequence(round_token)
+
+
+func _queue_stack_ingredient(ingredient: Ingredient) -> int:
+	stack_landing_token += 1
+	pending_stack_landing_tokens.append(stack_landing_token)
+	var speed_multiplier := ULTIMATE_STACK_SPEED_MULTIPLIER if ultimate_active else 1.0
+	burger_stack.add_ingredient(ingredient, stack_landing_token, speed_multiplier)
+	return stack_landing_token
+
+
+func _wait_for_stack_landing(token: int) -> void:
+	while pending_stack_landing_tokens.has(token):
+		await burger_stack.ingredient_landed
+		await get_tree().process_frame
+
+
+func _run_ultimate_sequence(token: int) -> void:
+	ultimate_active = true
+	_sync_player_controls()
+	AudioManager.play_sfx_while_paused(AudioManager.Sfx.ULTIMATE)
+	await ultimate_overlay.play_once()
+	if token != round_token:
+		ultimate_active = false
+		return
+	await _auto_complete_current_recipe(token)
+	ultimate_active = false
+	if token != round_token:
+		return
+	_sync_player_controls()
+
+
+func _auto_complete_current_recipe(token: int) -> void:
+	if current_recipe == null:
+		return
+
+	for ingredient_index in range(current_step, current_recipe.ingredients.size()):
+		if token != round_token or current_phase != Phase.PLAYING:
+			return
+
+		var ingredient: Ingredient = current_recipe.ingredients[ingredient_index]
+		var landing_token := _queue_stack_ingredient(ingredient)
+		_update_stack_camera()
+		current_step += 1
+		recipe_display_stack.set_current_step(current_step)
+		await _wait_for_stack_landing(landing_token)
+		if ingredient_index + 1 < current_recipe.ingredients.size():
+			await get_tree().create_timer(ULTIMATE_AUTO_STACK_DELAY_SECONDS).timeout
+
+	if token != round_token:
+		return
+
+	_update_order_progress_dots(current_recipe_index + 1)
+	await _finish_current_burger()
+
+
+func _sync_player_controls() -> void:
+	var controls_enabled := visible and current_phase == Phase.PLAYING and not ready_go_active and not ultimate_active
+	ingredient_slots.set_process_unhandled_input(controls_enabled)
+	ingredient_slots.set_interaction_enabled(controls_enabled)
+	if is_instance_valid(ultimate_bell):
+		ultimate_bell.set_trigger_enabled(_can_trigger_ultimate())
+
+
+func _can_trigger_ultimate() -> bool:
+	return visible and current_phase == Phase.PLAYING and current_recipe != null and not ready_go_active and not ultimate_active and not blackout_event_active and UltimateManager.is_ready
+
+
+func _can_run_ultimate() -> bool:
+	return visible and current_phase == Phase.PLAYING and current_recipe != null and not ready_go_active and not ultimate_active and not blackout_event_active
 
 
 func _on_distance_changed(value: float, _max_value: float) -> void:
@@ -577,6 +672,22 @@ func _reset_stack_camera() -> void:
 		stack_camera_tween.kill()
 	stack_camera_tween = null
 	stack_camera.position = STACK_CAMERA_DEFAULT_POSITION
+
+
+func _return_stack_camera_to_default() -> void:
+	if stack_camera.position.is_equal_approx(STACK_CAMERA_DEFAULT_POSITION):
+		return
+
+	if stack_camera_tween != null and stack_camera_tween.is_valid():
+		stack_camera_tween.kill()
+
+	if STACK_CAMERA_RETURN_DELAY_SECONDS > 0.0:
+		await get_tree().create_timer(STACK_CAMERA_RETURN_DELAY_SECONDS).timeout
+
+	stack_camera_tween = create_tween()
+	stack_camera_tween.tween_property(stack_camera, "position", STACK_CAMERA_DEFAULT_POSITION, STACK_CAMERA_RETURN_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	await stack_camera_tween.finished
+	stack_camera_tween = null
 
 
 func _slide_completed_burger_left() -> void:

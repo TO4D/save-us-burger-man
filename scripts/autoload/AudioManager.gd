@@ -13,6 +13,8 @@ enum Sfx {
 	ORDER_SUCCESS,
 	ORDER_SUCCESS_PERFECT,
 	ATTACK,
+	FIRE_BURGER,
+	ULTIMATE,
 }
 
 enum Bgm {
@@ -31,9 +33,11 @@ const SFX_PATHS := {
 	Sfx.LIGHT_OFF: "res://assets/audio/sfx/light_off.ogg",
 	Sfx.LIGHT_ON: "res://assets/audio/sfx/light_on.ogg",
 	Sfx.LIGHT_SPARK: "res://assets/audio/sfx/light_spark.ogg",
-	Sfx.ORDER_SUCCESS: "res://assets/audio/sfx/order_success2.ogg",
+	Sfx.ORDER_SUCCESS: "res://assets/audio/sfx/order_success.ogg",
 	Sfx.ORDER_SUCCESS_PERFECT: "res://assets/audio/sfx/order_success_perfect.ogg",
 	Sfx.ATTACK: "res://assets/audio/sfx/attack.ogg",
+	Sfx.FIRE_BURGER: "res://assets/audio/sfx/fire_burger.ogg",
+	Sfx.ULTIMATE: "res://assets/audio/sfx/ultimate.ogg",
 }
 
 const BGM_PATHS := {
@@ -61,15 +65,15 @@ func play_sfx(sfx: Sfx, volume_db: float = 0.0, pitch_scale: float = 1.0) -> voi
 	if stream == null:
 		return
 
-	var player := AudioStreamPlayer.new()
-	player.name = "SfxPlayer"
-	player.stream = stream
-	player.bus = sfx_bus
-	player.volume_db = volume_db
-	player.pitch_scale = pitch_scale
-	add_child(player)
-	player.finished.connect(player.queue_free)
-	player.play()
+	_play_stream(stream, volume_db, pitch_scale, Node.PROCESS_MODE_INHERIT)
+
+
+func play_sfx_while_paused(sfx: Sfx, volume_db: float = 0.0, pitch_scale: float = 1.0) -> void:
+	var stream := _load_stream(SFX_PATHS.get(sfx, ""))
+	if stream == null:
+		return
+
+	_play_stream(stream, volume_db, pitch_scale, Node.PROCESS_MODE_WHEN_PAUSED)
 
 
 func play_bgm(bgm: Bgm, volume_db: float = 0.0) -> void:
@@ -101,3 +105,16 @@ func _load_stream(path: String) -> AudioStream:
 		_missing_audio_paths[path] = true
 		push_warning("[AudioManager] Audio file not found or invalid: %s" % path)
 	return stream
+
+
+func _play_stream(stream: AudioStream, volume_db: float, pitch_scale: float, process_mode_value: ProcessMode) -> void:
+	var player := AudioStreamPlayer.new()
+	player.name = "SfxPlayer"
+	player.stream = stream
+	player.bus = sfx_bus
+	player.volume_db = volume_db
+	player.pitch_scale = pitch_scale
+	player.process_mode = process_mode_value
+	add_child(player)
+	player.finished.connect(player.queue_free)
+	player.play()

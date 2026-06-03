@@ -4,13 +4,16 @@ class_name UltimateBell
 const READY_COLOR := Color(0.806, 0.699, 0.0, 1.0)
 const IDLE_COLOR := Color(0.205, 0.205, 0.205, 1.0)
 const DIM_COLOR := Color(0.46, 0.43, 0.39, 1.0)
+const FILL_READY_COLOR := Color(1.0, 0.792, 0.2, 1.0)
+const FILL_IDLE_COLOR := Color(0.82, 0.52, 0.18, 1.0)
 
-@onready var fill_rect: TextureProgressBar = $Fill
-@onready var glow_rect: TextureRect = $Glow
+@onready var fill_rect: ColorRect = $Outline/BarBackground/Fill
+@onready var glow_rect: ColorRect = $Glow
 @onready var label: Label = $Label
 @onready var gauge_label: Label = $GaugeLabel
 
 var _base_position: Vector2
+var _trigger_enabled: bool = true
 
 
 func _ready() -> void:
@@ -24,26 +27,32 @@ func _ready() -> void:
 	_on_ready_changed(UltimateManager.is_ready)
 
 
+func set_trigger_enabled(enabled: bool) -> void:
+	_trigger_enabled = enabled
+	_apply_availability()
+
+
 func _on_pressed() -> void:
 	UltimateManager.trigger()
 
 
 func _on_gauge_changed(value: int, max_value: int) -> void:
 	var ratio := float(value) / float(max_value) if max_value > 0 else 0.0
-	fill_rect.value = ratio * fill_rect.max_value
+	fill_rect.anchor_top = 1.0 - ratio
 	gauge_label.text = "%d%%" % int(round(ratio * 100.0))
 
 
 func _on_ready_changed(ready: bool) -> void:
-	disabled = not ready
+	_apply_availability()
 	label.modulate = READY_COLOR if ready else IDLE_COLOR
 	gauge_label.modulate = READY_COLOR if ready else DIM_COLOR
+	fill_rect.color = FILL_READY_COLOR if ready else FILL_IDLE_COLOR
 	glow_rect.visible = ready
 	if ready:
 		_play_ready_bob()
 
 
-func _on_triggered(_recovery_amount: float, _freeze_duration: float) -> void:
+func _on_triggered() -> void:
 	position = _base_position
 	var tween := create_tween().set_parallel(true)
 	tween.tween_property(self, "scale", Vector2(0.92, 0.92), 0.06)
@@ -72,3 +81,7 @@ func _play_ready_bob() -> void:
 	var tween := create_tween()
 	tween.tween_property(self, "position:y", _base_position.y - 3.0, 0.08)
 	tween.tween_property(self, "position:y", _base_position.y, 0.08)
+
+
+func _apply_availability() -> void:
+	disabled = not UltimateManager.is_ready or not _trigger_enabled

@@ -6,11 +6,14 @@ signal ingredient_landed(stack_global_position: Vector2, token: int)
 const STACK_BASE_Y: int = 0
 const STACK_EFFECT_SCENE := preload("res://resources/vfx/StackEffect.tscn")
 const STACk_EFFECT_OFFSET_Y: float = 30.0
+const STACK_DROP_DURATION := 0.2
+const STACK_BOUNCE_SQUASH_DURATION := 0.05
+const STACK_BOUNCE_RESET_DURATION := 0.07
 
 var current_height: int = 0
 var stacked_ingredients: Array[Ingredient] = []
 
-func add_ingredient(ing: Ingredient, token: int = 0) -> void:
+func add_ingredient(ing: Ingredient, token: int = 0, speed_multiplier: float = 1.0) -> void:
 	var sprite = Sprite2D.new()
 	sprite.texture = ing.sprite
 	sprite.centered = false
@@ -25,13 +28,14 @@ func add_ingredient(ing: Ingredient, token: int = 0) -> void:
 	sprite.position = Vector2(0, target_y - 40)
 	add_child(sprite)
 
+	var speed := maxf(speed_multiplier, 0.001)
 	var tween = create_tween()
 	var stack_global_position: Vector2 = to_global(Vector2(0.0, target_y - STACk_EFFECT_OFFSET_Y))
-	tween.tween_property(sprite, "position:y", target_y, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(sprite, "position:y", target_y, STACK_DROP_DURATION / speed).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tween.tween_callback(_emit_ingredient_landed.bind(stack_global_position, token))
 	#tween.tween_callback(_spawn_stack_effect.bind(Vector2(0.0, target_y - STACk_EFFECT_OFFSET_Y)))
-	tween.tween_property(sprite, "scale", Vector2(1.15, 0.85), 0.05)
-	tween.tween_property(sprite, "scale", Vector2.ONE, 0.07)
+	tween.tween_property(sprite, "scale", Vector2(1.15, 0.85), STACK_BOUNCE_SQUASH_DURATION / speed)
+	tween.tween_property(sprite, "scale", Vector2.ONE, STACK_BOUNCE_RESET_DURATION / speed)
 
 	current_height += ing.stack_height
 	stacked_ingredients.append(ing)
