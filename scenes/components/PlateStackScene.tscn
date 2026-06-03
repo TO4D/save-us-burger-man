@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" uid="uid://bxs2t76pgylko" path="res://scenes/components/BurgerStack.tscn" id="1_stack"]
+[ext_resource type="Texture2D" uid="uid://br7a6eslknmd5" path="res://assets/sprites/cook/cook_area_jori2.png" id="2_jori"]
+[ext_resource type="Texture2D" uid="uid://dg745mhbduwe2" path="res://assets/sprites/cook/cook_area_doma.png" id="3_doma"]
+
+[node name="PlateStackScene" type="Node2D"]
+
+[node name="StackCamera" type="Camera2D" parent="."]
+position = Vector2(90, 87)
+enabled = true
+
+[node name="Cook_jori" type="Sprite2D" parent="."]
+position = Vector2(0, 118)
+scale = Vector2(0.6666666, 1)
+texture = ExtResource("2_jori")
+centered = false
+
+[node name="SpriteDoma" type="Sprite2D" parent="."]
+position = Vector2(91, 142)
+texture = ExtResource("3_doma")
+
+[node name="BurgerStack" parent="." instance=ExtResource("1_stack")]
+z_index = 1
+position = Vector2(90, 166)

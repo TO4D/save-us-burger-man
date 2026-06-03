@@ -1,20 +1,17 @@
 [gd_scene format=3 uid="uid://fmbafdwu28nm"]
 
 [ext_resource type="Script" uid="uid://ybh8i7vrjpp3" path="res://scenes/panels/orderPanel.gd" id="1"]
-[ext_resource type="PackedScene" uid="uid://bxs2t76pgylko" path="res://scenes/components/BurgerStack.tscn" id="2"]
-[ext_resource type="Texture2D" uid="uid://d0r1i1ea72pn2" path="res://assets/sprites/cook/cook_background.png" id="2_edvyg"]
-[ext_resource type="Texture2D" uid="uid://baf1m3n16xgxd" path="res://assets/sprites/cook/cook_slot_background.png" id="3_aryf5"]
+[ext_resource type="Texture2D" uid="uid://c8qrngoao0d5b" path="res://assets/sprites/cook/cook_slot_back.png" id="2_wtpwv"]
 [ext_resource type="PackedScene" uid="uid://7coxq8bafj1k" path="res://scenes/components/ComboCounter.tscn" id="4_combo"]
 [ext_resource type="PackedScene" uid="uid://f81sdvkvyogq" path="res://scenes/components/BattleGauge.tscn" id="4_l4fm3"]
 [ext_resource type="PackedScene" uid="uid://dwkpv5wbo3tqm" path="res://scenes/components/UltimateBell.tscn" id="5_bell"]
-[ext_resource type="Texture2D" uid="uid://j6p63de0a6w7" path="res://assets/sprites/cook/cook_doma.png" id="5_ja0vj"]
 [ext_resource type="Script" uid="uid://bkg1316f80lh8" path="res://scenes/components/RecipeDisplayStack.gd" id="6_stack"]
 [ext_resource type="PackedScene" uid="uid://dcyr7651s66f" path="res://scenes/components/IngredientSlot.tscn" id="7_slot"]
 [ext_resource type="Script" uid="uid://b20bp6pi5tbgd" path="res://scenes/components/IngredientSlotGrid.gd" id="8_grid"]
 [ext_resource type="PackedScene" uid="uid://cx4wtpu6m3qdr" path="res://scenes/components/MultiOrder.tscn" id="9_multi"]
-[ext_resource type="FontFile" uid="uid://bivsctx4h0jw" path="res://fonts/Jersey25-Regular.ttf" id="12_l4fm3"]
 [ext_resource type="Texture2D" uid="uid://c4ygqskfjim15" path="res://assets/sprites/ui/result_perfect.png" id="14_perfect"]
 [ext_resource type="Texture2D" uid="uid://dbsxpj7ft5qqc" path="res://assets/sprites/store/light_on.png" id="15_l4fm3"]
+[ext_resource type="PackedScene" path="res://scenes/components/PlateStackScene.tscn" id="16_plate_stack"]
 
 [node name="OrderPanel" type="Control" unique_id=890599604]
 layout_mode = 3
@@ -26,22 +23,27 @@ grow_vertical = 2
 script = ExtResource("1")
 
 [node name="Background" type="ColorRect" parent="." unique_id=1631623308]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.83928066, 0.85323197, 0.82905185, 1)
+color = Color(0.38039216, 0.29803923, 0.23921569, 1)
 
-[node name="Background1" type="Sprite2D" parent="." unique_id=624440060]
-texture = ExtResource("2_edvyg")
-centered = false
-
-[node name="Background2" type="Sprite2D" parent="." unique_id=1331383614]
-texture = ExtResource("3_aryf5")
-centered = false
+[node name="Background_slot" type="TextureRect" parent="." unique_id=2050253235]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -135.0
+offset_top = -126.0
+offset_right = 135.0
+grow_horizontal = 2
+grow_vertical = 0
+texture = ExtResource("2_wtpwv")
 
 [node name="BattleGauge" parent="." unique_id=1309183552 instance=ExtResource("4_l4fm3")]
 z_index = 50
@@ -51,24 +53,9 @@ layout_mode = 1
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 90.0
-offset_bottom = 320.0
+offset_top = 180.0
+offset_bottom = 352.0
 grow_horizontal = 2
-
-[node name="CustomerArea" type="Control" parent="PlayArea" unique_id=703238416]
-layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -252.0
-offset_top = -90.0
-offset_right = -152.0
-offset_bottom = 70.0
-grow_horizontal = 0
-grow_vertical = 2
-mouse_filter = 2
 
 [node name="PlateArea" type="Control" parent="PlayArea" unique_id=1139684568]
 layout_mode = 1
@@ -77,28 +64,30 @@ anchor_top = 0.62600005
 anchor_right = 0.34300002
 anchor_bottom = 0.62600005
 offset_left = -92.61001
-offset_top = -85.98001
+offset_top = -106.672
 offset_right = 87.38999
-offset_bottom = 86.01999
+offset_bottom = 67.327995
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Cook_jori" type="Sprite2D" parent="PlayArea/PlateArea" unique_id=1137743715]
-position = Vector2(0, 116)
-texture = ExtResource("5_ja0vj")
-centered = false
+[node name="StackViewportContainer" type="SubViewportContainer" parent="PlayArea/PlateArea" unique_id=462323128]
+clip_contents = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+stretch = true
 
-[node name="BurgerStack" parent="PlayArea/PlateArea" unique_id=235041741 instance=ExtResource("2")]
-position = Vector2(90, 168)
+[node name="StackViewport" type="SubViewport" parent="PlayArea/PlateArea/StackViewportContainer" unique_id=1347070830]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(180, 174)
+render_target_update_mode = 4
 
-[node name="ColorRect" type="ColorRect" parent="PlayArea/PlateArea" unique_id=1646500549]
-visible = false
-layout_mode = 0
-offset_left = 180.0
-offset_top = 152.0
-offset_right = 270.0
-offset_bottom = 172.0
-color = Color(0.21279216, 0.20355874, 0.1943241, 1)
+[node name="PlateStackScene" parent="PlayArea/PlateArea/StackViewportContainer/StackViewport" unique_id=800044148 instance=ExtResource("16_plate_stack")]
 
 [node name="OrderProgressDots" type="VBoxContainer" parent="PlayArea/PlateArea" unique_id=718414979]
 layout_mode = 1
@@ -122,12 +111,13 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -90.0
-offset_top = -230.0
+offset_top = -169.0
+offset_bottom = 1.0
 grow_horizontal = 0
 grow_vertical = 0
 mouse_filter = 2
 script = ExtResource("6_stack")
-max_display_height = 230.0
+max_display_height = 170.0
 
 [node name="IngredientSlots" type="GridContainer" parent="." unique_id=49289063]
 layout_mode = 1
@@ -136,10 +126,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -111.5
-offset_top = -140.0
-offset_right = 111.5
-offset_bottom = -31.0
+offset_left = -111.0
+offset_top = -118.0
+offset_right = 112.0
+offset_bottom = -9.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/h_separation = 5
@@ -179,19 +169,6 @@ offset_top = 88.0
 offset_right = 126.0
 offset_bottom = 138.00003
 
-[node name="StatusLabel" type="Label" parent="." unique_id=91600267]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_top = 455.0
-offset_bottom = 479.0
-grow_horizontal = 2
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_fonts/font = ExtResource("12_l4fm3")
-theme_override_font_sizes/font_size = 12
-text = "Memorize the recipe"
-horizontal_alignment = 1
-
 [node name="ResultRank" type="Control" parent="." unique_id=1902987360]
 visible = false
 z_index = 21
@@ -201,9 +178,9 @@ anchor_top = 0.551
 anchor_right = 0.335
 anchor_bottom = 0.551
 offset_left = -84.450005
-offset_top = -140.48001
+offset_top = -79.48001
 offset_right = 15.549995
-offset_bottom = -110.48001
+offset_bottom = -49.48001
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -226,8 +203,8 @@ z_index = 20
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 90.0
-offset_bottom = 320.0
+offset_top = 181.0
+offset_bottom = 361.0
 grow_horizontal = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 0.87058824)
@@ -264,6 +241,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="MultiOrder" parent="." unique_id=1478787284 instance=ExtResource("9_multi")]
+visible = true
 position = Vector2(139, 145)
 
 [node name="ComboCounter" parent="." unique_id=1534753254 instance=ExtResource("4_combo")]
@@ -281,6 +259,7 @@ grow_horizontal = 2
 pivot_offset = Vector2(0, 0)
 
 [node name="StoreLight" type="TextureRect" parent="." unique_id=570496574]
+visible = false
 z_index = 21
 layout_mode = 1
 anchors_preset = 5
@@ -293,3 +272,11 @@ offset_bottom = 120.0
 grow_horizontal = 2
 texture = ExtResource("15_l4fm3")
 stretch_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1523698326]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 180.0
+grow_horizontal = 2
+color = Color(0.3924442, 0.46302885, 0.6861568, 1)

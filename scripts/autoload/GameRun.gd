@@ -10,8 +10,8 @@ signal blackout_requested
 
 const CUSTOMERS_PER_STAGE := 2
 const MAX_STAGE := 10
-const KNOCKBACK_PER_DAMAGE := 1.5
-const DAMAGE_SINGLE := {
+const RECOVERY_PER_FULLNESS := 1.5
+const FULLNESS_SINGLE := {
 	1: 6.0,
 	2: 8.0,
 	3: 10.0,
@@ -55,7 +55,7 @@ var _blackout_request_pending := false
 
 func _ready() -> void:
 	DistanceManager.game_over.connect(_on_distance_game_over)
-	MonsterManager.defeated.connect(_on_monster_defeated)
+	MonsterManager.satisfied.connect(_on_monster_satisfied)
 
 
 func _process(delta: float) -> void:
@@ -132,7 +132,7 @@ func abort() -> void:
 
 func _create_customer(index: int, stage: int) -> Dictionary:
 	var burger_count := _burger_count_for_stage(stage)
-	var damage := _damage_for(stage, burger_count)
+	var fullness := _fullness_for(stage, burger_count)
 	var recipes: Array[Recipe] = []
 	for i in range(burger_count):
 		recipes.append(RecipeGenerator.generate_for_stage(stage))
@@ -146,8 +146,8 @@ func _create_customer(index: int, stage: int) -> Dictionary:
 		"stage": stage,
 		"recipes": recipes,
 		"variants": variants,
-		"damage": damage,
-		"knockback": _knockback_for(damage),
+		"fullness": fullness,
+		"knockback": _recovery_for(fullness),
 	}
 
 
@@ -155,25 +155,8 @@ func _stage_for_customer(index: int) -> int:
 	return mini(int(ceil(float(index) / float(CUSTOMERS_PER_STAGE))), MAX_STAGE)
 
 
-func _burger_count_for_stage(stage: int) -> int:
-	if stage < 3:
-		return 1
-
-	var multi_chance := MULTI_ORDER_CHANCE.get(stage, 0.0) as float
-	if randf() >= multi_chance:
-		return 1
-
-	if stage <= 3:
-		return 2
-	if stage <= 5:
-		return 3 if randf() < 0.35 else 2
-	if stage <= 7:
-		return 3 if randf() < 0.55 else 2
-	if stage == 8:
-		return 3
-	if stage == 9:
-		return 4 if randf() < 0.35 else 3
-	return 4
+func _burger_count_for_stage(_stage: int) -> int:
+	return 1
 
 
 func accept_blackout_request() -> bool:
@@ -242,14 +225,14 @@ func _blackout_chance_for_distance() -> float:
 	return 0.0
 
 
-func _damage_for(stage: int, burger_count: int) -> float:
-	var base_damage := DAMAGE_SINGLE.get(clampi(stage, 1, MAX_STAGE), 6.0) as float
+func _fullness_for(stage: int, burger_count: int) -> float:
+	var base_fullness := FULLNESS_SINGLE.get(clampi(stage, 1, MAX_STAGE), 6.0) as float
 	var multi_burger_bonus := 1.0 + 0.5 * float(maxi(burger_count - 1, 0))
-	return roundf(base_damage * multi_burger_bonus)
+	return roundf(base_fullness * multi_burger_bonus)
 
 
-func _knockback_for(damage: float) -> float:
-	return damage * KNOCKBACK_PER_DAMAGE
+func _recovery_for(fullness: float) -> float:
+	return fullness * RECOVERY_PER_FULLNESS
 
 
 func _on_distance_game_over() -> void:
@@ -265,7 +248,7 @@ func _on_distance_game_over() -> void:
 	run_failed.emit(_build_stats())
 
 
-func _on_monster_defeated() -> void:
+func _on_monster_satisfied() -> void:
 	if not running:
 		return
 
@@ -284,8 +267,8 @@ func _build_stats() -> Dictionary:
 		"failed": failed_customers,
 		"stage": current_stage,
 		"distance": DistanceManager.distance,
-		"monster_hp": MonsterManager.health,
-		"monster_max_hp": MonsterManager.MAX_HEALTH,
-		"damage_dealt": MonsterManager.damage_dealt,
+		"satiety": MonsterManager.satiety,
+		"max_satiety": MonsterManager.MAX_SATIETY,
+		"total_fullness": MonsterManager.total_fullness,
 		"time": elapsed_time,
 	}

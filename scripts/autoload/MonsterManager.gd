@@ -1,35 +1,35 @@
 extends Node
 
-signal health_changed(value: float, max_value: float)
-signal defeated
+signal satiety_changed(value: float, max_value: float)
+signal satisfied
 
-const MAX_HEALTH := 300.0
+const MAX_SATIETY := 300.0
 
-var health := MAX_HEALTH
-var damage_dealt := 0.0
+var satiety := 0.0
+var total_fullness := 0.0
 var running := false
 
 
 func reset() -> void:
-	health = MAX_HEALTH
-	damage_dealt = 0.0
+	satiety = 0.0
+	total_fullness = 0.0
 	running = true
-	health_changed.emit(health, MAX_HEALTH)
+	satiety_changed.emit(satiety, MAX_SATIETY)
 
 
 func stop() -> void:
 	running = false
 
 
-func apply_damage(amount: float) -> void:
+func add_satiety(amount: float) -> void:
 	if not running or amount <= 0.0:
 		return
 
-	var previous_health := health
-	health = maxf(health - amount, 0.0)
-	damage_dealt += previous_health - health
-	health_changed.emit(health, MAX_HEALTH)
+	var previous_satiety := satiety
+	satiety = minf(satiety + amount, MAX_SATIETY)
+	total_fullness += satiety - previous_satiety
+	satiety_changed.emit(satiety, MAX_SATIETY)
 
-	if health <= 0.0:
+	if satiety >= MAX_SATIETY:
 		running = false
-		defeated.emit()
+		satisfied.emit()

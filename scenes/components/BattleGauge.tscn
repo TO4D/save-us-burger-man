@@ -1,21 +1,10 @@
 [gd_scene format=3 uid="uid://f81sdvkvyogq"]
 
 [ext_resource type="Script" uid="uid://cfoee8j2l2bpe" path="res://scenes/components/BattleGauge.gd" id="1_g2r14"]
-[ext_resource type="Texture2D" uid="uid://bsr7r68ii64jw" path="res://assets/sprites/store/store_new.png" id="3_g2r14"]
-[ext_resource type="Texture2D" uid="uid://hvspgdua73v5" path="res://assets/sprites/distance/distance_background.png" id="3_xmndb"]
-[ext_resource type="Texture2D" uid="uid://c133hm3v6pclp" path="res://assets/sprites/monster/monster_hit.png" id="4_pchdm"]
-[ext_resource type="SpriteFrames" uid="uid://bh3vdhoj2v0t3" path="res://resources/animations/monster_walk.tres" id="5_f50tn"]
-
-[sub_resource type="Shader" id="Shader_7tkdo"]
-code = "shader_type canvas_item;
-
-void fragment() {
-	float alpha = texture(TEXTURE, UV).a * COLOR.a;
-	COLOR = vec4(1.0, 1.0, 1.0, alpha);
-}"
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_4p7wu"]
-shader = SubResource("Shader_7tkdo")
+[ext_resource type="Texture2D" uid="uid://c2mhfodle586u" path="res://assets/sprites/store/shop.png" id="5_g2r14"]
+[ext_resource type="Texture2D" uid="uid://cmjbcd0d67482" path="res://assets/sprites/monster/monster_new_idle.png" id="5_idle"]
+[ext_resource type="SpriteFrames" uid="uid://cxemxilhq8vjb" path="res://resources/animations/monster_eating.tres" id="6_eat_anim"]
+[ext_resource type="Texture2D" uid="uid://b1pofkh4sv4nc" path="res://assets/sprites/monster/monster_new_eat3.png" id="7_eaten"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g2r14"]
 bg_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
@@ -37,37 +26,35 @@ custom_minimum_size = Vector2(270, 90)
 layout_mode = 3
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 90.0
+offset_bottom = 180.0
 grow_horizontal = 2
 script = ExtResource("1_g2r14")
-
-[node name="Background" type="Sprite2D" parent="." unique_id=74392598]
-texture = ExtResource("3_xmndb")
-centered = false
+monster_icon_update_interval = 0.2
+monster_idle_texture = ExtResource("5_idle")
+monster_eating_frames = ExtResource("6_eat_anim")
+monster_eaten_texture = ExtResource("7_eaten")
 
 [node name="ShopIcon" type="Sprite2D" parent="." unique_id=461974474]
-position = Vector2(35, 58)
-texture = ExtResource("3_g2r14")
+position = Vector2(134, 179)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("5_g2r14")
+offset = Vector2(0, -25)
 
 [node name="MonsterIcon" type="Node2D" parent="." unique_id=7079341]
-position = Vector2(250, 51)
+position = Vector2(135, 0)
 
-[node name="WalkSprite" type="AnimatedSprite2D" parent="MonsterIcon" unique_id=1078545169]
-sprite_frames = ExtResource("5_f50tn")
-animation = &"walk"
-autoplay = "walk"
-
-[node name="HitSprite" type="Sprite2D" parent="MonsterIcon" unique_id=1904226389]
+[node name="EatingSprite" type="AnimatedSprite2D" parent="MonsterIcon" unique_id=1078545169]
 visible = false
-texture = ExtResource("4_pchdm")
+sprite_frames = ExtResource("6_eat_anim")
+frame_progress = 0.41305158
+offset = Vector2(0, -115)
 
-[node name="HitFlashSprite" type="Sprite2D" parent="MonsterIcon" unique_id=1889397213]
-visible = false
-z_index = 1
-material = SubResource("ShaderMaterial_4p7wu")
-texture = ExtResource("4_pchdm")
+[node name="StateSprite" type="Sprite2D" parent="MonsterIcon" unique_id=1904226389]
+texture = ExtResource("5_idle")
+offset = Vector2(0, -115)
 
 [node name="Bar" type="ProgressBar" parent="." unique_id=1938841943]
+visible = false
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
