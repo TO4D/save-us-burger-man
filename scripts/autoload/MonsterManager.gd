@@ -3,7 +3,7 @@ extends Node
 signal satiety_changed(value: float, max_value: float)
 signal satisfied
 
-const MAX_SATIETY := 300.0
+const MAX_SATIETY := 600.0
 
 var satiety := 0.0
 var total_fullness := 0.0

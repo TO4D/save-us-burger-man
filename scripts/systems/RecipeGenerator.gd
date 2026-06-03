@@ -33,23 +33,23 @@ static func _get_middle_length(stage: int) -> int:
 		1:
 			return 2
 		2:
-			return randi_range(3, 5)
+			return randi_range(4, 7)
 		3:
 			return 3
 		4:
-			return randi_range(4, 8)
+			return randi_range(5, 10)
 		5:
 			return 4
 		6:
-			return randi_range(4, 6)
+			return randi_range(6, 14)
 		7:
 			return 5
 		8:
-			return randi_range(5, 7)
+			return randi_range(7, 16)
 		9:
 			return 6
 		_:
-			return randi_range(6, 8)
+			return randi_range(8, 20)
 
 
 static func _find_ingredient(pool: Array[Ingredient], id: String) -> Ingredient:
