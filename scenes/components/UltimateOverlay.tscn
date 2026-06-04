@@ -1,11 +1,11 @@
-[gd_scene format=3 uid="uid://c4skrrih3n11n"]
+[gd_scene format=3 uid="uid://ch1nxmlssyr2g"]
 
-[ext_resource type="Script" path="res://scenes/components/UltimateOverlay.gd" id="1_ultov"]
+[ext_resource type="Script" uid="uid://dbfa83f6yuwr4" path="res://scenes/components/UltimateOverlay.gd" id="1_ultov"]
 
-[node name="UltimateOverlay" type="Control"]
+[node name="UltimateOverlay" type="Control" unique_id=64254622]
 visible = false
 z_index = 100
-layout_mode = 1
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -14,7 +14,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_ultov")
 
-[node name="DimOverlay" type="ColorRect" parent="."]
+[node name="DimOverlay" type="ColorRect" parent="." unique_id=1364899054]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -24,7 +24,6 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 0.72)
 
-[node name="AnimationSprite" type="AnimatedSprite2D" parent="."]
-position = Vector2(200, 180)
-centered = true
+[node name="AnimationSprite" type="AnimatedSprite2D" parent="." unique_id=1187966621]
 texture_filter = 1
+position = Vector2(200, 180)

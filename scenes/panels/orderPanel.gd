@@ -17,6 +17,12 @@ const STACK_CAMERA_RETURN_DELAY_SECONDS := 0.3
 const STACK_CAMERA_RETURN_SECONDS := 0.3
 const ULTIMATE_AUTO_STACK_DELAY_SECONDS := 0.01
 const ULTIMATE_STACK_SPEED_MULTIPLIER := 2.0
+const MONSTER_ULTIMATE_DELAY_MIN_SECONDS := 2.0
+const MONSTER_ULTIMATE_DELAY_MAX_SECONDS := 5.0
+const MONSTER_ULTIMATE_RETRY_DELAY_SECONDS := 1.0
+const MONSTER_SLOT_EXIT_SECONDS := 0.16
+const MONSTER_SLOT_RETURN_SECONDS := 0.42
+const MONSTER_SLOT_SHUFFLE_WAIT_SECONDS := 0.5
 const ORDER_PROGRESS_ICON_SIZE := Vector2(16.0, 16.0)
 const ORDER_PROGRESS_FILL_TEXTURE := preload("res://assets/sprites/ui/order_icon.1.png")
 const ORDER_PROGRESS_EMPTY_TEXTURE := preload("res://assets/sprites/ui/order_icon.2.png")
@@ -54,6 +60,12 @@ var ready_go_active: bool = false
 var blackout_event_active: bool = false
 var blackout_used_for_customer: bool = false
 var ultimate_active: bool = false
+var monster_ultimate_active: bool = false
+var monster_ultimate_schedule_token: int = 0
+var foreground_slot_home_position: Vector2 = Vector2.ZERO
+var ingredient_slots_home_position: Vector2 = Vector2.ZERO
+var monster_slot_tween: Tween = null
+var persistent_slot_ingredients: Array[Ingredient] = []
 
 @onready var battle_gauge: BattleGauge = $BattleGauge
 @onready var recipe_display_stack: RecipeDisplayStack = $PlayArea/RecipeDisplayStack
@@ -69,9 +81,11 @@ var ultimate_active: bool = false
 @onready var result_perfect: TextureRect = $ResultRank/Perfect
 @onready var blackout_overlay: ColorRect = $BlackoutOverlay
 @onready var combo_counter: ComboCounter = $ComboCounter
+@onready var foreground_slot: TextureRect = $Foreground_slot
 @onready var multi_order: MultiOrder = $MultiOrder
 @onready var ready_go_overlay: ColorRect = $ReadyGoOverlay
 @onready var ultimate_overlay: UltimateOverlay = $UltimateOverlay
+@onready var monster_ultimate_overlay: MonsterUltimateOverlay = $MonsterUltimateOverlay
 @onready var ready_go_label: Label = $ReadyGoOverlay/Label
 @onready var store_light: TextureRect = $StoreLight
 @onready var ultimate_bell: UltimateBell = $UltimateBell
@@ -80,8 +94,11 @@ var ultimate_active: bool = false
 func _ready() -> void:
 	panel_home_position = position
 	doma_home_position = sprite_doma.position
+	foreground_slot_home_position = foreground_slot.position
+	ingredient_slots_home_position = ingredient_slots.position
 	is_mobile_input = OS.has_feature("mobile")
 	UltimateManager.triggered.connect(_on_ultimate_triggered)
+	MonsterManager.ultimate_threshold_reached.connect(_on_monster_ultimate_threshold_reached)
 	GameRun.blackout_requested.connect(_on_blackout_requested)
 	DistanceManager.distance_changed.connect(_on_distance_changed)
 	burger_stack.ingredient_landed.connect(_on_stack_ingredient_landed)
@@ -108,7 +125,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 
 	var key_event := event as InputEventKey
-	if key_event.pressed and (ready_go_active or ultimate_active):
+	if key_event.pressed and (ready_go_active or ultimate_active or monster_ultimate_active):
 		get_viewport().set_input_as_handled()
 		return
 
@@ -136,6 +153,8 @@ func on_show(data: Dictionary = {}) -> void:
 	blackout_event_active = false
 	blackout_used_for_customer = false
 	ultimate_active = false
+	monster_ultimate_active = false
+	monster_ultimate_schedule_token += 1
 	pending_stack_landing_tokens.clear()
 	blackout_overlay.visible = false
 	store_light.texture = STORE_LIGHT_ON_TEXTURE
@@ -144,6 +163,7 @@ func on_show(data: Dictionary = {}) -> void:
 	_reset_stack_camera()
 	_setup_ingredient_slots(false)
 	_reset_doma()
+	_reset_ingredient_slot_panel_position()
 	sprite_doma.visible = false
 	_reset_screen_shake_position()
 	screen_shake_elapsed = 0.0
@@ -166,6 +186,8 @@ func on_hide() -> void:
 	blackout_event_active = false
 	blackout_used_for_customer = false
 	ultimate_active = false
+	monster_ultimate_active = false
+	monster_ultimate_schedule_token += 1
 	blackout_overlay.visible = false
 	store_light.texture = STORE_LIGHT_ON_TEXTURE
 	multi_order.hide_order_count()
@@ -178,10 +200,12 @@ func on_hide() -> void:
 	_reset_stack_camera()
 	pending_stack_landing_tokens.clear()
 	_reset_doma()
+	_reset_ingredient_slot_panel_position()
 	screen_shake_active = false
 	ready_go_active = false
 	ready_go_overlay.visible = false
 	ultimate_overlay.cancel()
+	monster_ultimate_overlay.cancel()
 	GameRun.set_start_blocked(false)
 	screen_shake_elapsed = 0.0
 	_reset_screen_shake_position()
@@ -205,6 +229,7 @@ func _start_play(token: int) -> void:
 	current_phase = Phase.PLAYING
 	_setup_ingredient_slots(true)
 	_sync_player_controls()
+	_schedule_monster_ultimate_if_pending(token)
 
 
 func _on_blackout_requested() -> void:
@@ -316,11 +341,13 @@ func _run_ready_go_overlay(token: int) -> void:
 func _setup_ingredient_slots(enabled: bool) -> void:
 	var stage: int = customer.get("stage", 1) as int
 	var ingredients: Array[Ingredient] = GameState.get_slot_ingredients(stage)
+	if not persistent_slot_ingredients.is_empty():
+		ingredients = _merge_persistent_slot_ingredients(ingredients)
 	ingredient_slots.configure(ingredients, is_mobile_input, enabled)
 
 
 func _on_ingredient_picked(ingredient: Ingredient) -> void:
-	if ready_go_active or ultimate_active or current_phase != Phase.PLAYING or current_recipe == null:
+	if ready_go_active or ultimate_active or monster_ultimate_active or current_phase != Phase.PLAYING or current_recipe == null:
 		return
 
 	var expected: Ingredient = current_recipe.ingredients[current_step]
@@ -386,6 +413,7 @@ func _finish_current_burger() -> void:
 	current_phase = Phase.PLAYING
 	_setup_ingredient_slots(true)
 	_sync_player_controls()
+	_schedule_monster_ultimate_if_pending(round_token)
 
 
 func _setup_order_progress_dots() -> void:
@@ -435,6 +463,7 @@ func _play_burger_throw_attack(fullness_amount: float, attack_knockback: float) 
 	var hit_monster := func() -> void:
 		AudioManager.play_sfx(AudioManager.Sfx.ATTACK)
 		MonsterManager.add_satiety(fullness_amount)
+		print("[OrderPanel] Burger served fullness=%.1f, monster satiety=%.1f/%.1f" % [fullness_amount, MonsterManager.satiety, MonsterManager.MAX_SATIETY])
 		DistanceManager.recover(attack_knockback)
 	battle_gauge.burger_attack_hit.connect(hit_monster, CONNECT_ONE_SHOT)
 	await battle_gauge.play_burger_attack(attack_knockback)
@@ -526,6 +555,13 @@ func _on_ultimate_triggered() -> void:
 	_run_ultimate_sequence(round_token)
 
 
+func _on_monster_ultimate_threshold_reached() -> void:
+	if not visible:
+		return
+
+	_schedule_monster_ultimate_if_pending(round_token)
+
+
 func _queue_stack_ingredient(ingredient: Ingredient) -> int:
 	stack_landing_token += 1
 	pending_stack_landing_tokens.append(stack_landing_token)
@@ -555,6 +591,111 @@ func _run_ultimate_sequence(token: int) -> void:
 	_sync_player_controls()
 
 
+func _run_monster_ultimate_sequence(token: int) -> void:
+	monster_ultimate_active = true
+	DistanceManager.hold_freeze()
+	_sync_player_controls()
+	await monster_ultimate_overlay.play_once()
+	if token != round_token:
+		DistanceManager.release_freeze()
+		monster_ultimate_active = false
+		return
+	await _run_monster_slot_shuffle_effect(token)
+	DistanceManager.release_freeze()
+	monster_ultimate_active = false
+	if token != round_token:
+		return
+	_sync_player_controls()
+
+
+func _schedule_monster_ultimate_if_pending(token: int, delay_seconds: float = -1.0) -> void:
+	if token != round_token or not MonsterManager.ultimate_pending:
+		return
+	if current_phase != Phase.PLAYING:
+		return
+
+	monster_ultimate_schedule_token += 1
+	var schedule_token := monster_ultimate_schedule_token
+	var wait_seconds := delay_seconds
+	if wait_seconds < 0.0:
+		wait_seconds = randf_range(MONSTER_ULTIMATE_DELAY_MIN_SECONDS, MONSTER_ULTIMATE_DELAY_MAX_SECONDS)
+
+	_wait_then_try_monster_ultimate(token, schedule_token, wait_seconds)
+
+
+func _wait_then_try_monster_ultimate(token: int, schedule_token: int, delay_seconds: float) -> void:
+	await get_tree().create_timer(delay_seconds).timeout
+	if token != round_token or schedule_token != monster_ultimate_schedule_token:
+		return
+	if not MonsterManager.ultimate_pending:
+		return
+
+	if not _can_run_monster_ultimate():
+		_schedule_monster_ultimate_if_pending(token, MONSTER_ULTIMATE_RETRY_DELAY_SECONDS)
+		return
+
+	if not MonsterManager.consume_ultimate_pending():
+		return
+
+	await _run_monster_ultimate_sequence(token)
+	_schedule_monster_ultimate_if_pending(token)
+
+
+func _can_run_monster_ultimate() -> bool:
+	return visible and current_phase == Phase.PLAYING and current_recipe != null and not ready_go_active and not ultimate_active and not monster_ultimate_active and not blackout_event_active
+
+
+func _run_monster_slot_shuffle_effect(token: int) -> void:
+	_reset_monster_slot_tween()
+	var offscreen_offset := Vector2(0.0, size.y - foreground_slot_home_position.y + foreground_slot.size.y + 24.0)
+	var foreground_exit_position := foreground_slot_home_position + offscreen_offset
+	var slots_exit_position := ingredient_slots_home_position + offscreen_offset
+
+	monster_slot_tween = create_tween().set_parallel(true)
+	monster_slot_tween.tween_property(foreground_slot, "position", foreground_exit_position, MONSTER_SLOT_EXIT_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	monster_slot_tween.tween_property(ingredient_slots, "position", slots_exit_position, MONSTER_SLOT_EXIT_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	await monster_slot_tween.finished
+	if token != round_token:
+		return
+
+	ingredient_slots.shuffle_visible_ingredients()
+	persistent_slot_ingredients = ingredient_slots.get_visible_ingredients()
+	await get_tree().create_timer(MONSTER_SLOT_SHUFFLE_WAIT_SECONDS).timeout
+	if token != round_token:
+		return
+
+	monster_slot_tween = create_tween().set_parallel(true)
+	monster_slot_tween.tween_property(foreground_slot, "position", foreground_slot_home_position, MONSTER_SLOT_RETURN_SECONDS).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+	monster_slot_tween.tween_property(ingredient_slots, "position", ingredient_slots_home_position, MONSTER_SLOT_RETURN_SECONDS).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+	await monster_slot_tween.finished
+	monster_slot_tween = null
+
+
+func _reset_ingredient_slot_panel_position() -> void:
+	_reset_monster_slot_tween()
+	foreground_slot.position = foreground_slot_home_position
+	ingredient_slots.position = ingredient_slots_home_position
+
+
+func _reset_monster_slot_tween() -> void:
+	if monster_slot_tween != null and monster_slot_tween.is_valid():
+		monster_slot_tween.kill()
+	monster_slot_tween = null
+
+
+func _merge_persistent_slot_ingredients(source_ingredients: Array[Ingredient]) -> Array[Ingredient]:
+	var merged: Array[Ingredient] = []
+	for saved_ingredient in persistent_slot_ingredients:
+		if source_ingredients.has(saved_ingredient):
+			merged.append(saved_ingredient)
+
+	for ingredient in source_ingredients:
+		if not merged.has(ingredient):
+			merged.append(ingredient)
+
+	return merged
+
+
 func _auto_complete_current_recipe(token: int) -> void:
 	if current_recipe == null:
 		return
@@ -580,7 +721,7 @@ func _auto_complete_current_recipe(token: int) -> void:
 
 
 func _sync_player_controls() -> void:
-	var controls_enabled := visible and current_phase == Phase.PLAYING and not ready_go_active and not ultimate_active
+	var controls_enabled := visible and current_phase == Phase.PLAYING and not ready_go_active and not ultimate_active and not monster_ultimate_active
 	ingredient_slots.set_process_unhandled_input(controls_enabled)
 	ingredient_slots.set_interaction_enabled(controls_enabled)
 	if is_instance_valid(ultimate_bell):
@@ -588,11 +729,11 @@ func _sync_player_controls() -> void:
 
 
 func _can_trigger_ultimate() -> bool:
-	return visible and current_phase == Phase.PLAYING and current_recipe != null and not ready_go_active and not ultimate_active and not blackout_event_active and UltimateManager.is_ready
+	return visible and current_phase == Phase.PLAYING and current_recipe != null and not ready_go_active and not ultimate_active and not monster_ultimate_active and not blackout_event_active and UltimateManager.is_ready
 
 
 func _can_run_ultimate() -> bool:
-	return visible and current_phase == Phase.PLAYING and current_recipe != null and not ready_go_active and not ultimate_active and not blackout_event_active
+	return visible and current_phase == Phase.PLAYING and current_recipe != null and not ready_go_active and not ultimate_active and not monster_ultimate_active and not blackout_event_active
 
 
 func _on_distance_changed(value: float, _max_value: float) -> void:

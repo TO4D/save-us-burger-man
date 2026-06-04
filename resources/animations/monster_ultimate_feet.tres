@@ -1,0 +1,46 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://by4gkgdct0pj8"]
+
+[ext_resource type="Texture2D" uid="uid://bi4nwx1yhgn7p" path="res://assets/sprites/ui/monster_ult_feet.png" id="1_feet"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_feet_0"]
+atlas = ExtResource("1_feet")
+region = Rect2(0, 0, 270, 230)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_feet_1"]
+atlas = ExtResource("1_feet")
+region = Rect2(270, 0, 270, 230)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_feet_2"]
+atlas = ExtResource("1_feet")
+region = Rect2(540, 0, 270, 230)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_feet_3"]
+atlas = ExtResource("1_feet")
+region = Rect2(0, 230, 270, 230)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_feet_4"]
+atlas = ExtResource("1_feet")
+region = Rect2(270, 230, 270, 230)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_feet_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_feet_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_feet_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_feet_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_feet_4")
+}],
+"loop": false,
+"name": &"default",
+"speed": 12.0
+}]

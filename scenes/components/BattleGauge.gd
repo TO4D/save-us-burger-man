@@ -212,7 +212,7 @@ func _on_freeze_changed(active: bool, remaining: float) -> void:
 	freeze_overlay.visible = active
 	freeze_overlay.modulate.a = 0.22 if active else 0.0
 	if active:
-		stage_label.text = "STUN %.1f" % remaining
+		stage_label.text = "STUN %.1f" % remaining if remaining > 0.0 else "STUN"
 	else:
 		stage_label.text = "STAGE %d" % GameRun.current_stage
 

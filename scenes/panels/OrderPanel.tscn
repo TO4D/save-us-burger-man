@@ -1,18 +1,20 @@
 [gd_scene format=3 uid="uid://fmbafdwu28nm"]
 
 [ext_resource type="Script" uid="uid://ybh8i7vrjpp3" path="res://scenes/panels/orderPanel.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://c8qrngoao0d5b" path="res://assets/sprites/cook/cook_slot_back.png" id="2_wtpwv"]
+[ext_resource type="Texture2D" uid="uid://baf1m3n16xgxd" path="res://assets/sprites/cook/cook_slot_background.png" id="2_l4fm3"]
 [ext_resource type="PackedScene" uid="uid://7coxq8bafj1k" path="res://scenes/components/ComboCounter.tscn" id="4_combo"]
 [ext_resource type="PackedScene" uid="uid://f81sdvkvyogq" path="res://scenes/components/BattleGauge.tscn" id="4_l4fm3"]
 [ext_resource type="PackedScene" uid="uid://dwkpv5wbo3tqm" path="res://scenes/components/UltimateBell.tscn" id="5_bell"]
+[ext_resource type="Texture2D" uid="uid://d0yp81yx20qcr" path="res://assets/sprites/cook/cook_slot_foreground.png" id="6_8lfvp"]
 [ext_resource type="Script" uid="uid://bkg1316f80lh8" path="res://scenes/components/RecipeDisplayStack.gd" id="6_stack"]
 [ext_resource type="PackedScene" uid="uid://dcyr7651s66f" path="res://scenes/components/IngredientSlot.tscn" id="7_slot"]
 [ext_resource type="Script" uid="uid://b20bp6pi5tbgd" path="res://scenes/components/IngredientSlotGrid.gd" id="8_grid"]
 [ext_resource type="PackedScene" uid="uid://cx4wtpu6m3qdr" path="res://scenes/components/MultiOrder.tscn" id="9_multi"]
-[ext_resource type="PackedScene" path="res://scenes/components/UltimateOverlay.tscn" id="10_ult_overlay"]
+[ext_resource type="PackedScene" uid="uid://ch1nxmlssyr2g" path="res://scenes/components/UltimateOverlay.tscn" id="10_ult_overlay"]
 [ext_resource type="Texture2D" uid="uid://c4ygqskfjim15" path="res://assets/sprites/ui/result_perfect.png" id="14_perfect"]
 [ext_resource type="Texture2D" uid="uid://dbsxpj7ft5qqc" path="res://assets/sprites/store/light_on.png" id="15_l4fm3"]
-[ext_resource type="PackedScene" path="res://scenes/components/PlateStackScene.tscn" id="16_plate_stack"]
+[ext_resource type="PackedScene" uid="uid://c37hgp1q5ourt" path="res://scenes/components/PlateStackScene.tscn" id="16_plate_stack"]
+[ext_resource type="PackedScene" uid="uid://cacit4jsxeo4r" path="res://scenes/components/MonsterUltimateOverlay.tscn" id="17_monster_ult_overlay"]
 
 [node name="OrderPanel" type="Control" unique_id=890599604]
 layout_mode = 3
@@ -44,7 +46,7 @@ offset_top = -126.0
 offset_right = 135.0
 grow_horizontal = 2
 grow_vertical = 0
-texture = ExtResource("2_wtpwv")
+texture = ExtResource("2_l4fm3")
 
 [node name="BattleGauge" parent="." unique_id=1309183552 instance=ExtResource("4_l4fm3")]
 z_index = 50
@@ -119,6 +121,14 @@ grow_vertical = 0
 mouse_filter = 2
 script = ExtResource("6_stack")
 max_display_height = 170.0
+
+[node name="Foreground_slot" type="TextureRect" parent="." unique_id=1375331359]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 357.0
+offset_right = 265.0
+offset_bottom = 475.0
+texture = ExtResource("6_8lfvp")
 
 [node name="IngredientSlots" type="GridContainer" parent="." unique_id=49289063]
 layout_mode = 1
@@ -241,6 +251,11 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="UltimateOverlay" parent="." unique_id=1157515607 instance=ExtResource("10_ult_overlay")]
+layout_mode = 1
+
+[node name="MonsterUltimateOverlay" parent="." unique_id=463160486 instance=ExtResource("17_monster_ult_overlay")]
+visible = false
+layout_mode = 1
 
 [node name="MultiOrder" parent="." unique_id=1478787284 instance=ExtResource("9_multi")]
 visible = true

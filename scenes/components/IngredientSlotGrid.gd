@@ -59,6 +59,42 @@ func clear_slots() -> void:
 		slot.clear_slot()
 
 
+func shuffle_visible_ingredients() -> void:
+	var visible_slots: Array[IngredientSlot] = []
+	var visible_ingredients: Array[Ingredient] = []
+	var interaction_was_enabled := false
+	for slot in ingredient_slot_nodes:
+		if slot.visible and slot.ingredient != null:
+			interaction_was_enabled = interaction_was_enabled or slot.interaction_enabled
+			visible_slots.append(slot)
+			visible_ingredients.append(slot.ingredient)
+
+	if visible_ingredients.size() <= 1:
+		return
+
+	var original_ingredients := visible_ingredients.duplicate()
+	visible_ingredients.shuffle()
+	for _attempt in range(4):
+		if visible_ingredients != original_ingredients:
+			break
+		visible_ingredients.shuffle()
+
+	for index in range(visible_slots.size()):
+		visible_slots[index].setup(visible_ingredients[index], false)
+		visible_slots[index].mouse_filter = Control.MOUSE_FILTER_STOP if is_mobile_input else Control.MOUSE_FILTER_IGNORE
+
+	set_interaction_enabled(interaction_was_enabled)
+	focus_current_slot()
+
+
+func get_visible_ingredients() -> Array[Ingredient]:
+	var ingredients: Array[Ingredient] = []
+	for slot in ingredient_slot_nodes:
+		if slot.visible and slot.ingredient != null:
+			ingredients.append(slot.ingredient)
+	return ingredients
+
+
 func set_interaction_enabled(enabled: bool) -> void:
 	for slot in ingredient_slot_nodes:
 		if slot.visible:

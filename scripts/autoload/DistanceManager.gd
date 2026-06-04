@@ -13,10 +13,14 @@ var distance := MAX_DISTANCE
 var decay_per_second := 1
 var running := false
 var freeze_remaining := 0.0
+var freeze_hold_count := 0
 
 
 func _process(delta: float) -> void:
 	if not running:
+		return
+
+	if freeze_hold_count > 0:
 		return
 
 	if freeze_remaining > 0.0:
@@ -36,6 +40,7 @@ func reset() -> void:
 	distance = MAX_DISTANCE
 	running = true
 	freeze_remaining = 0.0
+	freeze_hold_count = 0
 	distance_changed.emit(distance, MAX_DISTANCE)
 	freeze_changed.emit(false, freeze_remaining)
 
@@ -43,6 +48,7 @@ func reset() -> void:
 func stop() -> void:
 	running = false
 	freeze_remaining = 0.0
+	freeze_hold_count = 0
 	freeze_changed.emit(false, freeze_remaining)
 
 
@@ -60,3 +66,13 @@ func recover(amount: float) -> void:
 func freeze(duration: float) -> void:
 	freeze_remaining = maxf(freeze_remaining, duration)
 	freeze_changed.emit(freeze_remaining > 0.0, freeze_remaining)
+
+
+func hold_freeze() -> void:
+	freeze_hold_count += 1
+	freeze_changed.emit(true, freeze_remaining)
+
+
+func release_freeze() -> void:
+	freeze_hold_count = maxi(freeze_hold_count - 1, 0)
+	freeze_changed.emit(freeze_hold_count > 0 or freeze_remaining > 0.0, freeze_remaining)
