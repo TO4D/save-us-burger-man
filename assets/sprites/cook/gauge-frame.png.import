@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bhcbbmdnmgfjd"
-path="res://.godot/imported/slotBtn_normal.png-930069f5729339663acfb6935a0ea78a.ctex"
+uid="uid://d2k7sdgm3oluo"
+path="res://.godot/imported/gauge-frame.png-903525f5cdcf0238d18214b83c0d28c8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/cook/slotBtn_normal.png"
-dest_files=["res://.godot/imported/slotBtn_normal.png-930069f5729339663acfb6935a0ea78a.ctex"]
+source_file="res://assets/sprites/cook/gauge-frame.png"
+dest_files=["res://.godot/imported/gauge-frame.png-903525f5cdcf0238d18214b83c0d28c8.ctex"]
 
 [params]
 

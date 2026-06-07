@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://j6p63de0a6w7"
-path="res://.godot/imported/cook_doma.png-3bf8d26201ea1326ee509020c9a37b94.ctex"
+uid="uid://kx528lpg0lkh"
+path="res://.godot/imported/gauge-fill.png-f2bc34d66f0bca09f5d8e5e98c9c132d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/cook/cook_doma.png"
-dest_files=["res://.godot/imported/cook_doma.png-3bf8d26201ea1326ee509020c9a37b94.ctex"]
+source_file="res://assets/sprites/cook/gauge-fill.png"
+dest_files=["res://.godot/imported/gauge-fill.png-f2bc34d66f0bca09f5d8e5e98c9c132d.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://baf1m3n16xgxd"
-path="res://.godot/imported/cook_slot_background.png-7af84a503cf71b77958ec5bcde2dd9c8.ctex"
+uid="uid://bte2lqtf5tgfe"
+path="res://.godot/imported/combo.png-7c7570f0e58227a235a52978c5fa1418.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/cook/cook_slot_background.png"
-dest_files=["res://.godot/imported/cook_slot_background.png-7af84a503cf71b77958ec5bcde2dd9c8.ctex"]
+source_file="res://assets/sprites/ui/combo.png"
+dest_files=["res://.godot/imported/combo.png-7c7570f0e58227a235a52978c5fa1418.ctex"]
 
 [params]
 

@@ -1,11 +1,14 @@
 [gd_scene format=3 uid="uid://dwkpv5wbo3tqm"]
 
 [ext_resource type="Script" uid="uid://bymkpapka0ms7" path="res://scenes/components/UltimateBell.gd" id="1_l2x7o"]
+[ext_resource type="Texture2D" uid="uid://kx528lpg0lkh" path="res://assets/sprites/cook/gauge-fill.png" id="2_fill"]
+[ext_resource type="Texture2D" uid="uid://d2k7sdgm3oluo" path="res://assets/sprites/cook/gauge-frame.png" id="3_frame"]
+[ext_resource type="Texture2D" uid="uid://cfp3vys6e60tm" path="res://assets/sprites/cook/gauge-star-empty.png" id="4_star_empty"]
 
 [node name="UltimateBell" type="Button" unique_id=384873118]
-custom_minimum_size = Vector2(40, 104)
-offset_right = 40.0
-offset_bottom = 104.0
+custom_minimum_size = Vector2(17, 81)
+offset_right = 17.0
+offset_bottom = 81.0
 focus_mode = 0
 mouse_default_cursor_shape = 2
 flat = true
@@ -15,88 +18,60 @@ script = ExtResource("1_l2x7o")
 visible = false
 modulate = Color(1, 0.91933334, 0.56, 0.35)
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = -1
 anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -2.0
-offset_top = -2.0
-offset_right = 2.0
-offset_bottom = 2.0
+anchor_bottom = 0.98800004
+offset_bottom = -0.027999878
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(1, 0.91933334, 0.56, 1)
 
-[node name="Outline" type="Panel" parent="." unique_id=883407539]
-layout_mode = 1
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -11.0
-offset_top = -42.0
-offset_right = 11.0
-offset_bottom = 30.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-
-[node name="BarBackground" type="ColorRect" parent="Outline" unique_id=595200111]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 4.0
-offset_top = 4.0
-offset_right = -4.0
-offset_bottom = -4.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(0.18, 0.15, 0.13, 1)
-
-[node name="Fill" type="ColorRect" parent="Outline/BarBackground" unique_id=1853298063]
-layout_mode = 1
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 0
-mouse_filter = 2
-color = Color(0.82, 0.52, 0.18, 1)
-
-[node name="Label" type="Label" parent="." unique_id=1697461998]
+[node name="GaugeProgress" type="TextureProgressBar" parent="." unique_id=883407539]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -16.0
-offset_top = 34.0
-offset_right = 16.0
-offset_bottom = 48.0
+offset_left = -5.5
+offset_top = -37.5
+offset_right = 5.5
+offset_bottom = 32.5
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.82, 0.78, 0.7, 1)
-theme_override_font_sizes/font_size = 8
-text = "ULT"
-horizontal_alignment = 1
+mouse_filter = 2
+fill_mode = 3
+texture_progress = ExtResource("2_fill")
 
-[node name="GaugeLabel" type="Label" parent="." unique_id=656050770]
+[node name="GaugeFrame" type="TextureRect" parent="." unique_id=595200111]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -16.0
-offset_top = 48.0
-offset_right = 16.0
-offset_bottom = 62.0
+offset_left = -7.5
+offset_top = -39.5
+offset_right = 7.5
+offset_bottom = 39.5
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.46, 0.43, 0.39, 1)
-theme_override_font_sizes/font_size = 8
-text = "0%"
-horizontal_alignment = 1
+mouse_filter = 2
+texture = ExtResource("3_frame")
+
+[node name="StarIcon" type="TextureRect" parent="." unique_id=1697461998]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -5.5
+offset_top = 30.5
+offset_right = 5.5
+offset_bottom = 41.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("4_star_empty")

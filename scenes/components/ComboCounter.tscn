@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://cro2fw484baa5" path="res://scenes/components/ComboCounter.gd" id="1_scl1t"]
 [ext_resource type="FontFile" uid="uid://bivsctx4h0jw" path="res://fonts/Jersey25-Regular.ttf" id="2_tm550"]
 [ext_resource type="LabelSettings" uid="uid://bbx0n2c7skyw8" path="res://resources/fonts/ComboLabel.tres" id="3_cpi34"]
-[ext_resource type="Texture2D" uid="uid://bgrvkicmbp3pe" path="res://assets/sprites/ui/combo_letter.png" id="4_cpi34"]
+[ext_resource type="Texture2D" uid="uid://bte2lqtf5tgfe" path="res://assets/sprites/ui/combo.png" id="4_cpi34"]
 
 [node name="ComboCounter" type="HBoxContainer" unique_id=1689143140]
 anchors_preset = -1

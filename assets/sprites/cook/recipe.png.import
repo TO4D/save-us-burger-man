@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cj2qk8js7mnr0"
-path="res://.godot/imported/slotBtn_pressed.png-ed97e1fb26f8ba576d5e633d410d6c25.ctex"
+uid="uid://c7rnia6e18gyl"
+path="res://.godot/imported/recipe.png-d01b4e789c1f3f65e66ec5ffc6046baf.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/cook/slotBtn_pressed.png"
-dest_files=["res://.godot/imported/slotBtn_pressed.png-ed97e1fb26f8ba576d5e633d410d6c25.ctex"]
+source_file="res://assets/sprites/cook/recipe.png"
+dest_files=["res://.godot/imported/recipe.png-d01b4e789c1f3f65e66ec5ffc6046baf.ctex"]
 
 [params]
 

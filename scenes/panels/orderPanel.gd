@@ -32,6 +32,8 @@ const STORE_LIGHT_FAIL_TEXTURE := preload("res://assets/sprites/store/light_fail
 const BLACKOUT_WARNING_STEP_SECONDS := 0.2
 const BLACKOUT_WARNING_PAUSE_SECONDS := 0.6
 
+@export var show_perfect_result := false
+
 enum Phase { IDLE, CUSTOMER_ENTERING, PLAYING, SERVING, CUSTOMER_EXITING, COMPLETE }
 
 var current_phase: Phase = Phase.IDLE
@@ -125,6 +127,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 
 	var key_event := event as InputEventKey
+	if key_event.keycode == KEY_ESCAPE:
+		return
+
 	if key_event.pressed and (ready_go_active or ultimate_active or monster_ultimate_active):
 		get_viewport().set_input_as_handled()
 		return
@@ -501,6 +506,9 @@ func _flash_wrong_input() -> void:
 
 
 func _show_result_rank() -> void:
+	if not show_perfect_result:
+		return
+
 	if mistake_count > 0:
 		return
 
@@ -524,11 +532,12 @@ func _play_recipe_completion_feedback(token: int) -> void:
 		return
 
 	AudioManager.play_sfx(AudioManager.Sfx.ORDER_SUCCESS_PERFECT)
-	_show_result_rank()
-	await get_tree().create_timer(RESULT_RANK_DISPLAY_SECONDS).timeout
-	if token != round_token:
-		return
-	_hide_result_rank()
+	if show_perfect_result:
+		_show_result_rank()
+		await get_tree().create_timer(RESULT_RANK_DISPLAY_SECONDS).timeout
+		if token != round_token:
+			return
+		_hide_result_rank()
 
 
 func _hide_result_rank() -> void:

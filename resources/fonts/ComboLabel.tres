@@ -6,6 +6,5 @@
 font = ExtResource("1_ipoxu")
 font_size = 36
 font_color = Color(1, 0.74509805, 0.19215687, 1)
-outline_size = 1
-outline_color = Color(0.38039216, 0.2784314, 0.05882353, 1)
+outline_size = 2
 shadow_size = 0

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://br7a6eslknmd5"
-path="res://.godot/imported/cook_area_jori2.png-cefd38807188038a556ad0e2fc543c12.ctex"
+uid="uid://cfrb2u87yk8s6"
+path="res://.godot/imported/gauge-star-fill.png-6179d4a5495e3a443b77bda2a1bce911.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/cook/cook_area_jori2.png"
-dest_files=["res://.godot/imported/cook_area_jori2.png-cefd38807188038a556ad0e2fc543c12.ctex"]
+source_file="res://assets/sprites/cook/gauge-star-fill.png"
+dest_files=["res://.godot/imported/gauge-star-fill.png-6179d4a5495e3a443b77bda2a1bce911.ctex"]
 
 [params]
 

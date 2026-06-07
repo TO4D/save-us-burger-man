@@ -10,12 +10,14 @@ const FADE_OUT_SECONDS := 0.18
 @onready var value_label: Label = $ValueLabel
 
 var _display_position: Vector2
+var _label_base_scale: Vector2
 var _visibility_tween: Tween = null
 var _label_tween: Tween = null
 
 
 func _ready() -> void:
 	_display_position = position
+	_label_base_scale = value_label.scale
 	visible = false
 	modulate.a = 0.0
 	ComboManager.combo_changed.connect(_on_combo_changed)
@@ -28,11 +30,12 @@ func show_at_fixed_position() -> void:
 	position = _display_position
 	visible = true
 	modulate.a = 1.0
-	scale = Vector2(0.92, 0.92)
+	value_label.pivot_offset = value_label.size * 0.5
+	value_label.scale = _label_base_scale * 0.92
 	_reset_visibility_tween()
 	_visibility_tween = create_tween()
-	_visibility_tween.tween_property(self, "scale", Vector2(1.16, 1.16), 0.08).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	_visibility_tween.tween_property(self, "scale", Vector2.ONE, 0.1)
+	_visibility_tween.tween_property(value_label, "scale", _label_base_scale * 1.16, 0.08).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_visibility_tween.tween_property(value_label, "scale", _label_base_scale, 0.1)
 	_visibility_tween.tween_interval(IDLE_DISPLAY_SECONDS)
 	_visibility_tween.tween_property(self, "modulate:a", 0.0, FADE_OUT_SECONDS)
 	_visibility_tween.tween_callback(_hide_after_fade)
@@ -44,6 +47,7 @@ func _on_combo_changed(value: int) -> void:
 	if value <= 0:
 		_reset_visibility_tween()
 		_reset_label_tween()
+		value_label.scale = _label_base_scale
 		modulate.a = 0.0
 		visible = false
 
@@ -63,6 +67,7 @@ func _on_combo_reset(previous_value: int) -> void:
 	position = _display_position
 	visible = true
 	modulate.a = 1.0
+	value_label.scale = _label_base_scale
 	value_label.modulate = RESET_COLOR
 	_reset_visibility_tween()
 	_visibility_tween = create_tween()
@@ -89,4 +94,4 @@ func _reset_label_tween() -> void:
 
 func _hide_after_fade() -> void:
 	visible = false
-	scale = Vector2.ONE
+	value_label.scale = _label_base_scale

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dw1i0v87aqnkg"
-path="res://.godot/imported/slotBtn_focus_border.png-4782da3c19e753669a4b131163e544c1.ctex"
+uid="uid://et53x8h3iv6h"
+path="res://.godot/imported/doma.png-e650f4cebf1756c1d19aad00d941bb0b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/cook/slotBtn_focus_border.png"
-dest_files=["res://.godot/imported/slotBtn_focus_border.png-4782da3c19e753669a4b131163e544c1.ctex"]
+source_file="res://assets/sprites/cook/doma.png"
+dest_files=["res://.godot/imported/doma.png-e650f4cebf1756c1d19aad00d941bb0b.ctex"]
 
 [params]
 

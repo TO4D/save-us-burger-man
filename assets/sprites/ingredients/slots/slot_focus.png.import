@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c8qrngoao0d5b"
-path="res://.godot/imported/cook_slot_back.png-19fc6e8785c147c06d683e753ec1903f.ctex"
+uid="uid://c2hkr8qt7wre4"
+path="res://.godot/imported/slot_focus.png-1c96d6ddc4df61738a8a94f920b06f1b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/cook/cook_slot_back.png"
-dest_files=["res://.godot/imported/cook_slot_back.png-19fc6e8785c147c06d683e753ec1903f.ctex"]
+source_file="res://assets/sprites/ingredients/slots/slot_focus.png"
+dest_files=["res://.godot/imported/slot_focus.png-1c96d6ddc4df61738a8a94f920b06f1b.ctex"]
 
 [params]
 

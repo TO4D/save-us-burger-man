@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dg745mhbduwe2"
-path="res://.godot/imported/cook_area_doma.png-b6710b570b2b96602b67a6036ed1c7c5.ctex"
+uid="uid://d12mwvdusbg3y"
+path="res://.godot/imported/frame.png-9c71927489eb852bd20cfaca16ff23ab.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/cook/cook_area_doma.png"
-dest_files=["res://.godot/imported/cook_area_doma.png-b6710b570b2b96602b67a6036ed1c7c5.ctex"]
+source_file="res://assets/sprites/cook/frame.png"
+dest_files=["res://.godot/imported/frame.png-9c71927489eb852bd20cfaca16ff23ab.ctex"]
 
 [params]
 

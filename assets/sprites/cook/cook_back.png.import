@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bqiod5k86eij2"
-path="res://.godot/imported/distance_background.png-2098639d8de2a3567dcb689d57607085.ctex"
+uid="uid://dq3n401l20mhm"
+path="res://.godot/imported/cook_back.png-9cf48f691a769785a691485d59a7f744.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/cook/distance_background.png"
-dest_files=["res://.godot/imported/distance_background.png-2098639d8de2a3567dcb689d57607085.ctex"]
+source_file="res://assets/sprites/cook/cook_back.png"
+dest_files=["res://.godot/imported/cook_back.png-9cf48f691a769785a691485d59a7f744.ctex"]
 
 [params]
 

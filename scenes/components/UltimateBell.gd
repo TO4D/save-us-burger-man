@@ -1,16 +1,15 @@
 extends Button
 class_name UltimateBell
 
-const READY_COLOR := Color(0.806, 0.699, 0.0, 1.0)
-const IDLE_COLOR := Color(0.205, 0.205, 0.205, 1.0)
-const DIM_COLOR := Color(0.46, 0.43, 0.39, 1.0)
-const FILL_READY_COLOR := Color(1.0, 0.792, 0.2, 1.0)
-const FILL_IDLE_COLOR := Color(0.82, 0.52, 0.18, 1.0)
+@export var ready_gauge_modulate := Color.WHITE
+@export var idle_gauge_modulate := Color(0.72, 0.72, 0.72, 1.0)
+@export var empty_icon_texture: Texture2D = preload("res://assets/sprites/cook/gauge-star-empty.png")
+@export var ready_icon_texture: Texture2D = preload("res://assets/sprites/cook/gauge-star-fill.png")
 
-@onready var fill_rect: ColorRect = $Outline/BarBackground/Fill
+@onready var gauge_progress: TextureProgressBar = $GaugeProgress
+@onready var gauge_frame: TextureRect = $GaugeFrame
+@onready var star_icon: TextureRect = $StarIcon
 @onready var glow_rect: ColorRect = $Glow
-@onready var label: Label = $Label
-@onready var gauge_label: Label = $GaugeLabel
 
 var _base_position: Vector2
 var _trigger_enabled: bool = true
@@ -37,16 +36,15 @@ func _on_pressed() -> void:
 
 
 func _on_gauge_changed(value: int, max_value: int) -> void:
-	var ratio := float(value) / float(max_value) if max_value > 0 else 0.0
-	fill_rect.anchor_top = 1.0 - ratio
-	gauge_label.text = "%d%%" % int(round(ratio * 100.0))
+	gauge_progress.max_value = max_value
+	gauge_progress.value = value
 
 
 func _on_ready_changed(ready: bool) -> void:
 	_apply_availability()
-	label.modulate = READY_COLOR if ready else IDLE_COLOR
-	gauge_label.modulate = READY_COLOR if ready else DIM_COLOR
-	fill_rect.color = FILL_READY_COLOR if ready else FILL_IDLE_COLOR
+	gauge_progress.modulate = ready_gauge_modulate if ready else idle_gauge_modulate
+	gauge_frame.modulate = ready_gauge_modulate if ready else idle_gauge_modulate
+	star_icon.texture = ready_icon_texture if ready else empty_icon_texture
 	glow_rect.visible = ready
 	if ready:
 		_play_ready_bob()

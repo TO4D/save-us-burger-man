@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://c37hgp1q5ourt"]
 
 [ext_resource type="PackedScene" uid="uid://bxs2t76pgylko" path="res://scenes/components/BurgerStack.tscn" id="1_stack"]
+[ext_resource type="Texture2D" uid="uid://et53x8h3iv6h" path="res://assets/sprites/cook/doma.png" id="2_ji84v"]
 [ext_resource type="Texture2D" uid="uid://br7a6eslknmd5" path="res://assets/sprites/cook/cook_area_jori2.png" id="2_jori"]
-[ext_resource type="Texture2D" uid="uid://dg745mhbduwe2" path="res://assets/sprites/cook/cook_area_doma.png" id="3_doma"]
 
 [node name="PlateStackScene" type="Node2D" unique_id=915667550]
 
@@ -10,14 +10,15 @@
 position = Vector2(90, 87)
 
 [node name="Cook_jori" type="Sprite2D" parent="." unique_id=371930059]
+visible = false
 position = Vector2(0, 118)
 scale = Vector2(0.6666666, 1)
 texture = ExtResource("2_jori")
 centered = false
 
 [node name="SpriteDoma" type="Sprite2D" parent="." unique_id=505485120]
-position = Vector2(91, 142)
-texture = ExtResource("3_doma")
+position = Vector2(88, 145)
+texture = ExtResource("2_ji84v")
 
 [node name="BurgerStack" parent="." unique_id=1684319686 instance=ExtResource("1_stack")]
 z_index = 1

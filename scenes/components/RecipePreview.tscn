@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://o57oulc6d6rj"]
 
 [ext_resource type="Script" uid="uid://cvxjv7k40fn34" path="res://scenes/components/RecipePreview.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://dbf786n33o8at" path="res://assets/sprites/cook/cook_recipe.png" id="2_lr08r"]
+[ext_resource type="Texture2D" uid="uid://c7rnia6e18gyl" path="res://assets/sprites/cook/recipe.png" id="2_fqe5q"]
 [ext_resource type="Texture2D" uid="uid://bhabav8fkl6in" path="res://assets/sprites/ui/result_ok.png" id="3_fqe5q"]
 
 [node name="RecipePreview" type="Control" unique_id=525001118]
@@ -20,7 +20,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_lr08r")
+texture = ExtResource("2_fqe5q")
 patch_margin_left = 6
 patch_margin_top = 6
 patch_margin_right = 6

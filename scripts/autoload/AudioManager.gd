@@ -46,8 +46,8 @@ const BGM_PATHS := {
 	Bgm.INGAME: "res://assets/audio/bgm/ingame.ogg",
 }
 
-var sfx_bus: StringName = &"Master"
-var bgm_bus: StringName = &"Master"
+var sfx_bus: StringName = &"SFX"
+var bgm_bus: StringName = &"BGM"
 var _bgm_player: AudioStreamPlayer
 var _current_bgm: int = -1
 var _missing_audio_paths: Dictionary = {}

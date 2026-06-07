@@ -5,7 +5,7 @@ signal ultimate_threshold_reached
 signal satisfied
 
 const MAX_SATIETY := 600.0
-const ULTIMATE_THRESHOLD_RATIOS: Array[float] = [0.4, 0.8]
+const ULTIMATE_THRESHOLD_RATIOS: Array[float] = [0.6]
 
 var satiety := 0.0
 var total_fullness := 0.0

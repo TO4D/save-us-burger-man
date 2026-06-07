@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cnauecswlse1c"
-path="res://.godot/imported/slotBtn_hover.png-bcae9ff35ddbe01d756201fc53814d57.ctex"
+uid="uid://cfp3vys6e60tm"
+path="res://.godot/imported/gauge-star-empty.png-511289b9de3d62c1001350432f54ecb5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/cook/slotBtn_hover.png"
-dest_files=["res://.godot/imported/slotBtn_hover.png-bcae9ff35ddbe01d756201fc53814d57.ctex"]
+source_file="res://assets/sprites/cook/gauge-star-empty.png"
+dest_files=["res://.godot/imported/gauge-star-empty.png-511289b9de3d62c1001350432f54ecb5.ctex"]
 
 [params]
 
