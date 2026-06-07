@@ -9,6 +9,8 @@
 [ext_resource type="Texture2D" uid="uid://dy6ldpsfhm8kw" path="res://assets/images/cut_scene2.png" id="5_lhr70"]
 [ext_resource type="PackedScene" path="res://scenes/panels/VictoryPanel.tscn" id="6"]
 [ext_resource type="Texture2D" uid="uid://ctu0771wha68n" path="res://assets/images/cut_scene3.png" id="6_wp0k4"]
+[ext_resource type="PackedScene" uid="uid://dvq43cqbox0t1" path="res://scenes/panels/SettingsPanel.tscn" id="7_settings"]
+[ext_resource type="PackedScene" path="res://scenes/panels/PauseMenu.tscn" id="8_pause"]
 
 [node name="Main" type="Node2D" unique_id=1284514419]
 script = ExtResource("1")
@@ -25,5 +27,14 @@ cutscene_images = Array[Texture2D]([ExtResource("4_q8u5g"), ExtResource("5_lhr70
 [node name="OrderPanel" parent="PanelLayer" unique_id=1169860898 instance=ExtResource("4")]
 
 [node name="GameOverPanel" parent="PanelLayer" unique_id=1639389488 instance=ExtResource("5")]
+visible = false
 
 [node name="VictoryPanel" parent="PanelLayer" unique_id=1262721713 instance=ExtResource("6")]
+visible = false
+
+[node name="PauseMenu" parent="PanelLayer" unique_id=1866731922 instance=ExtResource("8_pause")]
+z_index = 40
+
+[node name="SettingsPanel" parent="PanelLayer" unique_id=580700130 instance=ExtResource("7_settings")]
+visible = false
+z_index = 41
