@@ -17,6 +17,9 @@ var settings_return_mode := SettingsReturnMode.MAIN_MENU
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	order_panel.process_mode = Node.PROCESS_MODE_PAUSABLE
+	pause_menu.process_mode = Node.PROCESS_MODE_WHEN_PAUSED
+	settings_panel.process_mode = Node.PROCESS_MODE_ALWAYS
 	PanelManager.register_panels($PanelLayer)
 	start_panel.start_pressed.connect(_on_start_pressed)
 	start_panel.settings_pressed.connect(_show_main_settings)
@@ -114,6 +117,7 @@ func _show_main_settings() -> void:
 
 func _show_pause_settings() -> void:
 	settings_return_mode = SettingsReturnMode.PAUSE_MENU
+	get_tree().paused = true
 	pause_menu.visible = false
 	settings_panel.visible = true
 	if settings_panel.has_method("on_show"):
