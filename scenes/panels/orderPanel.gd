@@ -6,8 +6,17 @@ const READY_OVERLAY_SECONDS := 2.0
 const GO_OVERLAY_SECONDS := 0.6
 const RESULT_RANK_DISPLAY_SECONDS := 0.55
 const SCREEN_SHAKE_STEP_DURATION := 0.04
-const DOMA_SLIDE_SECONDS := 0.35
+const COMPLETED_BURGER_DISPLAY_SECONDS := 0.2
+const DOMA_SLIDE_SECONDS := 0.15
 const DOMA_ENTRY_SECONDS := 0.35
+const PERFECT_BURGER_HALO_COLOR := Color(1.0, 0.88, 0.25, 0.9)
+const NORMAL_BURGER_HALO_COLOR := Color(1.0, 0.908, 0.45, 0.588)
+const PERFECT_BURGER_HALO_OUTLINE_SIZE := 2.5
+const NORMAL_BURGER_HALO_OUTLINE_SIZE := 2.5
+const PERFECT_BURGER_HALO_GLOW_SIZE := 5.0
+const NORMAL_BURGER_HALO_GLOW_SIZE := 5.0
+const PERFECT_BURGER_HALO_GLOW_STRENGTH := 0.38
+const NORMAL_BURGER_HALO_GLOW_STRENGTH := 0.25
 const DOMA_SLIDE_DISTANCE := 240.0
 const STACK_VIEWPORT_SIZE := Vector2(180.0, 174.0)
 const STACK_CAMERA_DEFAULT_POSITION := STACK_VIEWPORT_SIZE * 0.5
@@ -29,6 +38,7 @@ const ORDER_PROGRESS_EMPTY_TEXTURE := preload("res://assets/sprites/ui/order_ico
 const STORE_LIGHT_ON_TEXTURE := preload("res://assets/sprites/store/light_on.png")
 const STORE_LIGHT_OFF_TEXTURE := preload("res://assets/sprites/store/light_off.png")
 const STORE_LIGHT_FAIL_TEXTURE := preload("res://assets/sprites/store/light_fail.png")
+const COMPLETED_BURGER_HALO_SHADER := preload("res://resources/vfx/completed_burger_halo.gdshader")
 const BLACKOUT_WARNING_STEP_SECONDS := 0.2
 const BLACKOUT_WARNING_PAUSE_SECONDS := 0.6
 
@@ -394,10 +404,10 @@ func _finish_current_burger() -> void:
 	current_phase = Phase.SERVING
 	_sync_player_controls()
 	await _wait_for_pending_stack_landings()
+	var completion_was_perfect := mistake_count == 0
 	_play_recipe_completion_feedback(round_token)
-	await _return_stack_camera_to_default()
 
-	await _slide_completed_burger_left()
+	await _slide_completed_burger_left(completion_was_perfect)
 	await _play_burger_throw_attack(_fullness_per_burger(), _knockback_per_burger())
 	await recipe_display_stack.complete_current_recipe()
 	current_recipe_index += 1
@@ -840,29 +850,84 @@ func _return_stack_camera_to_default() -> void:
 	stack_camera_tween = null
 
 
-func _slide_completed_burger_left() -> void:
+func _slide_completed_burger_left(completion_was_perfect: bool) -> void:
 	var sliding_group := Node2D.new()
 	add_child(sliding_group)
 	sliding_group.global_position = Vector2.ZERO
 
 	var stack_snapshot := await _create_stack_viewport_snapshot()
+	var halo_snapshot := await _create_burger_stack_halo_snapshot()
 	sliding_group.add_child(stack_snapshot)
 	stack_snapshot.global_position = stack_viewport_container.global_position
+	sliding_group.add_child(halo_snapshot)
+	halo_snapshot.global_position = stack_viewport_container.global_position
+	_apply_completed_burger_halo(halo_snapshot, completion_was_perfect)
 	sprite_doma.visible = false
 
 	burger_stack.clear_stack()
 	_reset_stack_camera()
 
+	await get_tree().create_timer(COMPLETED_BURGER_DISPLAY_SECONDS).timeout
+
 	var tween: Tween = create_tween().set_parallel(true)
-	tween.tween_property(stack_snapshot, "global_position:x", stack_snapshot.global_position.x - DOMA_SLIDE_DISTANCE, DOMA_SLIDE_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(sliding_group, "position:x", sliding_group.position.x - DOMA_SLIDE_DISTANCE, DOMA_SLIDE_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	await tween.finished
 	sliding_group.queue_free()
+
+
+func _apply_completed_burger_halo(snapshot: Sprite2D, completion_was_perfect: bool) -> void:
+	var material := ShaderMaterial.new()
+	material.shader = COMPLETED_BURGER_HALO_SHADER
+	material.set_shader_parameter("halo_color", PERFECT_BURGER_HALO_COLOR if completion_was_perfect else NORMAL_BURGER_HALO_COLOR)
+	material.set_shader_parameter("outline_size", PERFECT_BURGER_HALO_OUTLINE_SIZE if completion_was_perfect else NORMAL_BURGER_HALO_OUTLINE_SIZE)
+	material.set_shader_parameter("glow_size", PERFECT_BURGER_HALO_GLOW_SIZE if completion_was_perfect else NORMAL_BURGER_HALO_GLOW_SIZE)
+	material.set_shader_parameter("glow_strength", PERFECT_BURGER_HALO_GLOW_STRENGTH if completion_was_perfect else NORMAL_BURGER_HALO_GLOW_STRENGTH)
+	snapshot.material = material
 
 
 func _create_stack_viewport_snapshot() -> Sprite2D:
 	await RenderingServer.frame_post_draw
 	var image := stack_viewport.get_texture().get_image()
 	var texture := ImageTexture.create_from_image(image)
+	var snapshot := Sprite2D.new()
+	snapshot.texture = texture
+	snapshot.centered = false
+	snapshot.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	return snapshot
+
+
+func _create_burger_stack_halo_snapshot() -> Sprite2D:
+	var halo_viewport := SubViewport.new()
+	halo_viewport.transparent_bg = true
+	halo_viewport.size = Vector2i(int(STACK_VIEWPORT_SIZE.x), int(STACK_VIEWPORT_SIZE.y))
+	halo_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
+	add_child(halo_viewport)
+
+	var stack_copy := Node2D.new()
+	stack_copy.position = burger_stack.position - stack_camera.position + STACK_CAMERA_DEFAULT_POSITION
+	halo_viewport.add_child(stack_copy)
+
+	for child in burger_stack.get_children():
+		var source_sprite := child as Sprite2D
+		if source_sprite == null:
+			continue
+
+		var copied_sprite := Sprite2D.new()
+		copied_sprite.texture = source_sprite.texture
+		copied_sprite.centered = source_sprite.centered
+		copied_sprite.offset = source_sprite.offset
+		copied_sprite.position = source_sprite.position
+		copied_sprite.scale = source_sprite.scale
+		copied_sprite.rotation = source_sprite.rotation
+		copied_sprite.modulate = source_sprite.modulate
+		copied_sprite.texture_filter = source_sprite.texture_filter
+		stack_copy.add_child(copied_sprite)
+
+	await RenderingServer.frame_post_draw
+	var image := halo_viewport.get_texture().get_image()
+	var texture := ImageTexture.create_from_image(image)
+	halo_viewport.queue_free()
+
 	var snapshot := Sprite2D.new()
 	snapshot.texture = texture
 	snapshot.centered = false

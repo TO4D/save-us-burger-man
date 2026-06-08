@@ -10,6 +10,7 @@ const DEFAULT_EATING_PARTICLE_SCENE := preload("res://resources/particles/Eating
 @export var monster_icon_update_interval: float = 0.5
 @export var monster_eating_min_speed_scale: float = 1.0
 @export var monster_eating_max_speed_scale: float = 2.0
+@export var cloud_scroll_speed: float = 1.0
 
 @export_group("Monster Sprites")
 @export var monster_idle_texture: Texture2D
@@ -27,6 +28,7 @@ const DEFAULT_EATING_PARTICLE_SCENE := preload("res://resources/particles/Eating
 @onready var monster_icon: Node2D = $MonsterIcon
 @onready var monster_eating_sprite: AnimatedSprite2D = $MonsterIcon/EatingSprite
 @onready var monster_state_sprite: Sprite2D = $MonsterIcon/StateSprite
+@onready var cloud_sprites: Array[TextureRect] = [$CloudLayer/CloudA, $CloudLayer/CloudB]
 #@onready var time_label: Label = $TimeLabel
 @onready var stage_label: Label = $StageLabel
 @onready var freeze_overlay: ColorRect = $FreezeOverlay
@@ -54,6 +56,8 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	_update_cloud_scroll(delta)
+
 	if monster_knockback_active:
 		return
 
@@ -120,6 +124,20 @@ func _on_distance_changed(value: float, max_value: float) -> void:
 
 func _apply_monster_icon_position() -> void:
 	monster_icon.position = pending_monster_icon_position
+
+
+func _update_cloud_scroll(delta: float) -> void:
+	if cloud_sprites.is_empty() or cloud_scroll_speed <= 0.0:
+		return
+
+	var cloud_width := cloud_sprites[0].size.x
+	if cloud_width <= 0.0:
+		return
+
+	for cloud in cloud_sprites:
+		cloud.position.x += cloud_scroll_speed * delta
+		if cloud.position.x >= cloud_width:
+			cloud.position.x -= cloud_width * cloud_sprites.size()
 
 
 func _set_monster_idle() -> void:

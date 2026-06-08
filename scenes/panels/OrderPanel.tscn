@@ -255,7 +255,6 @@ visible = false
 layout_mode = 1
 
 [node name="MultiOrder" parent="." unique_id=1478787284 instance=ExtResource("9_multi")]
-visible = true
 position = Vector2(139, 145)
 
 [node name="ComboCounter" parent="." unique_id=1534753254 instance=ExtResource("4_combo")]
@@ -288,6 +287,7 @@ texture = ExtResource("15_l4fm3")
 stretch_mode = 2
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=1523698326]
+visible = false
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
