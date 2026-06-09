@@ -14,10 +14,14 @@ const INDICATOR_TEXTURE := preload("res://assets/sprites/ui/indicator.png")
 @export var completed_ingredient_modulate: Color = Color(1, 1, 1, 0.5)
 @export var complete_stamp_size: Vector2 = Vector2(88.0, 88.0)
 @export var sliding_window_start_step: int = 4
+@export var clip_fade_height: float = 16.0
+@export var clip_fade_color: Color = Color(1.0, 0.9, 0.72, 1.0)
 
 @onready var background: NinePatchRect = $RecipeDisplayBackground
-@onready var items_root: Control = $ItemsRoot
-@onready var complete_stamp: TextureRect = $ItemsRoot/CompleteStamp
+@onready var items_clip: Control = $ItemsClip
+@onready var items_root: Control = $ItemsClip/ItemsRoot
+@onready var complete_stamp: TextureRect = $ItemsClip/ItemsRoot/CompleteStamp
+@onready var top_fade: ColorRect = $TopFade
 
 var recipe: Recipe = null
 var ingredients_visible: bool = true
@@ -92,6 +96,8 @@ func _render_recipe() -> void:
 		custom_minimum_size = Vector2.ZERO
 		size = Vector2.ZERO
 		background.visible = false
+		items_clip.size = Vector2.ZERO
+		top_fade.visible = false
 		_set_complete_stamp_visible(false, Vector2.ZERO)
 		return
 
@@ -105,14 +111,25 @@ func _render_recipe() -> void:
 		content_size.x + background_padding.x * 2.0,
 		content_size.y + background_padding.y * 2.0
 	)
+	var display_size := _get_display_size(total_size)
 
-	custom_minimum_size = total_size
-	size = total_size
+	custom_minimum_size = display_size
+	size = display_size
 	background.visible = true
 	background.position = Vector2.ZERO
-	background.size = total_size
-	items_root.position = Vector2(background_padding.x, background_padding.y + _get_sliding_window_offset(total_size, step_y))
+	background.size = display_size
+	var indicator_clip_margin := _get_indicator_clip_margin()
+	items_clip.position = Vector2(
+		maxf(background_padding.x - indicator_clip_margin, 0.0),
+		background_padding.y
+	)
+	items_clip.size = _get_items_clip_size(display_size, items_clip.position.x, indicator_clip_margin)
+	items_root.position = Vector2(
+		background_padding.x - items_clip.position.x,
+		_get_content_layout_offset(total_size, display_size) + _get_sliding_window_offset(total_size, step_y)
+	)
 	items_root.size = content_size
+	_update_top_fade(total_size, display_size)
 
 	for i in range(ingredient_count):
 		var ingredient: Ingredient = recipe.ingredients[i]
@@ -133,6 +150,46 @@ func _render_recipe() -> void:
 			_add_indicators(icon_position)
 
 	_set_complete_stamp_visible(active_step >= ingredient_count, content_size)
+
+
+func _get_display_size(total_size: Vector2) -> Vector2:
+	if visible_height <= 0.0:
+		return total_size
+
+	return Vector2(total_size.x, minf(total_size.y, visible_height))
+
+
+func _get_items_clip_size(display_size: Vector2, clip_position_x: float, indicator_clip_margin: float) -> Vector2:
+	return Vector2(
+		minf(
+			icon_size.x + indicator_clip_margin * 2.0,
+			maxf(display_size.x - clip_position_x, 0.0)
+		),
+		maxf(display_size.y - background_padding.y * 2.0, 0.0)
+	)
+
+
+func _get_indicator_clip_margin() -> float:
+	return indicator_size.x + indicator_gap
+
+
+func _get_content_layout_offset(total_size: Vector2, display_size: Vector2) -> float:
+	return display_size.y - total_size.y
+
+
+func _update_top_fade(total_size: Vector2, display_size: Vector2) -> void:
+	var has_clipped_content := total_size.y > display_size.y
+	var has_content_above_clip := items_root.position.y < 0.0
+	top_fade.visible = has_clipped_content and has_content_above_clip and clip_fade_height > 0.0
+	if not top_fade.visible:
+		return
+
+	top_fade.position = items_clip.position
+	top_fade.size = Vector2(items_clip.size.x, minf(clip_fade_height, items_clip.size.y))
+
+	var shader_material := top_fade.material as ShaderMaterial
+	if shader_material != null:
+		shader_material.set_shader_parameter("fade_color", clip_fade_color)
 
 
 func _get_sliding_window_offset(total_size: Vector2, step_y: float) -> float:
