@@ -4,7 +4,6 @@ signal order_completed(success: bool)
 
 const READY_OVERLAY_SECONDS := 2.0
 const GO_OVERLAY_SECONDS := 0.6
-const RESULT_RANK_DISPLAY_SECONDS := 0.55
 const SCREEN_SHAKE_STEP_DURATION := 0.04
 const COMPLETED_BURGER_DISPLAY_SECONDS := 0.2
 const DOMA_SLIDE_SECONDS := 0.15
@@ -41,8 +40,6 @@ const STORE_LIGHT_FAIL_TEXTURE := preload("res://assets/sprites/store/light_fail
 const COMPLETED_BURGER_HALO_SHADER := preload("res://resources/vfx/completed_burger_halo.gdshader")
 const BLACKOUT_WARNING_STEP_SECONDS := 0.2
 const BLACKOUT_WARNING_PAUSE_SECONDS := 0.6
-
-@export var show_perfect_result := false
 
 enum Phase { IDLE, CUSTOMER_ENTERING, PLAYING, SERVING, CUSTOMER_EXITING, COMPLETE }
 
@@ -91,6 +88,7 @@ var persistent_slot_ingredients: Array[Ingredient] = []
 @onready var ingredient_slots: IngredientSlotGrid = $IngredientSlots
 @onready var result_rank: Control = $ResultRank
 @onready var result_perfect: TextureRect = $ResultRank/Perfect
+@onready var result_good: TextureRect = $ResultRank/Good
 @onready var blackout_overlay: ColorRect = $BlackoutOverlay
 @onready var combo_counter: ComboCounter = $ComboCounter
 @onready var foreground_slot: TextureRect = $Foreground_slot
@@ -515,14 +513,9 @@ func _flash_wrong_input() -> void:
 	tween.tween_callback(flash.queue_free)
 
 
-func _show_result_rank() -> void:
-	if not show_perfect_result:
-		return
-
-	if mistake_count > 0:
-		return
-
-	result_perfect.visible = true
+func _show_result_rank(is_perfect: bool) -> void:
+	result_perfect.visible = is_perfect
+	result_good.visible = not is_perfect
 
 	if result_rank_tween != null and result_rank_tween.is_valid():
 		result_rank_tween.kill()
@@ -536,18 +529,14 @@ func _show_result_rank() -> void:
 	result_rank_tween.tween_property(result_rank, "modulate:a", 1.0, 0.08)
 
 
-func _play_recipe_completion_feedback(token: int) -> void:
-	if current_recipe_index + 1 < recipes.size() or mistake_count > 0:
+func _play_recipe_completion_feedback(_token: int) -> void:
+	if current_recipe_index + 1 < recipes.size():
 		AudioManager.play_sfx(AudioManager.Sfx.ORDER_SUCCESS)
 		return
 
-	AudioManager.play_sfx(AudioManager.Sfx.ORDER_SUCCESS_PERFECT)
-	if show_perfect_result:
-		_show_result_rank()
-		await get_tree().create_timer(RESULT_RANK_DISPLAY_SECONDS).timeout
-		if token != round_token:
-			return
-		_hide_result_rank()
+	var completion_was_perfect := mistake_count == 0
+	AudioManager.play_sfx(AudioManager.Sfx.ORDER_SUCCESS_PERFECT if completion_was_perfect else AudioManager.Sfx.ORDER_SUCCESS)
+	_show_result_rank(completion_was_perfect)
 
 
 func _hide_result_rank() -> void:
@@ -562,6 +551,7 @@ func _hide_result_rank() -> void:
 
 func _hide_result_rank_images() -> void:
 	result_perfect.visible = false
+	result_good.visible = false
 
 
 func _on_ultimate_triggered() -> void:

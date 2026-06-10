@@ -2,8 +2,9 @@
 
 [ext_resource type="Script" uid="uid://bymkpapka0ms7" path="res://scenes/components/UltimateBell.gd" id="1_l2x7o"]
 [ext_resource type="Texture2D" uid="uid://kx528lpg0lkh" path="res://assets/sprites/cook/gauge-fill.png" id="2_fill"]
+[ext_resource type="Texture2D" uid="uid://bhtv5g1rur5t2" path="res://assets/sprites/cook/gauge-key-empty.png" id="2_yawjp"]
 [ext_resource type="Texture2D" uid="uid://d2k7sdgm3oluo" path="res://assets/sprites/cook/gauge-frame.png" id="3_frame"]
-[ext_resource type="Texture2D" uid="uid://cfp3vys6e60tm" path="res://assets/sprites/cook/gauge-star-empty.png" id="4_star_empty"]
+[ext_resource type="Texture2D" uid="uid://bfxy3lqikxx31" path="res://assets/sprites/cook/gauge-key-fill.png" id="3_prt6i"]
 
 [node name="UltimateBell" type="Button" unique_id=384873118]
 custom_minimum_size = Vector2(17, 81)
@@ -13,6 +14,8 @@ focus_mode = 0
 mouse_default_cursor_shape = 2
 flat = true
 script = ExtResource("1_l2x7o")
+empty_icon_texture = ExtResource("2_yawjp")
+ready_icon_texture = ExtResource("3_prt6i")
 
 [node name="Glow" type="ColorRect" parent="." unique_id=1001365805]
 visible = false
@@ -20,12 +23,12 @@ modulate = Color(1, 0.91933334, 0.56, 0.35)
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
-anchor_bottom = 0.98800004
-offset_bottom = -0.027999878
+anchor_bottom = 1.0370001
+offset_bottom = 0.002998352
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(1, 0.91933334, 0.56, 1)
+color = Color(1, 0.8753333, 0.32, 1)
 
 [node name="GaugeProgress" type="TextureProgressBar" parent="." unique_id=883407539]
 layout_mode = 1
@@ -74,4 +77,4 @@ offset_bottom = 41.5
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("4_star_empty")
+texture = ExtResource("2_yawjp")

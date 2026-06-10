@@ -12,16 +12,11 @@ const INDICATOR_TEXTURE := preload("res://assets/sprites/ui/indicator.png")
 @export var indicator_shake_offset: float = 3.0
 @export var indicator_shake_step_duration: float = 0.04
 @export var completed_ingredient_modulate: Color = Color(1, 1, 1, 0.5)
-@export var complete_stamp_size: Vector2 = Vector2(88.0, 88.0)
+@export var complete_modulate_alpha: float = 0.8
 @export var sliding_window_start_step: int = 4
-@export var clip_fade_height: float = 16.0
-@export var clip_fade_color: Color = Color(1.0, 0.9, 0.72, 1.0)
 
 @onready var background: NinePatchRect = $RecipeDisplayBackground
-@onready var items_clip: Control = $ItemsClip
-@onready var items_root: Control = $ItemsClip/ItemsRoot
-@onready var complete_stamp: TextureRect = $ItemsClip/ItemsRoot/CompleteStamp
-@onready var top_fade: ColorRect = $TopFade
+@onready var items_root: Control = $ItemsRoot
 
 var recipe: Recipe = null
 var ingredients_visible: bool = true
@@ -29,7 +24,6 @@ var active_step: int = -1
 var visible_height: float = 0.0
 var _indicator_root: Control = null
 var _indicator_shake_tween: Tween = null
-var _complete_stamp_tween: Tween = null
 
 
 func _ready() -> void:
@@ -39,11 +33,13 @@ func _ready() -> void:
 
 func set_recipe(value: Recipe) -> void:
 	recipe = value
+	active_step = -1
 	_render_recipe()
 
 
 func clear_recipe() -> void:
 	recipe = null
+	active_step = -1
 	_render_recipe()
 
 
@@ -89,16 +85,13 @@ func _render_recipe() -> void:
 	_indicator_root = null
 
 	for child in items_root.get_children():
-		if child != complete_stamp:
-			child.queue_free()
+		child.queue_free()
 
 	if recipe == null or recipe.ingredients.is_empty():
 		custom_minimum_size = Vector2.ZERO
 		size = Vector2.ZERO
 		background.visible = false
-		items_clip.size = Vector2.ZERO
-		top_fade.visible = false
-		_set_complete_stamp_visible(false, Vector2.ZERO)
+		modulate.a = 1.0
 		return
 
 	var ingredient_count := recipe.ingredients.size()
@@ -111,25 +104,15 @@ func _render_recipe() -> void:
 		content_size.x + background_padding.x * 2.0,
 		content_size.y + background_padding.y * 2.0
 	)
-	var display_size := _get_display_size(total_size)
 
-	custom_minimum_size = display_size
-	size = display_size
+	custom_minimum_size = total_size
+	size = total_size
 	background.visible = true
 	background.position = Vector2.ZERO
-	background.size = display_size
-	var indicator_clip_margin := _get_indicator_clip_margin()
-	items_clip.position = Vector2(
-		maxf(background_padding.x - indicator_clip_margin, 0.0),
-		background_padding.y
-	)
-	items_clip.size = _get_items_clip_size(display_size, items_clip.position.x, indicator_clip_margin)
-	items_root.position = Vector2(
-		background_padding.x - items_clip.position.x,
-		_get_content_layout_offset(total_size, display_size) + _get_sliding_window_offset(total_size, step_y)
-	)
+	background.size = total_size
+	modulate.a = complete_modulate_alpha if active_step >= ingredient_count else 1.0
+	items_root.position = Vector2(background_padding.x, background_padding.y + _get_sliding_window_offset(total_size, step_y))
 	items_root.size = content_size
-	_update_top_fade(total_size, display_size)
 
 	for i in range(ingredient_count):
 		var ingredient: Ingredient = recipe.ingredients[i]
@@ -148,48 +131,6 @@ func _render_recipe() -> void:
 
 		if i == active_step:
 			_add_indicators(icon_position)
-
-	_set_complete_stamp_visible(active_step >= ingredient_count, content_size)
-
-
-func _get_display_size(total_size: Vector2) -> Vector2:
-	if visible_height <= 0.0:
-		return total_size
-
-	return Vector2(total_size.x, minf(total_size.y, visible_height))
-
-
-func _get_items_clip_size(display_size: Vector2, clip_position_x: float, indicator_clip_margin: float) -> Vector2:
-	return Vector2(
-		minf(
-			icon_size.x + indicator_clip_margin * 2.0,
-			maxf(display_size.x - clip_position_x, 0.0)
-		),
-		maxf(display_size.y - background_padding.y * 2.0, 0.0)
-	)
-
-
-func _get_indicator_clip_margin() -> float:
-	return indicator_size.x + indicator_gap
-
-
-func _get_content_layout_offset(total_size: Vector2, display_size: Vector2) -> float:
-	return display_size.y - total_size.y
-
-
-func _update_top_fade(total_size: Vector2, display_size: Vector2) -> void:
-	var has_clipped_content := total_size.y > display_size.y
-	var has_content_above_clip := items_root.position.y < 0.0
-	top_fade.visible = has_clipped_content and has_content_above_clip and clip_fade_height > 0.0
-	if not top_fade.visible:
-		return
-
-	top_fade.position = items_clip.position
-	top_fade.size = Vector2(items_clip.size.x, minf(clip_fade_height, items_clip.size.y))
-
-	var shader_material := top_fade.material as ShaderMaterial
-	if shader_material != null:
-		shader_material.set_shader_parameter("fade_color", clip_fade_color)
 
 
 func _get_sliding_window_offset(total_size: Vector2, step_y: float) -> float:
@@ -234,29 +175,3 @@ func _create_indicator() -> TextureRect:
 	indicator.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	indicator.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return indicator
-
-
-func _set_complete_stamp_visible(value: bool, content_size: Vector2) -> void:
-	complete_stamp.custom_minimum_size = complete_stamp_size
-	complete_stamp.size = complete_stamp_size
-	complete_stamp.position = (content_size - complete_stamp_size) * 0.5
-	complete_stamp.pivot_offset = complete_stamp_size * 0.5
-	items_root.move_child(complete_stamp, items_root.get_child_count() - 1)
-
-	if complete_stamp.visible == value:
-		return
-
-	if _complete_stamp_tween != null and _complete_stamp_tween.is_valid():
-		_complete_stamp_tween.kill()
-	_complete_stamp_tween = null
-
-	complete_stamp.visible = value
-	if value:
-		complete_stamp.scale = Vector2(1.25, 1.25)
-		complete_stamp.modulate.a = 0.0
-		_complete_stamp_tween = create_tween().set_parallel(true)
-		_complete_stamp_tween.tween_property(complete_stamp, "scale", Vector2.ONE, 0.14).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		_complete_stamp_tween.tween_property(complete_stamp, "modulate:a", 1.0, 0.08)
-	else:
-		complete_stamp.scale = Vector2.ONE
-		complete_stamp.modulate.a = 1.0
