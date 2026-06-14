@@ -40,6 +40,9 @@ const STORE_LIGHT_FAIL_TEXTURE := preload("res://assets/sprites/store/light_fail
 const COMPLETED_BURGER_HALO_SHADER := preload("res://resources/vfx/completed_burger_halo.gdshader")
 const BLACKOUT_WARNING_STEP_SECONDS := 0.2
 const BLACKOUT_WARNING_PAUSE_SECONDS := 0.6
+const RESULT_LABEL_FLASH_SECONDS := 0.2
+const RESULT_LABEL_FLASH_INTERVAL_SECONDS := 0.12
+const RESULT_LABEL_FLASH_COLOR := Color.WHITE
 
 enum Phase { IDLE, CUSTOMER_ENTERING, PLAYING, SERVING, CUSTOMER_EXITING, COMPLETE }
 
@@ -62,6 +65,7 @@ var screen_shake_offset: float = 0.0
 var is_mobile_input: bool = false
 var mistake_count: int = 0
 var result_rank_tween: Tween = null
+var result_label_flash_tween: Tween = null
 var stack_landing_token: int = 0
 var pending_stack_landing_tokens: Array[int] = []
 var stack_camera_tween: Tween = null
@@ -87,8 +91,9 @@ var persistent_slot_ingredients: Array[Ingredient] = []
 @onready var order_progress_dots: VBoxContainer = $PlayArea/PlateArea/OrderProgressDots
 @onready var ingredient_slots: IngredientSlotGrid = $IngredientSlots
 @onready var result_rank: Control = $ResultRank
-@onready var result_perfect: TextureRect = $ResultRank/Perfect
-@onready var result_good: TextureRect = $ResultRank/Good
+@onready var result_label: Control = $ResultRank/Result_Label
+@onready var result_label_shadow: Label = $ResultRank/Result_Label/shadow
+@onready var result_label_text: Label = $ResultRank/Result_Label/text
 @onready var blackout_overlay: ColorRect = $BlackoutOverlay
 @onready var combo_counter: ComboCounter = $ComboCounter
 @onready var foreground_slot: TextureRect = $Foreground_slot
@@ -100,8 +105,14 @@ var persistent_slot_ingredients: Array[Ingredient] = []
 @onready var store_light: TextureRect = $StoreLight
 @onready var ultimate_bell: UltimateBell = $UltimateBell
 
+var result_label_shadow_settings: LabelSettings
+var result_label_text_settings: LabelSettings
+var result_label_shadow_color: Color
+var result_label_text_color: Color
+
 
 func _ready() -> void:
+	_setup_result_label_flash()
 	panel_home_position = position
 	doma_home_position = sprite_doma.position
 	foreground_slot_home_position = foreground_slot.position
@@ -514,8 +525,12 @@ func _flash_wrong_input() -> void:
 
 
 func _show_result_rank(is_perfect: bool) -> void:
-	result_perfect.visible = is_perfect
-	result_good.visible = not is_perfect
+	result_label.visible = true
+	_set_result_label_text("PERFECT" if is_perfect else "GREAT")
+	if is_perfect:
+		_start_result_label_flash()
+	else:
+		_stop_result_label_flash()
 
 	if result_rank_tween != null and result_rank_tween.is_valid():
 		result_rank_tween.kill()
@@ -543,6 +558,7 @@ func _hide_result_rank() -> void:
 	if result_rank_tween != null and result_rank_tween.is_valid():
 		result_rank_tween.kill()
 	result_rank_tween = null
+	_stop_result_label_flash()
 	result_rank.visible = false
 	result_rank.scale = Vector2.ONE
 	result_rank.modulate.a = 1.0
@@ -550,8 +566,60 @@ func _hide_result_rank() -> void:
 
 
 func _hide_result_rank_images() -> void:
-	result_perfect.visible = false
-	result_good.visible = false
+	result_label.visible = false
+
+
+func _setup_result_label_flash() -> void:
+	result_label_shadow_settings = _duplicate_label_settings(result_label_shadow)
+	result_label_text_settings = _duplicate_label_settings(result_label_text)
+	result_label_shadow_color = result_label_shadow_settings.font_color
+	result_label_text_color = result_label_text_settings.font_color
+
+
+func _duplicate_label_settings(label: Label) -> LabelSettings:
+	if label.label_settings != null:
+		var copied_settings := label.label_settings.duplicate() as LabelSettings
+		label.label_settings = copied_settings
+		return copied_settings
+
+	var new_settings := LabelSettings.new()
+	new_settings.font_color = label.get_theme_color("font_color")
+	label.label_settings = new_settings
+	return new_settings
+
+
+func _set_result_label_text(value: String) -> void:
+	result_label_shadow.text = value
+	result_label_text.text = value
+
+
+func _start_result_label_flash() -> void:
+	_stop_result_label_flash()
+	_set_result_label_flash_color(RESULT_LABEL_FLASH_COLOR)
+	result_label_flash_tween = create_tween().set_loops()
+	result_label_flash_tween.tween_property(result_label_text_settings, "font_color", result_label_text_color, RESULT_LABEL_FLASH_SECONDS)
+	result_label_flash_tween.parallel().tween_property(result_label_shadow_settings, "font_color", result_label_shadow_color, RESULT_LABEL_FLASH_SECONDS)
+	result_label_flash_tween.tween_interval(RESULT_LABEL_FLASH_INTERVAL_SECONDS)
+	result_label_flash_tween.tween_callback(_set_result_label_flash_color.bind(RESULT_LABEL_FLASH_COLOR))
+
+
+func _stop_result_label_flash() -> void:
+	if result_label_flash_tween != null and result_label_flash_tween.is_valid():
+		result_label_flash_tween.kill()
+	result_label_flash_tween = null
+	_restore_result_label_colors()
+
+
+func _set_result_label_flash_color(color: Color) -> void:
+	result_label_shadow_settings.font_color = color
+	result_label_text_settings.font_color = color
+
+
+func _restore_result_label_colors() -> void:
+	if result_label_shadow_settings != null:
+		result_label_shadow_settings.font_color = result_label_shadow_color
+	if result_label_text_settings != null:
+		result_label_text_settings.font_color = result_label_text_color
 
 
 func _on_ultimate_triggered() -> void:

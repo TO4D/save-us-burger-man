@@ -1,10 +1,8 @@
 [gd_resource type="LabelSettings" format=3 uid="uid://bbx0n2c7skyw8"]
 
-[ext_resource type="FontFile" uid="uid://bivsctx4h0jw" path="res://fonts/Jersey25-Regular.ttf" id="1_ipoxu"]
+[ext_resource type="FontFile" uid="uid://dial72f450tkp" path="res://fonts/neodgm.ttf" id="1_ipoxu"]
 
 [resource]
 font = ExtResource("1_ipoxu")
-font_size = 36
 font_color = Color(1, 0.74509805, 0.19215687, 1)
-outline_size = 2
 shadow_size = 0

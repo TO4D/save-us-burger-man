@@ -2,11 +2,11 @@
 
 [ext_resource type="Script" uid="uid://cfoee8j2l2bpe" path="res://scenes/components/BattleGauge.gd" id="1_g2r14"]
 [ext_resource type="Texture2D" uid="uid://dklkrtu2i1at3" path="res://assets/sprites/store/clouds.png" id="5_clouds"]
-[ext_resource type="Texture2D" uid="uid://c2mhfodle586u" path="res://assets/sprites/store/shop.png" id="5_g2r14"]
 [ext_resource type="Texture2D" uid="uid://cmjbcd0d67482" path="res://assets/sprites/monster/monster_new_idle.png" id="5_idle"]
-[ext_resource type="Texture2D" uid="uid://cn7wgrll5ad1t" path="res://assets/sprites/store/shopView.png" id="5_iod1h"]
+[ext_resource type="Texture2D" uid="uid://6jbtrgt0kgvp" path="res://assets/sprites/store/shopView_tone.png" id="5_qdju5"]
 [ext_resource type="SpriteFrames" uid="uid://cxemxilhq8vjb" path="res://resources/animations/monster_eating.tres" id="6_eat_anim"]
 [ext_resource type="Texture2D" uid="uid://b1pofkh4sv4nc" path="res://assets/sprites/monster/monster_new_eat3.png" id="7_eaten"]
+[ext_resource type="Texture2D" uid="uid://0m1h3pw3oxiy" path="res://assets/sprites/store/shop_new_tone.png" id="7_uetx7"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g2r14"]
 bg_color = Color(0.7607843, 0.7607843, 0.7607843, 1)
@@ -40,7 +40,7 @@ monster_eaten_texture = ExtResource("7_eaten")
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
-texture = ExtResource("5_iod1h")
+texture = ExtResource("5_qdju5")
 stretch_mode = 2
 
 [node name="CloudLayer" type="Control" parent="." unique_id=1487570097]
@@ -70,9 +70,8 @@ stretch_mode = 2
 
 [node name="ShopIcon" type="Sprite2D" parent="." unique_id=461974474]
 position = Vector2(134, 173)
-scale = Vector2(0.5, 0.5)
-texture = ExtResource("5_g2r14")
-offset = Vector2(0, -25)
+texture = ExtResource("7_uetx7")
+offset = Vector2(0, -13)
 
 [node name="MonsterIcon" type="Node2D" parent="." unique_id=7079341]
 position = Vector2(135, 0)

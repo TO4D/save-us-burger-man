@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cacit4jsxeo4r"]
 
 [ext_resource type="Script" uid="uid://b305avhxxfuis" path="res://scenes/components/MonsterUltimateOverlay.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://nk1uje5in5wv" path="res://assets/sprites/ui/monster_ult.png" id="2_intro"]
+[ext_resource type="Texture2D" uid="uid://k2xemn07ge86" path="res://assets/sprites/ui/monster_ult2.png" id="2_htfwi"]
 
 [node name="MonsterUltimateOverlay" type="Control" unique_id=179667489]
 z_index = 100
@@ -27,7 +27,7 @@ color = Color(0, 0, 0, 0.72)
 [node name="IntroSprite" type="Sprite2D" parent="." unique_id=2125878623]
 texture_filter = 1
 position = Vector2(135, 211)
-texture = ExtResource("2_intro")
+texture = ExtResource("2_htfwi")
 
 [node name="FeetSprite" type="AnimatedSprite2D" parent="." unique_id=603232140]
 texture_filter = 1

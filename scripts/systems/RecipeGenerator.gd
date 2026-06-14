@@ -31,7 +31,7 @@ static func generate_for_stage(stage: int) -> Recipe:
 static func _get_middle_length(stage: int) -> int:
 	match clamp(stage, 1, 10):
 		1:
-			return 18
+			return 3
 		2:
 			return randi_range(4, 7)
 		3:

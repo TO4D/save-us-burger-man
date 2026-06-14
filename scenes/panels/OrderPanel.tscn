@@ -7,16 +7,17 @@
 [ext_resource type="Texture2D" uid="uid://dq3n401l20mhm" path="res://assets/sprites/cook/cook_back.png" id="4_t7gr7"]
 [ext_resource type="PackedScene" uid="uid://dwkpv5wbo3tqm" path="res://scenes/components/UltimateBell.tscn" id="5_bell"]
 [ext_resource type="Script" uid="uid://bkg1316f80lh8" path="res://scenes/components/RecipeDisplayStack.gd" id="6_stack"]
-[ext_resource type="Texture2D" uid="uid://gbpma8v66siu" path="res://assets/sprites/cook/slot.png" id="7_ayopg"]
+[ext_resource type="Texture2D" uid="uid://cc6m141oic454" path="res://assets/sprites/cook/slot_grey.png" id="6_t7gr7"]
 [ext_resource type="PackedScene" uid="uid://dcyr7651s66f" path="res://scenes/components/IngredientSlot.tscn" id="7_slot"]
 [ext_resource type="Script" uid="uid://b20bp6pi5tbgd" path="res://scenes/components/IngredientSlotGrid.gd" id="8_grid"]
 [ext_resource type="PackedScene" uid="uid://cx4wtpu6m3qdr" path="res://scenes/components/MultiOrder.tscn" id="9_multi"]
-[ext_resource type="Texture2D" uid="uid://825eunnjjb62" path="res://assets/sprites/cook/result_perfect_noback.png" id="10_t7gr7"]
 [ext_resource type="PackedScene" uid="uid://ch1nxmlssyr2g" path="res://scenes/components/UltimateOverlay.tscn" id="10_ult_overlay"]
-[ext_resource type="Texture2D" uid="uid://dh28ng4xxwk8g" path="res://assets/sprites/cook/result_good_noback.png" id="11_t7gr7"]
+[ext_resource type="LabelSettings" uid="uid://cy0ggqjcgv7nf" path="res://resources/fonts/OrderResultLabel.tres" id="12_k1074"]
+[ext_resource type="LabelSettings" uid="uid://bnkbmixeetrqv" path="res://resources/fonts/OrderResultLabel_shadow.tres" id="13_ds823"]
 [ext_resource type="Texture2D" uid="uid://dbsxpj7ft5qqc" path="res://assets/sprites/store/light_on.png" id="15_l4fm3"]
 [ext_resource type="PackedScene" uid="uid://c37hgp1q5ourt" path="res://scenes/components/PlateStackScene.tscn" id="16_plate_stack"]
 [ext_resource type="PackedScene" uid="uid://cacit4jsxeo4r" path="res://scenes/components/MonsterUltimateOverlay.tscn" id="17_monster_ult_overlay"]
+[ext_resource type="Texture2D" uid="uid://dc2jy6gw3vvpp" path="res://assets/sprites/cook/roof.png" id="18_ayopg"]
 
 [node name="OrderPanel" type="Control" unique_id=890599604]
 layout_mode = 3
@@ -111,14 +112,14 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -96.0
-offset_top = -160.0
+offset_top = -150.0
 offset_right = -6.0
 offset_bottom = -5.0
 grow_horizontal = 0
 grow_vertical = 0
 mouse_filter = 2
 script = ExtResource("6_stack")
-max_display_height = 155.0
+max_display_height = 145.0
 
 [node name="Foreground_slot" type="TextureRect" parent="." unique_id=1375331359]
 layout_mode = 0
@@ -126,7 +127,7 @@ offset_left = 5.0
 offset_top = 355.0
 offset_right = 265.0
 offset_bottom = 475.0
-texture = ExtResource("7_ayopg")
+texture = ExtResource("6_t7gr7")
 
 [node name="IngredientSlots" type="GridContainer" parent="." unique_id=49289063]
 layout_mode = 1
@@ -193,27 +194,56 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="Perfect" type="TextureRect" parent="ResultRank" unique_id=1832580181]
+[node name="Result_Label" type="Control" parent="ResultRank" unique_id=1483446609]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -135.0
+offset_top = -4.0
+offset_right = 135.0
+offset_bottom = 36.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
-texture = ExtResource("10_t7gr7")
-stretch_mode = 5
+pivot_offset = Vector2(135, 0)
 
-[node name="Good" type="TextureRect" parent="ResultRank" unique_id=1486547921]
+[node name="shadow" type="Label" parent="ResultRank/Result_Label" unique_id=384557381]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -82.0
+offset_top = -22.0
+offset_right = 86.0
+offset_bottom = 26.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
-texture = ExtResource("11_t7gr7")
-stretch_mode = 5
+text = "PERFECT"
+label_settings = ExtResource("13_ds823")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="text" type="Label" parent="ResultRank/Result_Label" unique_id=2018591295]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -84.0
+offset_top = -24.0
+offset_right = 84.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "PERFECT"
+label_settings = ExtResource("12_k1074")
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="BlackoutOverlay" type="ColorRect" parent="." unique_id=1651185138]
 visible = false
@@ -276,9 +306,9 @@ anchor_top = 0.177
 anchor_right = 0.0
 anchor_bottom = 0.177
 offset_left = 10.0
-offset_top = 98.04
-offset_right = 130.0
-offset_bottom = 135.04001
+offset_top = 103.04
+offset_right = 211.0
+offset_bottom = 143.04001
 grow_horizontal = 2
 pivot_offset = Vector2(0, 0)
 
@@ -320,3 +350,12 @@ offset_right = 135.0
 grow_horizontal = 2
 grow_vertical = 0
 texture = ExtResource("2_8lfvp")
+
+[node name="Roof" type="TextureRect" parent="." unique_id=1741553387]
+z_index = 20
+layout_mode = 0
+offset_top = 180.0
+offset_right = 270.0
+offset_bottom = 220.0
+texture = ExtResource("18_ayopg")
+stretch_mode = 2

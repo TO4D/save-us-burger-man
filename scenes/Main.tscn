@@ -4,11 +4,8 @@
 [ext_resource type="PackedScene" uid="uid://jpymc5yu72ku" path="res://scenes/panels/StartPanel.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://1a8ywfm1s7j4" path="res://scenes/panels/CutscenePanel.tscn" id="3"]
 [ext_resource type="PackedScene" uid="uid://fmbafdwu28nm" path="res://scenes/panels/OrderPanel.tscn" id="4"]
-[ext_resource type="Texture2D" uid="uid://cm4uui0cmyndi" path="res://assets/images/cut_scene1.png" id="4_q8u5g"]
 [ext_resource type="PackedScene" path="res://scenes/panels/GameOverPanel.tscn" id="5"]
-[ext_resource type="Texture2D" uid="uid://dy6ldpsfhm8kw" path="res://assets/images/cut_scene2.png" id="5_lhr70"]
 [ext_resource type="PackedScene" path="res://scenes/panels/VictoryPanel.tscn" id="6"]
-[ext_resource type="Texture2D" uid="uid://ctu0771wha68n" path="res://assets/images/cut_scene3.png" id="6_wp0k4"]
 [ext_resource type="PackedScene" uid="uid://dvq43cqbox0t1" path="res://scenes/panels/SettingsPanel.tscn" id="7_settings"]
 [ext_resource type="PackedScene" path="res://scenes/panels/PauseMenu.tscn" id="8_pause"]
 
@@ -22,7 +19,6 @@ skip_start_overlay = true
 [node name="StartPanel" parent="PanelLayer" unique_id=1136073367 instance=ExtResource("2")]
 
 [node name="CutscenePanel" parent="PanelLayer" unique_id=839360778 instance=ExtResource("3")]
-cutscene_images = Array[Texture2D]([ExtResource("4_q8u5g"), ExtResource("5_lhr70"), ExtResource("6_wp0k4")])
 
 [node name="OrderPanel" parent="PanelLayer" unique_id=1169860898 instance=ExtResource("4")]
 
