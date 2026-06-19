@@ -1,19 +1,19 @@
 [gd_resource type="Resource" script_class="Ingredient" format=3 uid="uid://bnda6sn76y1s7"]
 
 [ext_resource type="Script" uid="uid://cpbwt2jx44ei" path="res://scripts/data/Ingredient.gd" id="1_7untq"]
-[ext_resource type="Texture2D" uid="uid://ga4epf38f5od" path="res://assets/sprites/ingredients/icons/icon_cheese.png" id="1_bgv0b"]
 [ext_resource type="Texture2D" uid="uid://cs3onv8u5ml7j" path="res://assets/sprites/ingredients/preview/pre_cheese.png" id="2_jxa70"]
 [ext_resource type="Texture2D" uid="uid://bto4kbn8ps6ye" path="res://assets/sprites/ingredients/slots/slot_cheese2.png" id="4_3oijf"]
-[ext_resource type="Texture2D" uid="uid://dwcqq8yfm7h6" path="res://assets/sprites/ingredients/cheese2.png" id="4_jxa70"]
 [ext_resource type="Texture2D" uid="uid://cds854ixjqb1k" path="res://assets/sprites/ingredients/slots/slot_cheese1.png" id="5_hp57g"]
 [ext_resource type="Texture2D" uid="uid://c2s1cumxlhl16" path="res://assets/sprites/ingredients/slots/slot_cheese3.png" id="6_spqmn"]
+[ext_resource type="Texture2D" uid="uid://bktip7wvpw3ej" path="res://assets/sprites/ingredients/cheese1.png" id="6_yqyvf"]
+[ext_resource type="Texture2D" uid="uid://bqp3ff8u5v0f8" path="res://assets/sprites/ingredients/cheese2.png" id="7_stack"]
 
 [resource]
 script = ExtResource("1_7untq")
 id = "cheese"
 display_name = "cheese"
-sprite = ExtResource("4_jxa70")
-icon_sprite = ExtResource("1_bgv0b")
+sprite = ExtResource("6_yqyvf")
+stack_sprite = ExtResource("7_stack")
 preview_icon_sprite = ExtResource("2_jxa70")
 slot_button_normal = ExtResource("5_hp57g")
 slot_button_pressed = ExtResource("6_spqmn")

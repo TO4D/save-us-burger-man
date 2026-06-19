@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://f81sdvkvyogq"]
 
 [ext_resource type="Script" uid="uid://cfoee8j2l2bpe" path="res://scenes/components/BattleGauge.gd" id="1_g2r14"]
+[ext_resource type="Texture2D" uid="uid://8ascfekdsfoe" path="res://assets/sprites/monster/monster_new_new1.png" id="2_qdju5"]
+[ext_resource type="Texture2D" uid="uid://c4g8oqxgswnu" path="res://assets/sprites/monster/monster_new_new4.png" id="4_qdju5"]
 [ext_resource type="Texture2D" uid="uid://dklkrtu2i1at3" path="res://assets/sprites/store/clouds.png" id="5_clouds"]
-[ext_resource type="Texture2D" uid="uid://cmjbcd0d67482" path="res://assets/sprites/monster/monster_new_idle.png" id="5_idle"]
 [ext_resource type="Texture2D" uid="uid://6jbtrgt0kgvp" path="res://assets/sprites/store/shopView_tone.png" id="5_qdju5"]
 [ext_resource type="SpriteFrames" uid="uid://cxemxilhq8vjb" path="res://resources/animations/monster_eating.tres" id="6_eat_anim"]
-[ext_resource type="Texture2D" uid="uid://b1pofkh4sv4nc" path="res://assets/sprites/monster/monster_new_eat3.png" id="7_eaten"]
 [ext_resource type="Texture2D" uid="uid://0m1h3pw3oxiy" path="res://assets/sprites/store/shop_new_tone.png" id="7_uetx7"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g2r14"]
@@ -32,9 +32,9 @@ offset_bottom = 180.0
 grow_horizontal = 2
 script = ExtResource("1_g2r14")
 monster_icon_update_interval = 0.2
-monster_idle_texture = ExtResource("5_idle")
+monster_idle_texture = ExtResource("2_qdju5")
 monster_eating_frames = ExtResource("6_eat_anim")
-monster_eaten_texture = ExtResource("7_eaten")
+monster_eaten_texture = ExtResource("4_qdju5")
 
 [node name="back" type="TextureRect" parent="." unique_id=253994848]
 layout_mode = 0
@@ -83,7 +83,7 @@ frame_progress = 0.41305158
 offset = Vector2(0, -115)
 
 [node name="StateSprite" type="Sprite2D" parent="MonsterIcon" unique_id=1904226389]
-texture = ExtResource("5_idle")
+texture = ExtResource("2_qdju5")
 offset = Vector2(0, -115)
 
 [node name="Bar" type="ProgressBar" parent="." unique_id=1938841943]

@@ -417,7 +417,7 @@ func _finish_current_burger() -> void:
 	_play_recipe_completion_feedback(round_token)
 
 	await _slide_completed_burger_left(completion_was_perfect)
-	await _play_burger_throw_attack(_fullness_per_burger(), _knockback_per_burger())
+	await _play_burger_throw_attack(_fullness_per_burger(), _knockback_per_burger(), completion_was_perfect)
 	await recipe_display_stack.complete_current_recipe()
 	current_recipe_index += 1
 	_update_order_progress_dots()
@@ -483,14 +483,14 @@ func _fail_customer() -> void:
 	order_completed.emit(false)
 
 
-func _play_burger_throw_attack(fullness_amount: float, attack_knockback: float) -> void:
+func _play_burger_throw_attack(fullness_amount: float, attack_knockback: float, completion_was_perfect: bool) -> void:
 	var hit_monster := func() -> void:
 		AudioManager.play_sfx(AudioManager.Sfx.ATTACK)
 		MonsterManager.add_satiety(fullness_amount)
 		print("[OrderPanel] Burger served fullness=%.1f, monster satiety=%.1f/%.1f" % [fullness_amount, MonsterManager.satiety, MonsterManager.MAX_SATIETY])
 		DistanceManager.recover(attack_knockback)
 	battle_gauge.burger_attack_hit.connect(hit_monster, CONNECT_ONE_SHOT)
-	await battle_gauge.play_burger_attack(attack_knockback)
+	await battle_gauge.play_burger_attack(attack_knockback, completion_was_perfect)
 
 
 func _fullness_per_burger() -> float:

@@ -1,19 +1,17 @@
 [gd_resource type="Resource" script_class="Ingredient" format=3 uid="uid://bu5exve0xitg2"]
 
 [ext_resource type="Script" uid="uid://cpbwt2jx44ei" path="res://scripts/data/Ingredient.gd" id="1_7ry4t"]
-[ext_resource type="Texture2D" uid="uid://71udra7ewb67" path="res://assets/sprites/ingredients/icons/icon_tomato.png" id="1_xoas7"]
 [ext_resource type="Texture2D" uid="uid://b34jves6r2wjp" path="res://assets/sprites/ingredients/preview/pre_tomato.png" id="2_exbth"]
-[ext_resource type="Texture2D" uid="uid://t2tfyjf1wgef" path="res://assets/sprites/ingredients/tomato2.png" id="4_exbth"]
 [ext_resource type="Texture2D" uid="uid://bt4c1jjx3e8j1" path="res://assets/sprites/ingredients/slots/slot_tomato2.png" id="4_nibfo"]
 [ext_resource type="Texture2D" uid="uid://bldv4d1i3f87g" path="res://assets/sprites/ingredients/slots/slot_tomato1.png" id="5_tmqfi"]
+[ext_resource type="Texture2D" uid="uid://d4cvjfc0ikuw1" path="res://assets/sprites/ingredients/tomato.png" id="6_a7i0y"]
 [ext_resource type="Texture2D" uid="uid://jdem7dxuvacl" path="res://assets/sprites/ingredients/slots/slot_tomato3.png" id="6_gq78j"]
 
 [resource]
 script = ExtResource("1_7ry4t")
 id = "tomato"
 display_name = "tomato"
-sprite = ExtResource("4_exbth")
-icon_sprite = ExtResource("1_xoas7")
+sprite = ExtResource("6_a7i0y")
 preview_icon_sprite = ExtResource("2_exbth")
 slot_button_normal = ExtResource("5_tmqfi")
 slot_button_pressed = ExtResource("6_gq78j")

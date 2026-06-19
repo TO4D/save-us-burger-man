@@ -1,23 +1,21 @@
 [gd_resource type="Resource" script_class="Ingredient" format=3 uid="uid://b7ym2t4f53bx1"]
 
 [ext_resource type="Script" uid="uid://cpbwt2jx44ei" path="res://scripts/data/Ingredient.gd" id="1_ckfbo"]
-[ext_resource type="Texture2D" uid="uid://bxdmp48dweiju" path="res://assets/sprites/ingredients/icons/icon_onion.png" id="1_lo2hv"]
-[ext_resource type="Texture2D" uid="uid://eau730f31hon" path="res://assets/sprites/ingredients/preview/pre_anion.png" id="2_v28mo"]
+[ext_resource type="Texture2D" uid="uid://eau730f31hon" path="res://assets/sprites/ingredients/preview/pre_onion.png" id="1_meb42"]
 [ext_resource type="Texture2D" uid="uid://ms81khtdsdg0" path="res://assets/sprites/ingredients/slots/slot_onion2.png" id="4_u1b1i"]
-[ext_resource type="Texture2D" uid="uid://v3dibj0gc66s" path="res://assets/sprites/ingredients/anion2.png" id="4_v28mo"]
 [ext_resource type="Texture2D" uid="uid://cdhvo62n4s7yh" path="res://assets/sprites/ingredients/slots/slot_onion1.png" id="5_fon6l"]
 [ext_resource type="Texture2D" uid="uid://dqabs6uen07jc" path="res://assets/sprites/ingredients/slots/slot_onion3.png" id="6_3rjsa"]
+[ext_resource type="Texture2D" uid="uid://dimoduupoua7x" path="res://assets/sprites/ingredients/onion.png" id="6_u1b1i"]
 
 [resource]
 script = ExtResource("1_ckfbo")
 id = "onion"
 display_name = "onion"
-sprite = ExtResource("4_v28mo")
-icon_sprite = ExtResource("1_lo2hv")
-preview_icon_sprite = ExtResource("2_v28mo")
+sprite = ExtResource("6_u1b1i")
+preview_icon_sprite = ExtResource("1_meb42")
 slot_button_normal = ExtResource("5_fon6l")
 slot_button_pressed = ExtResource("6_3rjsa")
 slot_button_hover = ExtResource("4_u1b1i")
 stack_height = 8
-stack_offset_y = 10
+stack_offset_y = 8
 metadata/_custom_type_script = "uid://cpbwt2jx44ei"

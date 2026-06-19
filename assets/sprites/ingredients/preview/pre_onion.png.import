@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bqp3ff8u5v0f8"
-path="res://.godot/imported/cheese2.png-f87d55beed6a229d9771d6f9151342d9.ctex"
+uid="uid://eau730f31hon"
+path="res://.godot/imported/pre_onion.png-bd2c07485f442a1c89ffa9a0bdc92177.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/ingredients/cheese2.png"
-dest_files=["res://.godot/imported/cheese2.png-f87d55beed6a229d9771d6f9151342d9.ctex"]
+source_file="res://assets/sprites/ingredients/preview/pre_onion.png"
+dest_files=["res://.godot/imported/pre_onion.png-bd2c07485f442a1c89ffa9a0bdc92177.ctex"]
 
 [params]
 

@@ -10,6 +10,7 @@ anchors_preset = 0
 mouse_filter = 2
 script = ExtResource("1")
 background_padding = Vector2(10, 10)
+sliding_window_start_step = 3
 
 [node name="RecipeDisplayBackground" type="NinePatchRect" parent="." unique_id=1198540343]
 layout_mode = 1

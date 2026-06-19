@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bqp3ff8u5v0f8"
-path="res://.godot/imported/cheese2.png-f87d55beed6a229d9771d6f9151342d9.ctex"
+uid="uid://clnsn3okvsbo6"
+path="res://.godot/imported/burger_fire_effect.png-456f794cf8622e30f65cfdff9da19a41.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/ingredients/cheese2.png"
-dest_files=["res://.godot/imported/cheese2.png-f87d55beed6a229d9771d6f9151342d9.ctex"]
+source_file="res://assets/sprites/particle/burger_fire_effect.png"
+dest_files=["res://.godot/imported/burger_fire_effect.png-456f794cf8622e30f65cfdff9da19a41.ctex"]
 
 [params]
 

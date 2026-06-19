@@ -1,19 +1,17 @@
 [gd_resource type="Resource" script_class="Ingredient" format=3 uid="uid://b6ub75p7fmpax"]
 
-[ext_resource type="Texture2D" uid="uid://ces3qauey1jos" path="res://assets/sprites/ingredients/icons/icon_bunBottom.png" id="1_56bix"]
 [ext_resource type="Script" uid="uid://cpbwt2jx44ei" path="res://scripts/data/Ingredient.gd" id="1_ckyym"]
 [ext_resource type="Texture2D" uid="uid://br77k2xjiahvd" path="res://assets/sprites/ingredients/preview/pre_bun_bottom.png" id="2_km403"]
-[ext_resource type="Texture2D" uid="uid://dcb63b0ixi48i" path="res://assets/sprites/ingredients/bun_bottom2.png" id="4_km403"]
 [ext_resource type="Texture2D" uid="uid://k0uibpdwt24i" path="res://assets/sprites/ingredients/slots/slot_bunBottom2.png" id="4_uu5g4"]
 [ext_resource type="Texture2D" uid="uid://d4fy3jdll418u" path="res://assets/sprites/ingredients/slots/slot_bunBottom1.png" id="5_i26e4"]
+[ext_resource type="Texture2D" uid="uid://cc7iq5boy4kro" path="res://assets/sprites/ingredients/bun_bottom.png" id="6_64y8u"]
 [ext_resource type="Texture2D" uid="uid://cdb6jlsp3mpe5" path="res://assets/sprites/ingredients/slots/slot_bunBottom3.png" id="6_o6lnj"]
 
 [resource]
 script = ExtResource("1_ckyym")
 id = "bun_bottom"
 display_name = "bunBottom"
-sprite = ExtResource("4_km403")
-icon_sprite = ExtResource("1_56bix")
+sprite = ExtResource("6_64y8u")
 preview_icon_sprite = ExtResource("2_km403")
 slot_button_normal = ExtResource("5_i26e4")
 slot_button_pressed = ExtResource("6_o6lnj")

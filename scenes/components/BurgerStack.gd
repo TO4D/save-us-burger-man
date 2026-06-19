@@ -32,6 +32,7 @@ func add_ingredient(ing: Ingredient, token: int = 0, speed_multiplier: float = 1
 	var tween = create_tween()
 	var stack_global_position: Vector2 = to_global(Vector2(0.0, target_y - STACk_EFFECT_OFFSET_Y))
 	tween.tween_property(sprite, "position:y", target_y, STACK_DROP_DURATION / speed).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_callback(_apply_stack_sprite.bind(sprite, ing))
 	tween.tween_callback(_emit_ingredient_landed.bind(stack_global_position, token))
 	#tween.tween_callback(_spawn_stack_effect.bind(Vector2(0.0, target_y - STACk_EFFECT_OFFSET_Y)))
 	tween.tween_property(sprite, "scale", Vector2(1.15, 0.85), STACK_BOUNCE_SQUASH_DURATION / speed)
@@ -39,6 +40,15 @@ func add_ingredient(ing: Ingredient, token: int = 0, speed_multiplier: float = 1
 
 	current_height += ing.stack_height
 	stacked_ingredients.append(ing)
+
+func _apply_stack_sprite(sprite: Sprite2D, ing: Ingredient) -> void:
+	if ing.stack_sprite == null:
+		return
+	sprite.texture = ing.stack_sprite
+	sprite.offset = Vector2(
+		-floori(ing.stack_sprite.get_width() / 2.0),
+		-ing.stack_sprite.get_height()
+	)
 
 func _emit_ingredient_landed(stack_global_position: Vector2, token: int) -> void:
 	AudioManager.play_sfx(AudioManager.Sfx.INGREDIENT_STACK)

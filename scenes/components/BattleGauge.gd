@@ -5,12 +5,14 @@ signal burger_attack_hit
 
 const BURGER_ATTACK_TEXTURE := preload("res://assets/sprites/ui/order_icon.1.png")
 const DEFAULT_EATING_PARTICLE_SCENE := preload("res://resources/particles/Eating.tscn")
+const DEFAULT_BURGER_PROJECTILE_SCENE := preload("res://scenes/components/BurgerProjectile.tscn")
 
 @export var distance_display_scale: float = 10.0
 @export var monster_icon_update_interval: float = 0.5
 @export var monster_eating_min_speed_scale: float = 1.0
 @export var monster_eating_max_speed_scale: float = 2.0
 @export var cloud_scroll_speed: float = 1.0
+@export var burger_projectile_scene: PackedScene = DEFAULT_BURGER_PROJECTILE_SCENE
 
 @export_group("Monster Sprites")
 @export var monster_idle_texture: Texture2D
@@ -69,16 +71,20 @@ func _process(delta: float) -> void:
 	_apply_monster_icon_position()
 
 
-func play_burger_attack(knockback_amount: float = 0.0) -> void:
+func play_burger_attack(knockback_amount: float = 0.0, is_perfect: bool = false) -> void:
+	var target_position := Vector2(monster_icon.global_position.x + 6.0, monster_icon.global_position.y - 110.0)
 	var projectile := _create_burger_projectile()
 	add_child(projectile)
+	if projectile.has_method("configure"):
+		projectile.call("configure", is_perfect)
 	AudioManager.play_sfx(AudioManager.Sfx.FIRE_BURGER)
 
-	var target_position := Vector2(monster_icon.global_position.x + 6.0, monster_icon.global_position.y - 110.0)
 	var tween: Tween = create_tween().set_parallel(true)
 	tween.tween_property(projectile, "global_position", target_position, 0.34).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tween.tween_property(projectile, "scale", Vector2(1.1, 1.1), 0.34)
-	tween.tween_property(projectile, "rotation", TAU * 1.35, 0.34)
+	var projectile_icon := projectile.get_node_or_null("BurgerIcon") as Sprite2D
+	if projectile_icon != null:
+		tween.tween_property(projectile_icon, "rotation", TAU * 1.35, 0.34)
 	await tween.finished
 
 	monster_knockback_active = true
@@ -107,13 +113,16 @@ func play_ultimate_barrage(projectile_count: int = 6) -> void:
 		await get_tree().create_timer(0.06).timeout
 
 
-func _create_burger_projectile() -> Sprite2D:
-	var icon := Sprite2D.new()
-	icon.texture = BURGER_ATTACK_TEXTURE
-	icon.position = shop_icon.position
-	icon.modulate = Color.WHITE
-	icon.scale = Vector2(0.8, 0.8)
-	return icon
+func _create_burger_projectile() -> Node2D:
+	var projectile := burger_projectile_scene.instantiate() as Node2D
+	if projectile == null:
+		projectile = Sprite2D.new()
+		(projectile as Sprite2D).texture = BURGER_ATTACK_TEXTURE
+
+	projectile.position = shop_icon.position
+	projectile.scale = Vector2(0.8, 0.8)
+	projectile.z_index = 20
+	return projectile
 
 
 func _on_distance_changed(value: float, max_value: float) -> void:

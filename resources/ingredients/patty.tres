@@ -1,23 +1,21 @@
 [gd_resource type="Resource" script_class="Ingredient" format=3 uid="uid://bh2cbyfyngogk"]
 
 [ext_resource type="Script" uid="uid://cpbwt2jx44ei" path="res://scripts/data/Ingredient.gd" id="1_a0l6g"]
-[ext_resource type="Texture2D" uid="uid://c1qsb425g1ydt" path="res://assets/sprites/ingredients/icons/icon_patty.png" id="1_u1n5x"]
 [ext_resource type="Texture2D" uid="uid://hhks5ddebfdq" path="res://assets/sprites/ingredients/preview/pre_patty.png" id="2_uyk2v"]
 [ext_resource type="Texture2D" uid="uid://dsamktlv6vs8f" path="res://assets/sprites/ingredients/slots/slot_patty2.png" id="4_cpfm8"]
-[ext_resource type="Texture2D" uid="uid://1o6jgjdcvrsi" path="res://assets/sprites/ingredients/patty2.png" id="4_uyk2v"]
 [ext_resource type="Texture2D" uid="uid://doucnguhwonww" path="res://assets/sprites/ingredients/slots/slot_patty1.png" id="5_xk6g6"]
 [ext_resource type="Texture2D" uid="uid://52p7kqvb8i4l" path="res://assets/sprites/ingredients/slots/slot_patty3.png" id="6_3jekx"]
+[ext_resource type="Texture2D" uid="uid://g22lky28ckl6" path="res://assets/sprites/ingredients/patty.png" id="6_7lktx"]
 
 [resource]
 script = ExtResource("1_a0l6g")
 id = "patty"
 display_name = "patty"
-sprite = ExtResource("4_uyk2v")
-icon_sprite = ExtResource("1_u1n5x")
+sprite = ExtResource("6_7lktx")
 preview_icon_sprite = ExtResource("2_uyk2v")
 slot_button_normal = ExtResource("5_xk6g6")
 slot_button_pressed = ExtResource("6_3jekx")
 slot_button_hover = ExtResource("4_cpfm8")
 stack_height = 16
-stack_offset_y = 6
+stack_offset_y = 8
 metadata/_custom_type_script = "uid://cpbwt2jx44ei"

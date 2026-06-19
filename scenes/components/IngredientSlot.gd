@@ -110,15 +110,13 @@ func _texture_for_state(state: VisualState) -> Texture2D:
 	if ingredient == null:
 		return _default_texture_normal
 
-	var overlay := ingredient.icon_sprite if ingredient.icon_sprite != null else ingredient.sprite
+	var overlay := ingredient.sprite
 	match state:
 		VisualState.PRESSED:
 			if ingredient.slot_button_pressed != null:
 				return ingredient.slot_button_pressed
 			return _compose_slot_texture(_default_texture_pressed, overlay)
 		VisualState.FOCUSED:
-			if ingredient.slot_button_focused != null:
-				return ingredient.slot_button_focused
 			if ingredient.slot_button_hover != null:
 				return ingredient.slot_button_hover
 			return _compose_slot_texture(_default_texture_focused, overlay)

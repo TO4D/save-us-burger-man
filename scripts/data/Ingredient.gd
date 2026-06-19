@@ -4,10 +4,9 @@ class_name Ingredient
 @export var id: String = ""
 @export var display_name: String = ""
 @export var sprite: Texture2D
-@export var icon_sprite: Texture2D
+@export var stack_sprite: Texture2D
 @export var preview_icon_sprite: Texture2D
 @export var slot_button_normal: Texture2D
-@export var slot_button_focused: Texture2D
 @export var slot_button_pressed: Texture2D
 @export var slot_button_hover: Texture2D
 @export var stack_height: int = 32

@@ -118,7 +118,7 @@ func _render_recipe() -> void:
 		var ingredient: Ingredient = recipe.ingredients[i]
 		var icon_position := Vector2(0.0, content_size.y - icon_size.y - step_y * float(i))
 		var icon := TextureRect.new()
-		icon.texture = ingredient.preview_icon_sprite if ingredient.preview_icon_sprite != null else ingredient.icon_sprite if ingredient.icon_sprite != null else ingredient.sprite
+		icon.texture = ingredient.preview_icon_sprite if ingredient.preview_icon_sprite != null else ingredient.sprite
 		icon.position = icon_position
 		icon.custom_minimum_size = icon_size
 		icon.size = icon_size
