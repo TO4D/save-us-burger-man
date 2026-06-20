@@ -2,7 +2,7 @@ extends Control
 class_name ComboCounter
 
 const RESET_COLOR := Color(1.0, 0.45, 0.4, 1.0)
-const FLASH_COLOR := Color.WHITE
+const FLASH_COLOR := Color("FFDA94ff")
 const INACTIVE_COLOR := Color(0.9, 0.9, 0.9, 0.55)
 const IDLE_DISPLAY_SECONDS := 5.0
 const FADE_OUT_SECONDS := 0.18
@@ -13,9 +13,11 @@ const COMBO_SCALE_OUT_SECONDS := 0.1
 const COMBO_SCALE_BACK_SECONDS := 0.2
 
 @onready var value_label: Label = $ValueLabel
+@onready var value_label_shadow: Label = $shadow
 
 var _display_position: Vector2
 var _label_base_scale: Vector2
+var _shadow_base_scale: Vector2
 var _visibility_tween: Tween = null
 var _combo_flash_tween: Tween = null
 var _combo_scale_tween: Tween = null
@@ -27,6 +29,7 @@ var _combo_text_color: Color
 func _ready() -> void:
 	_display_position = position
 	_label_base_scale = value_label.scale
+	_shadow_base_scale = value_label_shadow.scale
 	if value_label.label_settings != null:
 		_value_label_settings = value_label.label_settings.duplicate()
 	else:
@@ -47,7 +50,9 @@ func show_at_fixed_position() -> void:
 	visible = true
 	modulate.a = 1.0
 	value_label.pivot_offset = value_label.size * 0.5
+	value_label_shadow.pivot_offset = value_label_shadow.size * 0.5
 	value_label.scale = _label_base_scale
+	value_label_shadow.scale = _shadow_base_scale
 	_reset_visibility_tween()
 	_visibility_tween = create_tween()
 	_visibility_tween.tween_interval(IDLE_DISPLAY_SECONDS)
@@ -56,7 +61,10 @@ func show_at_fixed_position() -> void:
 
 
 func _on_combo_changed(value: int) -> void:
-	value_label.text = "%d COMBO" % value
+	var combo_text := "%d COMBO" % value
+	value_label.text = combo_text
+	value_label_shadow.text = combo_text
+
 	if value > _last_combo_value:
 		_flash_combo_text()
 		if value % COMBO_SCALE_INTERVAL == 0:
@@ -70,6 +78,7 @@ func _on_combo_changed(value: int) -> void:
 		_reset_combo_scale_tween()
 		_set_combo_text_color(INACTIVE_COLOR)
 		value_label.scale = _label_base_scale
+		value_label_shadow.scale = _shadow_base_scale
 		modulate.a = 0.0
 		visible = false
 
@@ -82,6 +91,7 @@ func _on_combo_reset(previous_value: int) -> void:
 	visible = true
 	modulate.a = 1.0
 	value_label.scale = _label_base_scale
+	value_label_shadow.scale = _shadow_base_scale
 	_set_combo_text_color(RESET_COLOR)
 	_reset_visibility_tween()
 	_visibility_tween = create_tween()
@@ -104,6 +114,7 @@ func _hide_after_fade() -> void:
 	visible = false
 	_reset_combo_scale_tween()
 	value_label.scale = _label_base_scale
+	value_label_shadow.scale = _shadow_base_scale
 
 
 func _flash_combo_text() -> void:
@@ -120,10 +131,15 @@ func _set_combo_text_color(color: Color) -> void:
 func _play_combo_scale_effect() -> void:
 	_reset_combo_scale_tween()
 	value_label.pivot_offset = value_label.size * 0.5
+	value_label_shadow.pivot_offset = value_label_shadow.size * 0.5
 	value_label.scale = _label_base_scale
-	_combo_scale_tween = create_tween()
+	value_label_shadow.scale = _shadow_base_scale
+	_combo_scale_tween = create_tween().set_parallel(true)
 	_combo_scale_tween.tween_property(value_label, "scale", _label_base_scale * COMBO_SCALE_MULTIPLIER, COMBO_SCALE_OUT_SECONDS).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_combo_scale_tween.tween_property(value_label_shadow, "scale", _shadow_base_scale * COMBO_SCALE_MULTIPLIER, COMBO_SCALE_OUT_SECONDS).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_combo_scale_tween.chain().set_parallel(true)
 	_combo_scale_tween.tween_property(value_label, "scale", _label_base_scale, COMBO_SCALE_BACK_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_combo_scale_tween.tween_property(value_label_shadow, "scale", _shadow_base_scale, COMBO_SCALE_BACK_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 
 func _reset_combo_flash_tween() -> void:

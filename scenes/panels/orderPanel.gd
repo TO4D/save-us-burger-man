@@ -4,7 +4,6 @@ signal order_completed(success: bool)
 
 const READY_OVERLAY_SECONDS := 2.0
 const GO_OVERLAY_SECONDS := 0.6
-const SCREEN_SHAKE_STEP_DURATION := 0.04
 const COMPLETED_BURGER_DISPLAY_SECONDS := 0.2
 const DOMA_SLIDE_SECONDS := 0.15
 const DOMA_ENTRY_SECONDS := 0.35
@@ -43,6 +42,11 @@ const BLACKOUT_WARNING_PAUSE_SECONDS := 0.6
 const RESULT_LABEL_FLASH_SECONDS := 0.2
 const RESULT_LABEL_FLASH_INTERVAL_SECONDS := 0.12
 const RESULT_LABEL_FLASH_COLOR := Color.WHITE
+const ULT_CARD_READY_POSITION := Vector2(22.0, 340.0)
+const ULT_CARD_HIDDEN_POSITION := Vector2(22.0, 360.0)
+const ULT_CARD_SLIDE_SECONDS := 0.2
+const ULT_CARD_READY_Z_INDEX := 51
+const ULT_CARD_HIDDEN_Z_INDEX := 0
 
 enum Phase { IDLE, CUSTOMER_ENTERING, PLAYING, SERVING, CUSTOMER_EXITING, COMPLETE }
 
@@ -55,15 +59,10 @@ var current_step: int = 0
 var fullness: float = 0.0
 var knockback: float = 0.0
 var round_token: int = 0
-var screen_shake_elapsed: float = 0.0
-var screen_shake_active: bool = false
-var screen_shake_tween: Tween = null
-var panel_home_position: Vector2 = Vector2.ZERO
 var doma_home_position: Vector2 = Vector2.ZERO
-var screen_shake_interval_seconds: float = 0.0
-var screen_shake_offset: float = 0.0
 var is_mobile_input: bool = false
 var mistake_count: int = 0
+var order_started_at_msec: int = 0
 var result_rank_tween: Tween = null
 var result_label_flash_tween: Tween = null
 var stack_landing_token: int = 0
@@ -78,6 +77,7 @@ var monster_ultimate_schedule_token: int = 0
 var foreground_slot_home_position: Vector2 = Vector2.ZERO
 var ingredient_slots_home_position: Vector2 = Vector2.ZERO
 var monster_slot_tween: Tween = null
+var ult_card_tween: Tween = null
 var persistent_slot_ingredients: Array[Ingredient] = []
 
 @onready var battle_gauge: BattleGauge = $BattleGauge
@@ -94,6 +94,9 @@ var persistent_slot_ingredients: Array[Ingredient] = []
 @onready var result_label: Control = $ResultRank/Result_Label
 @onready var result_label_shadow: Label = $ResultRank/Result_Label/shadow
 @onready var result_label_text: Label = $ResultRank/Result_Label/text
+@onready var result_time_label: Control = $ResultRank/Result_time_Label
+@onready var result_time_label_shadow: Label = $ResultRank/Result_time_Label/shadow
+@onready var result_time_label_text: Label = $ResultRank/Result_time_Label/text
 @onready var blackout_overlay: ColorRect = $BlackoutOverlay
 @onready var combo_counter: ComboCounter = $ComboCounter
 @onready var foreground_slot: TextureRect = $Foreground_slot
@@ -104,6 +107,7 @@ var persistent_slot_ingredients: Array[Ingredient] = []
 @onready var ready_go_label: Label = $ReadyGoOverlay/Label
 @onready var store_light: TextureRect = $StoreLight
 @onready var ultimate_bell: UltimateBell = $UltimateBell
+@onready var ult_card: Sprite2D = $ultCard
 
 var result_label_shadow_settings: LabelSettings
 var result_label_text_settings: LabelSettings
@@ -113,32 +117,20 @@ var result_label_text_color: Color
 
 func _ready() -> void:
 	_setup_result_label_flash()
-	panel_home_position = position
 	doma_home_position = sprite_doma.position
 	foreground_slot_home_position = foreground_slot.position
 	ingredient_slots_home_position = ingredient_slots.position
 	is_mobile_input = OS.has_feature("mobile")
 	UltimateManager.triggered.connect(_on_ultimate_triggered)
+	UltimateManager.ready_changed.connect(_on_ultimate_ready_changed)
 	MonsterManager.ultimate_threshold_reached.connect(_on_monster_ultimate_threshold_reached)
 	GameRun.blackout_requested.connect(_on_blackout_requested)
-	DistanceManager.distance_changed.connect(_on_distance_changed)
 	burger_stack.ingredient_landed.connect(_on_stack_ingredient_landed)
 	ingredient_slots.ingredient_picked.connect(_on_ingredient_picked)
 	_reset_stack_camera()
-	_on_distance_changed(DistanceManager.distance, DistanceManager.MAX_DISTANCE)
+	_set_ult_card_ready(UltimateManager.is_ready, false)
 	_sync_player_controls()
 
-
-func _process(delta: float) -> void:
-	if not visible or not screen_shake_active:
-		return
-
-	screen_shake_elapsed += delta
-	if screen_shake_elapsed < screen_shake_interval_seconds:
-		return
-
-	screen_shake_elapsed = 0.0
-	_play_screen_shake()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -174,6 +166,7 @@ func on_show(data: Dictionary = {}) -> void:
 	current_recipe_index = 0
 	current_step = 0
 	mistake_count = 0
+	order_started_at_msec = 0
 	blackout_event_active = false
 	blackout_used_for_customer = false
 	ultimate_active = false
@@ -189,10 +182,7 @@ func on_show(data: Dictionary = {}) -> void:
 	_reset_doma()
 	_reset_ingredient_slot_panel_position()
 	sprite_doma.visible = false
-	_reset_screen_shake_position()
-	screen_shake_elapsed = 0.0
 	_setup_order_progress_dots()
-	_on_distance_changed(DistanceManager.distance, DistanceManager.MAX_DISTANCE)
 	_sync_player_controls()
 	var token := round_token
 	if data.get("show_ready_go", false):
@@ -225,14 +215,11 @@ func on_hide() -> void:
 	pending_stack_landing_tokens.clear()
 	_reset_doma()
 	_reset_ingredient_slot_panel_position()
-	screen_shake_active = false
 	ready_go_active = false
 	ready_go_overlay.visible = false
 	ultimate_overlay.cancel()
 	monster_ultimate_overlay.cancel()
 	GameRun.set_start_blocked(false)
-	screen_shake_elapsed = 0.0
-	_reset_screen_shake_position()
 	_sync_player_controls()
 
 
@@ -251,6 +238,7 @@ func _start_play(token: int) -> void:
 	if token != round_token:
 		return
 	current_phase = Phase.PLAYING
+	order_started_at_msec = Time.get_ticks_msec()
 	_setup_ingredient_slots(true)
 	_sync_player_controls()
 	_schedule_monster_ultimate_if_pending(token)
@@ -432,7 +420,6 @@ func _finish_current_burger() -> void:
 	current_step = 0
 	recipe_display_stack.set_current_step(current_step)
 	burger_stack.clear_stack()
-	_reset_stack_camera()
 	await _enter_doma_from_right()
 	current_phase = Phase.PLAYING
 	_setup_ingredient_slots(true)
@@ -526,6 +513,8 @@ func _flash_wrong_input() -> void:
 
 func _show_result_rank(is_perfect: bool) -> void:
 	result_label.visible = true
+	result_time_label.visible = true
+	_set_result_time_label_text(_get_order_elapsed_seconds())
 	_set_result_label_text("PERFECT" if is_perfect else "GREAT")
 	if is_perfect:
 		_start_result_label_flash()
@@ -567,6 +556,7 @@ func _hide_result_rank() -> void:
 
 func _hide_result_rank_images() -> void:
 	result_label.visible = false
+	result_time_label.visible = false
 
 
 func _setup_result_label_flash() -> void:
@@ -591,6 +581,18 @@ func _duplicate_label_settings(label: Label) -> LabelSettings:
 func _set_result_label_text(value: String) -> void:
 	result_label_shadow.text = value
 	result_label_text.text = value
+
+
+func _set_result_time_label_text(elapsed_seconds: float) -> void:
+	var value := "%.2fs" % elapsed_seconds
+	result_time_label_shadow.text = value
+	result_time_label_text.text = value
+
+
+func _get_order_elapsed_seconds() -> float:
+	if order_started_at_msec <= 0:
+		return 0.0
+	return float(Time.get_ticks_msec() - order_started_at_msec) / 1000.0
 
 
 func _start_result_label_flash() -> void:
@@ -630,6 +632,34 @@ func _on_ultimate_triggered() -> void:
 	#battle_gauge.play_ultimate_barrage()
 
 	_run_ultimate_sequence(round_token)
+
+
+func _on_ultimate_ready_changed(ready: bool) -> void:
+	if ready:
+		AudioManager.play_sfx(AudioManager.Sfx.ULTIMATE_CHARGED)
+	_set_ult_card_ready(ready)
+
+
+func _set_ult_card_ready(ready: bool, animated: bool = true) -> void:
+	if ult_card_tween != null and ult_card_tween.is_valid():
+		ult_card_tween.kill()
+	ult_card_tween = null
+
+	var target_position := ULT_CARD_READY_POSITION if ready else ULT_CARD_HIDDEN_POSITION
+	if not animated:
+		ult_card.position = target_position
+		ult_card.z_index = ULT_CARD_READY_Z_INDEX if ready else ULT_CARD_HIDDEN_Z_INDEX
+		return
+
+	if ready:
+		ult_card.z_index = ULT_CARD_READY_Z_INDEX
+
+	ult_card_tween = create_tween()
+	ult_card_tween.tween_property(ult_card, "position", target_position, ULT_CARD_SLIDE_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	if not ready:
+		ult_card_tween.tween_callback(func() -> void:
+			ult_card.z_index = ULT_CARD_HIDDEN_Z_INDEX
+		)
 
 
 func _on_monster_ultimate_threshold_reached() -> void:
@@ -813,55 +843,6 @@ func _can_run_ultimate() -> bool:
 	return visible and current_phase == Phase.PLAYING and current_recipe != null and not ready_go_active and not ultimate_active and not monster_ultimate_active and not blackout_event_active
 
 
-func _on_distance_changed(value: float, _max_value: float) -> void:
-	var distance_meters := value * battle_gauge.distance_display_scale
-	var should_shake := false
-	var next_interval := 0.0
-	var next_offset := 0.0
-
-	if distance_meters <= 200.0:
-		should_shake = true
-		next_interval = 1.0
-		next_offset = 4.0
-	elif distance_meters <= 500.0:
-		should_shake = true
-		next_interval = 1.0
-		next_offset = 2.0
-	elif distance_meters <= 800.0:
-		should_shake = true
-		next_interval = 2.0
-		next_offset = 1.0
-
-	if should_shake == screen_shake_active and is_equal_approx(next_interval, screen_shake_interval_seconds) and is_equal_approx(next_offset, screen_shake_offset):
-		return
-
-	screen_shake_active = should_shake
-	screen_shake_interval_seconds = next_interval
-	screen_shake_offset = next_offset
-	screen_shake_elapsed = 0.0
-	if not should_shake:
-		_reset_screen_shake_position()
-
-
-func _play_screen_shake() -> void:
-	_reset_screen_shake_tween()
-	position = panel_home_position
-	screen_shake_tween = create_tween()
-	screen_shake_tween.tween_property(self, "position:x", panel_home_position.x - screen_shake_offset, SCREEN_SHAKE_STEP_DURATION)
-	screen_shake_tween.tween_property(self, "position:x", panel_home_position.x + screen_shake_offset, SCREEN_SHAKE_STEP_DURATION * 2.0)
-	screen_shake_tween.tween_property(self, "position:x", panel_home_position.x, SCREEN_SHAKE_STEP_DURATION)
-
-
-func _reset_screen_shake_position() -> void:
-	_reset_screen_shake_tween()
-	position = panel_home_position
-
-
-func _reset_screen_shake_tween() -> void:
-	if screen_shake_tween != null and screen_shake_tween.is_valid():
-		screen_shake_tween.kill()
-	screen_shake_tween = null
-
 
 func _update_stack_camera(animated: bool = true) -> void:
 	var target_position := STACK_CAMERA_DEFAULT_POSITION
@@ -923,13 +904,18 @@ func _slide_completed_burger_left(completion_was_perfect: bool) -> void:
 	sprite_doma.visible = false
 
 	burger_stack.clear_stack()
-	_reset_stack_camera()
 
 	await get_tree().create_timer(COMPLETED_BURGER_DISPLAY_SECONDS).timeout
 
+	if stack_camera_tween != null and stack_camera_tween.is_valid():
+		stack_camera_tween.kill()
+
 	var tween: Tween = create_tween().set_parallel(true)
+	stack_camera_tween = tween
 	tween.tween_property(sliding_group, "position:x", sliding_group.position.x - DOMA_SLIDE_DISTANCE, DOMA_SLIDE_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(stack_camera, "position", STACK_CAMERA_DEFAULT_POSITION, STACK_CAMERA_RETURN_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	await tween.finished
+	stack_camera_tween = null
 	sliding_group.queue_free()
 
 
@@ -944,9 +930,33 @@ func _apply_completed_burger_halo(snapshot: Sprite2D, completion_was_perfect: bo
 
 
 func _create_stack_viewport_snapshot() -> Sprite2D:
+	var viewport_size := Vector2(stack_viewport.size)
+	var snapshot_viewport := SubViewport.new()
+	snapshot_viewport.transparent_bg = true
+	snapshot_viewport.size = stack_viewport.size
+	snapshot_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
+	add_child(snapshot_viewport)
+
+	var doma_copy := _copy_sprite_for_snapshot(sprite_doma)
+	doma_copy.position = sprite_doma.position - stack_camera.position + viewport_size * 0.5
+	snapshot_viewport.add_child(doma_copy)
+
+	var stack_copy := Node2D.new()
+	stack_copy.position = burger_stack.position - stack_camera.position + viewport_size * 0.5
+	stack_copy.z_index = burger_stack.z_index
+	snapshot_viewport.add_child(stack_copy)
+
+	for child in burger_stack.get_children():
+		var source_sprite := child as Sprite2D
+		if source_sprite == null:
+			continue
+		stack_copy.add_child(_copy_sprite_for_snapshot(source_sprite))
+
 	await RenderingServer.frame_post_draw
-	var image := stack_viewport.get_texture().get_image()
+	var image := snapshot_viewport.get_texture().get_image()
 	var texture := ImageTexture.create_from_image(image)
+	snapshot_viewport.queue_free()
+
 	var snapshot := Sprite2D.new()
 	snapshot.texture = texture
 	snapshot.centered = false
@@ -954,15 +964,32 @@ func _create_stack_viewport_snapshot() -> Sprite2D:
 	return snapshot
 
 
+func _copy_sprite_for_snapshot(source: Sprite2D) -> Sprite2D:
+	var copied_sprite := Sprite2D.new()
+	copied_sprite.texture = source.texture
+	copied_sprite.centered = source.centered
+	copied_sprite.offset = source.offset
+	copied_sprite.position = source.position
+	copied_sprite.scale = source.scale
+	copied_sprite.rotation = source.rotation
+	copied_sprite.modulate = source.modulate
+	copied_sprite.flip_h = source.flip_h
+	copied_sprite.flip_v = source.flip_v
+	copied_sprite.z_index = source.z_index
+	copied_sprite.texture_filter = source.texture_filter
+	return copied_sprite
+
+
 func _create_burger_stack_halo_snapshot() -> Sprite2D:
+	var viewport_size := Vector2(stack_viewport.size)
 	var halo_viewport := SubViewport.new()
 	halo_viewport.transparent_bg = true
-	halo_viewport.size = Vector2i(int(STACK_VIEWPORT_SIZE.x), int(STACK_VIEWPORT_SIZE.y))
+	halo_viewport.size = stack_viewport.size
 	halo_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 	add_child(halo_viewport)
 
 	var stack_copy := Node2D.new()
-	stack_copy.position = burger_stack.position - stack_camera.position + STACK_CAMERA_DEFAULT_POSITION
+	stack_copy.position = burger_stack.position - stack_camera.position + viewport_size * 0.5
 	halo_viewport.add_child(stack_copy)
 
 	for child in burger_stack.get_children():

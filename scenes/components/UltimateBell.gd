@@ -8,7 +8,7 @@ class_name UltimateBell
 
 @onready var gauge_progress: TextureProgressBar = $GaugeProgress
 @onready var gauge_frame: TextureRect = $GaugeFrame
-@onready var star_icon: TextureRect = $StarIcon
+#@onready var star_icon: TextureRect = $StarIcon
 @onready var glow_rect: ColorRect = $Glow
 
 var _base_position: Vector2
@@ -44,10 +44,8 @@ func _on_ready_changed(ready: bool) -> void:
 	_apply_availability()
 	gauge_progress.modulate = ready_gauge_modulate if ready else idle_gauge_modulate
 	gauge_frame.modulate = ready_gauge_modulate if ready else idle_gauge_modulate
-	star_icon.texture = ready_icon_texture if ready else empty_icon_texture
+	#star_icon.texture = ready_icon_texture if ready else empty_icon_texture
 	glow_rect.visible = ready
-	if ready:
-		_play_ready_bob()
 
 
 func _on_triggered() -> void:
@@ -72,13 +70,6 @@ func _on_combo_milestone(_value: int) -> void:
 			glow_rect.visible = false
 			glow_rect.modulate.a = 0.18
 	)
-
-
-func _play_ready_bob() -> void:
-	position = _base_position
-	var tween := create_tween()
-	tween.tween_property(self, "position:y", _base_position.y - 3.0, 0.08)
-	tween.tween_property(self, "position:y", _base_position.y, 0.08)
 
 
 func _apply_availability() -> void:

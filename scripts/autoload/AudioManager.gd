@@ -14,6 +14,7 @@ enum Sfx {
 	ORDER_SUCCESS_PERFECT,
 	ATTACK,
 	FIRE_BURGER,
+	ULTIMATE_CHARGED,
 	ULTIMATE,
 }
 
@@ -37,6 +38,7 @@ const SFX_PATHS := {
 	Sfx.ORDER_SUCCESS_PERFECT: "res://assets/audio/sfx/order_success_perfect.ogg",
 	Sfx.ATTACK: "res://assets/audio/sfx/attack.ogg",
 	Sfx.FIRE_BURGER: "res://assets/audio/sfx/fire_burger.ogg",
+	Sfx.ULTIMATE_CHARGED: "res://assets/audio/sfx/ultimate_charge2.ogg",
 	Sfx.ULTIMATE: "res://assets/audio/sfx/ultimate.ogg",
 }
 

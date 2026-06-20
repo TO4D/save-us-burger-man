@@ -1,17 +1,23 @@
 [gd_scene format=3 uid="uid://c37hgp1q5ourt"]
 
+[ext_resource type="Texture2D" uid="uid://cckthkexmg2t2" path="res://assets/sprites/cook/plate.png" id="1_6s5wm"]
+[ext_resource type="Texture2D" uid="uid://cmlbqixgwmrua" path="res://assets/sprites/cook/doma_long.png" id="1_ji84v"]
 [ext_resource type="PackedScene" uid="uid://bxs2t76pgylko" path="res://scenes/components/BurgerStack.tscn" id="1_stack"]
-[ext_resource type="Texture2D" uid="uid://et53x8h3iv6h" path="res://assets/sprites/cook/doma.png" id="2_ji84v"]
 
 [node name="PlateStackScene" type="Node2D" unique_id=915667550]
 
 [node name="StackCamera" type="Camera2D" parent="." unique_id=848496312]
 position = Vector2(90, 87)
 
+[node name="SpriteBackground" type="Sprite2D" parent="." unique_id=1574109410]
+z_index = -1
+position = Vector2(90, 153)
+texture = ExtResource("1_ji84v")
+
 [node name="SpriteDoma" type="Sprite2D" parent="." unique_id=505485120]
-position = Vector2(88, 145)
-texture = ExtResource("2_ji84v")
+position = Vector2(42, 145)
+texture = ExtResource("1_6s5wm")
 
 [node name="BurgerStack" parent="." unique_id=1684319686 instance=ExtResource("1_stack")]
 z_index = 1
-position = Vector2(90, 166)
+position = Vector2(42, 166)

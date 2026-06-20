@@ -35,6 +35,7 @@ const MULTI_ORDER_CHANCE := {
 }
 const BLACKOUT_ROLL_INTERVAL_SECONDS := 5.0
 const BLACKOUT_COOLDOWN_SECONDS := 30.0
+const BLACKOUT_ENABLED := false
 const BLACKOUT_CHANCE_DISTANCE_80 := 0.9
 const BLACKOUT_CHANCE_DISTANCE_60 := 0.01
 const BLACKOUT_CHANCE_DISTANCE_40 := 0.02
@@ -189,6 +190,9 @@ func _reset_blackout_state() -> void:
 
 
 func _update_blackout_roll(delta: float) -> void:
+	if not BLACKOUT_ENABLED:
+		return
+
 	if _blackout_cooldown_remaining > 0.0:
 		_blackout_cooldown_remaining = maxf(_blackout_cooldown_remaining - delta, 0.0)
 
