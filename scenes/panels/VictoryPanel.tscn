@@ -1,8 +1,12 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://4fwsnybnqyje"]
 
-[ext_resource type="Script" path="res://scenes/panels/ResultPanel.gd" id="1"]
+[ext_resource type="Script" uid="uid://ckg44kk8h2l4f" path="res://scenes/panels/ResultPanel.gd" id="1"]
+[ext_resource type="LabelSettings" uid="uid://jaix775cyv7l" path="res://resources/fonts/gameclear_title.tres" id="2_3yyb6"]
+[ext_resource type="LabelSettings" uid="uid://dv3b3430c2ap1" path="res://resources/fonts/gameclear_desc.tres" id="3_s65np"]
+[ext_resource type="PackedScene" uid="uid://d06ul8o8xh72f" path="res://scenes/components/AppButton.tscn" id="4_button"]
 
-[node name="VictoryPanel" type="Control"]
+[node name="VictoryPanel" type="Control" unique_id=1363638108]
+z_index = 201
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,44 +14,66 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
-title_text = "The townspeople escaped!"
+title_text = "Game Clear"
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Dim" type="ColorRect" parent="." unique_id=1207393501]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.05, 0.14, 0.12, 1)
+color = Color(0, 0, 0, 0.3137255)
 
-[node name="Center" type="VBoxContainer" parent="."]
+[node name="Panel" type="PanelContainer" parent="Dim" unique_id=2024289673]
+custom_minimum_size = Vector2(220, 0)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -120.0
-offset_top = -110.0
-offset_right = 120.0
-offset_bottom = 110.0
+offset_left = -110.0
+offset_top = -130.0
+offset_right = 110.0
+offset_bottom = 130.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 18
+
+[node name="Margin" type="MarginContainer" parent="Dim/Panel" unique_id=1995429553]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="Rows" type="VBoxContainer" parent="Dim/Panel/Margin" unique_id=1202470713]
+layout_mode = 2
+theme_override_constants/separation = 12
 alignment = 1
 
-[node name="TitleLabel" type="Label" parent="Center"]
+[node name="TitleLabel" type="Label" parent="Dim/Panel/Margin/Rows" unique_id=167403216]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
+text = "Game Clear"
+label_settings = ExtResource("2_3yyb6")
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="StatsLabel" type="Label" parent="Center"]
+[node name="StatsLabel" type="Label" parent="Dim/Panel/Margin/Rows" unique_id=1201438333]
 layout_mode = 2
+text = "TEST"
+label_settings = ExtResource("3_s65np")
 horizontal_alignment = 1
 
-[node name="RestartButton" type="Button" parent="Center"]
-custom_minimum_size = Vector2(180, 48)
+[node name="RestartButton" parent="Dim/Panel/Margin/Rows" unique_id=689732688 instance=ExtResource("4_button")]
 layout_mode = 2
+focus_neighbor_top = NodePath("../MainMenuButton")
+focus_neighbor_bottom = NodePath("../MainMenuButton")
 text = "Restart"
+
+[node name="MainMenuButton" parent="Dim/Panel/Margin/Rows" unique_id=1188466645 instance=ExtResource("4_button")]
+layout_mode = 2
+focus_neighbor_top = NodePath("../RestartButton")
+focus_neighbor_bottom = NodePath("../RestartButton")
+text = "Main Menu"

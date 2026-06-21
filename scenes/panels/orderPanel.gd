@@ -74,6 +74,7 @@ var foreground_slot_home_position: Vector2 = Vector2.ZERO
 var ingredient_slots_home_position: Vector2 = Vector2.ZERO
 var monster_slot_tween: Tween = null
 var persistent_slot_ingredients: Array[Ingredient] = []
+var gameplay_locked := false
 
 @onready var battle_gauge: BattleGauge = $BattleGauge
 @onready var recipe_display_stack: RecipeDisplayStack = $PlayArea/RecipeDisplayStack
@@ -119,6 +120,7 @@ func _ready() -> void:
 	UltimateManager.ready_changed.connect(_on_ultimate_ready_changed)
 	MonsterManager.ultimate_threshold_reached.connect(_on_monster_ultimate_threshold_reached)
 	GameRun.blackout_requested.connect(_on_blackout_requested)
+	GameRun.run_started.connect(_on_run_started)
 	burger_stack.ingredient_landed.connect(_on_stack_ingredient_landed)
 	ingredient_slots.ingredient_picked.connect(_on_ingredient_picked)
 	_reset_stack_camera()
@@ -146,6 +148,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func on_show(data: Dictionary = {}) -> void:
+	gameplay_locked = false
 	round_token += 1
 	customer = data.get("customer", {})
 	recipes = customer.get("recipes", [])
@@ -184,6 +187,15 @@ func on_show(data: Dictionary = {}) -> void:
 			return
 	_start_order(token)
 
+func _on_run_started() -> void:
+	var ingredients := GameState.get_slot_ingredients(1)
+	var original_order := ingredients.duplicate()
+	ingredients.shuffle()
+	for _attempt in range(4):
+		if ingredients != original_order:
+			break
+		ingredients.shuffle()
+	persistent_slot_ingredients = ingredients
 
 func on_hide() -> void:
 	round_token += 1
@@ -352,7 +364,7 @@ func _setup_ingredient_slots(enabled: bool) -> void:
 
 
 func _on_ingredient_picked(ingredient: Ingredient) -> void:
-	if ready_go_active or ultimate_active or monster_ultimate_active or current_phase != Phase.PLAYING or current_recipe == null:
+	if gameplay_locked or ready_go_active or ultimate_active or monster_ultimate_active or current_phase != Phase.PLAYING or current_recipe == null:
 		return
 
 	var expected: Ingredient = current_recipe.ingredients[current_step]
@@ -799,19 +811,24 @@ func _auto_complete_current_recipe(token: int) -> void:
 
 
 func _sync_player_controls() -> void:
-	var controls_enabled := visible and current_phase == Phase.PLAYING and not ready_go_active and not ultimate_active and not monster_ultimate_active
+	var controls_enabled := visible and current_phase == Phase.PLAYING and not gameplay_locked and not ready_go_active and not ultimate_active and not monster_ultimate_active
 	ingredient_slots.set_process_unhandled_input(controls_enabled)
 	ingredient_slots.set_interaction_enabled(controls_enabled)
 	if is_instance_valid(ultimate_bell):
 		ultimate_bell.set_trigger_enabled(_can_trigger_ultimate())
 
 
+func set_gameplay_locked(locked: bool) -> void:
+	gameplay_locked = locked
+	_sync_player_controls()
+
+
 func _can_trigger_ultimate() -> bool:
-	return visible and current_phase == Phase.PLAYING and current_recipe != null and not ready_go_active and not ultimate_active and not monster_ultimate_active and not blackout_event_active and UltimateManager.is_ready
+	return visible and current_phase == Phase.PLAYING and current_recipe != null and not gameplay_locked and not ready_go_active and not ultimate_active and not monster_ultimate_active and not blackout_event_active and UltimateManager.is_ready
 
 
 func _can_run_ultimate() -> bool:
-	return visible and current_phase == Phase.PLAYING and current_recipe != null and not ready_go_active and not ultimate_active and not monster_ultimate_active and not blackout_event_active
+	return visible and current_phase == Phase.PLAYING and current_recipe != null and not gameplay_locked and not ready_go_active and not ultimate_active and not monster_ultimate_active and not blackout_event_active
 
 
 

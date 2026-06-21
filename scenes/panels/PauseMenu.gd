@@ -17,3 +17,7 @@ func _ready() -> void:
 	main_menu_button.pressed.connect(func(): main_menu_pressed.emit())
 	settings_button.pressed.connect(func(): settings_pressed.emit())
 	quit_button.pressed.connect(func(): quit_pressed.emit())
+
+
+func on_show() -> void:
+	resume_button.grab_focus()

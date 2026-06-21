@@ -1,0 +1,8 @@
+[gd_resource type="LabelSettings" format=3 uid="uid://b4b52yns6ccc0"]
+
+[ext_resource type="FontFile" uid="uid://dial72f450tkp" path="res://fonts/neodgm.ttf" id="1_57xca"]
+
+[resource]
+font = ExtResource("1_57xca")
+font_size = 32
+font_color = Color(0.9105817, 0, 0.4296132, 1)

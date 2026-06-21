@@ -243,31 +243,34 @@ func _on_distance_game_over() -> void:
 	if not running:
 		return
 
+	var stats := _build_stats()
 	running = false
 	start_blocked = false
 	_reset_blackout_state()
 	MonsterManager.stop()
 	ComboManager.reset()
 	UltimateManager.reset()
-	run_failed.emit(_build_stats())
+	run_failed.emit(stats)
 
 
 func _on_monster_satisfied() -> void:
 	if not running:
 		return
 
+	var stats := _build_stats()
 	running = false
 	start_blocked = false
 	_reset_blackout_state()
 	DistanceManager.stop()
 	ComboManager.reset()
 	UltimateManager.reset()
-	run_victory.emit(_build_stats())
+	run_victory.emit(stats)
 
 
 func _build_stats() -> Dictionary:
 	return {
 		"served": served_customers,
+		"max_combo": ComboManager.max_combo,
 		"failed": failed_customers,
 		"stage": current_stage,
 		"distance": DistanceManager.distance,

@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scenes/panels/PauseMenu.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/components/AppButton.tscn" id="2_button"]
 
 [node name="PauseMenu" type="Control"]
 visible = false
@@ -54,22 +55,26 @@ theme_override_font_sizes/font_size = 24
 text = "Paused"
 horizontal_alignment = 1
 
-[node name="ResumeButton" type="Button" parent="Dim/Panel/Margin/Rows"]
-custom_minimum_size = Vector2(180, 42)
+[node name="ResumeButton" parent="Dim/Panel/Margin/Rows" instance=ExtResource("2_button")]
 layout_mode = 2
+focus_neighbor_top = NodePath("../QuitButton")
+focus_neighbor_bottom = NodePath("../MainMenuButton")
 text = "Resume"
 
-[node name="MainMenuButton" type="Button" parent="Dim/Panel/Margin/Rows"]
-custom_minimum_size = Vector2(180, 42)
+[node name="MainMenuButton" parent="Dim/Panel/Margin/Rows" instance=ExtResource("2_button")]
 layout_mode = 2
+focus_neighbor_top = NodePath("../ResumeButton")
+focus_neighbor_bottom = NodePath("../SettingsButton")
 text = "Main Menu"
 
-[node name="SettingsButton" type="Button" parent="Dim/Panel/Margin/Rows"]
-custom_minimum_size = Vector2(180, 42)
+[node name="SettingsButton" parent="Dim/Panel/Margin/Rows" instance=ExtResource("2_button")]
 layout_mode = 2
+focus_neighbor_top = NodePath("../MainMenuButton")
+focus_neighbor_bottom = NodePath("../QuitButton")
 text = "Settings"
 
-[node name="QuitButton" type="Button" parent="Dim/Panel/Margin/Rows"]
-custom_minimum_size = Vector2(180, 42)
+[node name="QuitButton" parent="Dim/Panel/Margin/Rows" instance=ExtResource("2_button")]
 layout_mode = 2
+focus_neighbor_top = NodePath("../SettingsButton")
+focus_neighbor_bottom = NodePath("../ResumeButton")
 text = "Quit Game"

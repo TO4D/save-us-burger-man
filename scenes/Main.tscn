@@ -4,10 +4,12 @@
 [ext_resource type="PackedScene" uid="uid://jpymc5yu72ku" path="res://scenes/panels/StartPanel.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://1a8ywfm1s7j4" path="res://scenes/panels/CutscenePanel.tscn" id="3"]
 [ext_resource type="PackedScene" uid="uid://fmbafdwu28nm" path="res://scenes/panels/OrderPanel.tscn" id="4"]
-[ext_resource type="PackedScene" path="res://scenes/panels/GameOverPanel.tscn" id="5"]
-[ext_resource type="PackedScene" path="res://scenes/panels/VictoryPanel.tscn" id="6"]
+[ext_resource type="PackedScene" uid="uid://fknrbbgp24xl" path="res://scenes/panels/GameOverPanel.tscn" id="5"]
+[ext_resource type="PackedScene" uid="uid://4fwsnybnqyje" path="res://scenes/panels/VictoryPanel.tscn" id="6"]
 [ext_resource type="PackedScene" uid="uid://dvq43cqbox0t1" path="res://scenes/panels/SettingsPanel.tscn" id="7_settings"]
 [ext_resource type="PackedScene" path="res://scenes/panels/PauseMenu.tscn" id="8_pause"]
+[ext_resource type="PackedScene" uid="uid://b8h3spi4xyjcb" path="res://scenes/components/GameOverCutscene.tscn" id="9_game_over_cutscene"]
+[ext_resource type="PackedScene" uid="uid://pjrmmf2s4yx5" path="res://scenes/components/GameClearCutscene.tscn" id="10_game_clear_cutscene"]
 
 [node name="Main" type="Node2D" unique_id=1284514419]
 script = ExtResource("1")
@@ -21,6 +23,10 @@ skip_start_overlay = true
 [node name="CutscenePanel" parent="PanelLayer" unique_id=839360778 instance=ExtResource("3")]
 
 [node name="OrderPanel" parent="PanelLayer" unique_id=1169860898 instance=ExtResource("4")]
+
+[node name="GameOverCutscene" parent="PanelLayer" unique_id=40169258 instance=ExtResource("9_game_over_cutscene")]
+
+[node name="GameClearCutscene" parent="PanelLayer" unique_id=1767173989 instance=ExtResource("10_game_clear_cutscene")]
 
 [node name="GameOverPanel" parent="PanelLayer" unique_id=1639389488 instance=ExtResource("5")]
 visible = false

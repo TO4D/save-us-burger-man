@@ -18,6 +18,8 @@ func _ready() -> void:
 func on_show(_data: Dictionary = {}) -> void:
 	_current_index = 0
 	_show_current_scene()
+	if cutscene_images.size() > 0:
+		next_button.grab_focus()
 
 
 func _show_current_scene() -> void:

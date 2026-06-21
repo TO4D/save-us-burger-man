@@ -1,0 +1,6 @@
+[gd_resource type="LabelSettings" format=3 uid="uid://bys1p62800xhv"]
+
+[ext_resource type="FontFile" uid="uid://dial72f450tkp" path="res://fonts/neodgm.ttf" id="1_cuau7"]
+
+[resource]
+font = ExtResource("1_cuau7")

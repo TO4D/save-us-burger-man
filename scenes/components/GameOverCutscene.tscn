@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://b8h3spi4xyjcb"]
+
+[ext_resource type="Script" uid="uid://cpt2u16sxkcsv" path="res://scenes/components/GameOverCutscene.gd" id="1_script"]
+[ext_resource type="SpriteFrames" uid="uid://4tu1vfjsgj3c" path="res://resources/animations/gameover.tres" id="2_frames"]
+
+[node name="GameOverCutscene" type="Control" unique_id=1550782627]
+z_index = 200
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1007668528]
+sprite_frames = ExtResource("2_frames")

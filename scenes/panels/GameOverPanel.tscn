@@ -1,8 +1,12 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://fknrbbgp24xl"]
 
-[ext_resource type="Script" path="res://scenes/panels/ResultPanel.gd" id="1"]
+[ext_resource type="Script" uid="uid://ckg44kk8h2l4f" path="res://scenes/panels/ResultPanel.gd" id="1"]
+[ext_resource type="LabelSettings" uid="uid://b4b52yns6ccc0" path="res://resources/fonts/gameover_title.tres" id="2_r4cqq"]
+[ext_resource type="LabelSettings" uid="uid://cfgrcy516kj8i" path="res://resources/fonts/gameover_desc.tres" id="3_pyhpj"]
+[ext_resource type="PackedScene" uid="uid://d06ul8o8xh72f" path="res://scenes/components/AppButton.tscn" id="4_button"]
 
-[node name="GameOverPanel" type="Control"]
+[node name="GameOverPanel" type="Control" unique_id=1136727094]
+z_index = 201
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,44 +14,66 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
-title_text = "The beast reached town..."
+title_text = "Game Over"
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Dim" type="ColorRect" parent="." unique_id=65234220]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.16, 0.06, 0.05, 1)
+color = Color(0, 0, 0, 0.3137255)
 
-[node name="Center" type="VBoxContainer" parent="."]
+[node name="Panel" type="PanelContainer" parent="Dim" unique_id=1836651363]
+custom_minimum_size = Vector2(220, 0)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -120.0
-offset_top = -110.0
-offset_right = 120.0
-offset_bottom = 110.0
+offset_left = -110.0
+offset_top = -130.0
+offset_right = 110.0
+offset_bottom = 130.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 18
+
+[node name="Margin" type="MarginContainer" parent="Dim/Panel" unique_id=2051382161]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="Rows" type="VBoxContainer" parent="Dim/Panel/Margin" unique_id=776299520]
+layout_mode = 2
+theme_override_constants/separation = 12
 alignment = 1
 
-[node name="TitleLabel" type="Label" parent="Center"]
+[node name="TitleLabel" type="Label" parent="Dim/Panel/Margin/Rows" unique_id=1824452845]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
+text = "Game Over"
+label_settings = ExtResource("2_r4cqq")
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="StatsLabel" type="Label" parent="Center"]
+[node name="StatsLabel" type="Label" parent="Dim/Panel/Margin/Rows" unique_id=2026648377]
 layout_mode = 2
+text = "TEST"
+label_settings = ExtResource("3_pyhpj")
 horizontal_alignment = 1
 
-[node name="RestartButton" type="Button" parent="Center"]
-custom_minimum_size = Vector2(180, 48)
+[node name="RestartButton" parent="Dim/Panel/Margin/Rows" unique_id=820362624 instance=ExtResource("4_button")]
 layout_mode = 2
+focus_neighbor_top = NodePath("../MainMenuButton")
+focus_neighbor_bottom = NodePath("../MainMenuButton")
 text = "Restart"
+
+[node name="MainMenuButton" parent="Dim/Panel/Margin/Rows" unique_id=1267261615 instance=ExtResource("4_button")]
+layout_mode = 2
+focus_neighbor_top = NodePath("../RestartButton")
+focus_neighbor_bottom = NodePath("../RestartButton")
+text = "Main Menu"

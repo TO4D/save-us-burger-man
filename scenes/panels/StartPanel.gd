@@ -8,15 +8,36 @@ signal quit_pressed
 @onready var settings_button: Button = $Center/Buttons/SettingsButton
 @onready var credits_button: Button = $Center/Buttons/CreditsButton
 @onready var quit_button: Button = $Center/Buttons/QuitButton
-@onready var credits_popup: AcceptDialog = $CreditsPopup
+@onready var credits_overlay: Control = $CreditsOverlay
+@onready var credits_close_button: Button = $CreditsOverlay/Dim/Panel/Margin/Rows/CloseButton
 
 
 func _ready() -> void:
 	start_button.pressed.connect(func(): start_pressed.emit())
 	settings_button.pressed.connect(func(): settings_pressed.emit())
 	credits_button.pressed.connect(_show_credits)
+	credits_close_button.pressed.connect(_hide_credits)
 	quit_button.pressed.connect(func(): quit_pressed.emit())
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not credits_overlay.visible or event is not InputEventKey:
+		return
+
+	var key_event := event as InputEventKey
+	if key_event.pressed and not key_event.echo and key_event.keycode == KEY_ESCAPE:
+		_hide_credits()
+		get_viewport().set_input_as_handled()
+
+func on_show(_data: Dictionary = {}) -> void:
+	credits_overlay.hide()
+	start_button.grab_focus()
 
 
 func _show_credits() -> void:
-	credits_popup.popup_centered()
+	credits_overlay.show()
+	credits_close_button.grab_focus()
+
+
+func _hide_credits() -> void:
+	credits_overlay.hide()
+	credits_button.grab_focus()

@@ -1,6 +1,7 @@
-[gd_scene format=3 uid="uid://1a8ywfm1s7j4"]
+[gd_scene load_steps=3 format=3 uid="uid://1a8ywfm1s7j4"]
 
 [ext_resource type="Script" uid="uid://cygthe8ppgl1h" path="res://scenes/panels/CutscenePanel.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/components/AppButton.tscn" id="2_button"]
 
 [node name="CutscenePanel" type="Control" unique_id=233831715]
 layout_mode = 3
@@ -65,7 +66,6 @@ custom_minimum_size = Vector2(16, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="NextButton" type="Button" parent="Footer" unique_id=1575419691]
-custom_minimum_size = Vector2(120, 40)
+[node name="NextButton" parent="Footer" unique_id=1575419691 instance=ExtResource("2_button")]
 layout_mode = 2
 text = "Next"

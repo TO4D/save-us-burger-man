@@ -1,6 +1,10 @@
 [gd_scene format=3 uid="uid://jpymc5yu72ku"]
 
 [ext_resource type="Script" uid="uid://cy2h7uomvjvrq" path="res://scenes/panels/StartPanel.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://d06ul8o8xh72f" path="res://scenes/components/AppButton.tscn" id="2_button"]
+[ext_resource type="LabelSettings" uid="uid://6wss840bitqx" path="res://resources/fonts/start_title.tres" id="2_n84dy"]
+[ext_resource type="LabelSettings" uid="uid://jaix775cyv7l" path="res://resources/fonts/gameclear_title.tres" id="3_credits_title"]
+[ext_resource type="LabelSettings" uid="uid://dv3b3430c2ap1" path="res://resources/fonts/gameclear_desc.tres" id="4_credits_desc"]
 
 [node name="StartPanel" type="Control" unique_id=2127225055]
 layout_mode = 3
@@ -18,7 +22,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.1, 0.13, 0.11, 1)
 
 [node name="Center" type="VBoxContainer" parent="." unique_id=422920646]
 layout_mode = 1
@@ -41,42 +44,103 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Save Us,
 Burger Man"
+label_settings = ExtResource("2_n84dy")
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="SubtitleLabel" type="Label" parent="Center" unique_id=17944893]
+[node name="Buttons" type="VBoxContainer" parent="Center" unique_id=1405900965]
 layout_mode = 2
-text = "Defeat the Monster"
-horizontal_alignment = 1
-
-[node name="Buttons" type="VBoxContainer" parent="Center"]
-layout_mode = 2
+size_flags_horizontal = 4
 theme_override_constants/separation = 10
 
-[node name="StartButton" type="Button" parent="Center/Buttons" unique_id=400919795]
-custom_minimum_size = Vector2(180, 48)
+[node name="StartButton" parent="Center/Buttons" unique_id=400919795 instance=ExtResource("2_button")]
 layout_mode = 2
+focus_neighbor_top = NodePath("../QuitButton")
+focus_neighbor_bottom = NodePath("../SettingsButton")
 text = "Game Start"
 
-[node name="SettingsButton" type="Button" parent="Center/Buttons"]
-custom_minimum_size = Vector2(180, 44)
+[node name="SettingsButton" parent="Center/Buttons" unique_id=406740847 instance=ExtResource("2_button")]
 layout_mode = 2
+focus_neighbor_top = NodePath("../StartButton")
+focus_neighbor_bottom = NodePath("../CreditsButton")
 text = "Settings"
 
-[node name="CreditsButton" type="Button" parent="Center/Buttons"]
-custom_minimum_size = Vector2(180, 44)
+[node name="CreditsButton" parent="Center/Buttons" unique_id=981364878 instance=ExtResource("2_button")]
 layout_mode = 2
+focus_neighbor_top = NodePath("../SettingsButton")
+focus_neighbor_bottom = NodePath("../QuitButton")
 text = "Credits"
 
-[node name="QuitButton" type="Button" parent="Center/Buttons"]
-custom_minimum_size = Vector2(180, 44)
+[node name="QuitButton" parent="Center/Buttons" unique_id=1642636890 instance=ExtResource("2_button")]
 layout_mode = 2
+focus_neighbor_top = NodePath("../CreditsButton")
+focus_neighbor_bottom = NodePath("../StartButton")
 text = "Quit Game"
 
-[node name="CreditsPopup" type="AcceptDialog" parent="."]
-title = "Credits"
-position = Vector2i(0, 36)
-size = Vector2i(260, 140)
-dialog_text = "Save Us, Burger Man
+[node name="CreditsOverlay" type="Control" parent="."]
+visible = false
+z_index = 201
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
 
-Created by the Burger What team."
+[node name="Dim" type="ColorRect" parent="CreditsOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.3137255)
+
+[node name="Panel" type="PanelContainer" parent="CreditsOverlay/Dim"]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -110.0
+offset_top = -130.0
+offset_right = 110.0
+offset_bottom = 130.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="CreditsOverlay/Dim/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="Rows" type="VBoxContainer" parent="CreditsOverlay/Dim/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="CreditsOverlay/Dim/Panel/Margin/Rows"]
+layout_mode = 2
+text = "Credits"
+label_settings = ExtResource("3_credits_title")
+horizontal_alignment = 1
+
+[node name="CreditsLabel" type="Label" parent="CreditsOverlay/Dim/Panel/Margin/Rows"]
+layout_mode = 2
+text = "Save Us, Burger Man\n\nCreated by the Burger What team."
+label_settings = ExtResource("4_credits_desc")
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="CloseButton" parent="CreditsOverlay/Dim/Panel/Margin/Rows" instance=ExtResource("2_button")]
+layout_mode = 2
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath(".")
+text = "Close"

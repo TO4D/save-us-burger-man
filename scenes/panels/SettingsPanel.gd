@@ -2,6 +2,8 @@ extends Control
 
 signal back_pressed
 
+const UI_FONT := preload("res://fonts/neodgm.ttf")
+
 @onready var master_slider: HSlider = $Panel/Margin/Rows/MasterVolume/Slider
 @onready var master_value_label: Label = $Panel/Margin/Rows/MasterVolume/Value
 @onready var bgm_slider: HSlider = $Panel/Margin/Rows/BgmVolume/Slider
@@ -16,6 +18,7 @@ var _syncing := false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	resolution_option.get_popup().add_theme_font_override("font", UI_FONT)
 	_setup_resolution_options()
 	master_slider.value_changed.connect(_on_master_volume_changed)
 	bgm_slider.value_changed.connect(_on_bgm_volume_changed)
@@ -27,6 +30,7 @@ func _ready() -> void:
 
 func on_show(_data: Dictionary = {}) -> void:
 	_sync_from_settings()
+	master_slider.grab_focus()
 
 
 func _setup_resolution_options() -> void:

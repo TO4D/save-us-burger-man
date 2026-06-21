@@ -46,6 +46,7 @@ func _ready() -> void:
 	DistanceManager.distance_changed.connect(_on_distance_changed)
 	DistanceManager.freeze_changed.connect(_on_freeze_changed)
 	#GameRun.time_changed.connect(_on_time_changed)
+	GameRun.run_started.connect(_on_run_started)
 	GameRun.stage_changed.connect(_on_stage_changed)
 	$Bar.visible = false
 	monster_start_position = monster_icon.position
@@ -130,6 +131,12 @@ func _on_distance_changed(value: float, max_value: float) -> void:
 	pending_monster_icon_position = monster_start_position.lerp(monster_target_position, 1.0 - ratio)
 	_update_monster_eating_speed()
 
+func _on_run_started() -> void:
+	monster_icon_update_elapsed = 0.0
+	monster_knockback_active = false
+	monster_icon.position = pending_monster_icon_position
+	monster_icon.scale = Vector2.ONE
+	_set_monster_idle()
 
 func _apply_monster_icon_position() -> void:
 	monster_icon.position = pending_monster_icon_position

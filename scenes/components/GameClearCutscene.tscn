@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://pjrmmf2s4yx5"]
+
+[ext_resource type="Script" uid="uid://dabe4paamgqoh" path="res://scenes/components/GameClearCutscene.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://brrolwa5ygepx" path="res://assets/sprites/monster/game_clear_back.png" id="2_background"]
+[ext_resource type="Texture2D" uid="uid://d31564058n8hm" path="res://assets/sprites/monster/monster_burp.png" id="3_burp"]
+[ext_resource type="Texture2D" uid="uid://d1idp1fy7n8cd" path="res://assets/sprites/monster/monster_walk.png" id="4_walk"]
+
+[node name="GameClearCutscene" type="Control" unique_id=560178814]
+z_index = 200
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+burp_hold_seconds = 0.8
+walk_fps = 10.0
+walk_duration = 5.2
+walk_move_interval = 0.48
+exit_padding = 1.0
+burp_texture = ExtResource("3_burp")
+walk_texture = ExtResource("4_walk")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1328558467]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_background")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="MonsterSprite" type="Sprite2D" parent="." unique_id=1666423637]
+position = Vector2(167, 273)
+scale = Vector2(2, 2)
+texture = ExtResource("3_burp")
+hframes = 3
+vframes = 2

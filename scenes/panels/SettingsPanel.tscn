@@ -1,6 +1,10 @@
 [gd_scene format=3 uid="uid://dvq43cqbox0t1"]
 
 [ext_resource type="Script" uid="uid://ct0ql3l27jyt8" path="res://scenes/panels/SettingsPanel.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://d06ul8o8xh72f" path="res://scenes/components/AppButton.tscn" id="2_button"]
+[ext_resource type="LabelSettings" uid="uid://jb2lc5thhys3" path="res://resources/fonts/setting_title.tres" id="2_gokik"]
+[ext_resource type="LabelSettings" uid="uid://bys1p62800xhv" path="res://resources/fonts/setting_desc.tres" id="3_d5so4"]
+[ext_resource type="FontFile" uid="uid://dial72f450tkp" path="res://fonts/neodgm.ttf" id="4_d5so4"]
 
 [node name="SettingsPanel" type="Control" unique_id=338462545]
 layout_mode = 3
@@ -44,12 +48,13 @@ theme_override_constants/margin_bottom = 18
 
 [node name="Rows" type="VBoxContainer" parent="Panel/Margin" unique_id=616352216]
 layout_mode = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 16
 
 [node name="TitleLabel" type="Label" parent="Panel/Margin/Rows" unique_id=667084724]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Settings"
+label_settings = ExtResource("2_gokik")
 horizontal_alignment = 1
 
 [node name="MasterVolume" type="HBoxContainer" parent="Panel/Margin/Rows" unique_id=1673773822]
@@ -60,16 +65,20 @@ theme_override_constants/separation = 8
 custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
 text = "Master"
+label_settings = ExtResource("3_d5so4")
 
 [node name="Slider" type="HSlider" parent="Panel/Margin/Rows/MasterVolume" unique_id=773463666]
 layout_mode = 2
 size_flags_horizontal = 3
+focus_neighbor_top = NodePath("../../BackButton")
+focus_neighbor_bottom = NodePath("../../BgmVolume/Slider")
 value = 100.0
 
 [node name="Value" type="Label" parent="Panel/Margin/Rows/MasterVolume" unique_id=998381305]
 custom_minimum_size = Vector2(42, 0)
 layout_mode = 2
 text = "100%"
+label_settings = ExtResource("3_d5so4")
 horizontal_alignment = 2
 
 [node name="BgmVolume" type="HBoxContainer" parent="Panel/Margin/Rows" unique_id=204965848]
@@ -80,16 +89,20 @@ theme_override_constants/separation = 8
 custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
 text = "BGM"
+label_settings = ExtResource("3_d5so4")
 
 [node name="Slider" type="HSlider" parent="Panel/Margin/Rows/BgmVolume" unique_id=67248505]
 layout_mode = 2
 size_flags_horizontal = 3
+focus_neighbor_top = NodePath("../../MasterVolume/Slider")
+focus_neighbor_bottom = NodePath("../../SfxVolume/Slider")
 value = 100.0
 
 [node name="Value" type="Label" parent="Panel/Margin/Rows/BgmVolume" unique_id=1285072425]
 custom_minimum_size = Vector2(42, 0)
 layout_mode = 2
 text = "100%"
+label_settings = ExtResource("3_d5so4")
 horizontal_alignment = 2
 
 [node name="SfxVolume" type="HBoxContainer" parent="Panel/Margin/Rows" unique_id=1559700073]
@@ -100,16 +113,20 @@ theme_override_constants/separation = 8
 custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
 text = "SFX"
+label_settings = ExtResource("3_d5so4")
 
 [node name="Slider" type="HSlider" parent="Panel/Margin/Rows/SfxVolume" unique_id=1615047120]
 layout_mode = 2
 size_flags_horizontal = 3
+focus_neighbor_top = NodePath("../../BgmVolume/Slider")
+focus_neighbor_bottom = NodePath("../../Resolution/Option")
 value = 100.0
 
 [node name="Value" type="Label" parent="Panel/Margin/Rows/SfxVolume" unique_id=429914876]
 custom_minimum_size = Vector2(42, 0)
 layout_mode = 2
 text = "100%"
+label_settings = ExtResource("3_d5so4")
 horizontal_alignment = 2
 
 [node name="Resolution" type="VBoxContainer" parent="Panel/Margin/Rows" unique_id=1099594127]
@@ -119,11 +136,17 @@ theme_override_constants/separation = 6
 [node name="Label" type="Label" parent="Panel/Margin/Rows/Resolution" unique_id=1639189822]
 layout_mode = 2
 text = "Resolution"
+label_settings = ExtResource("2_gokik")
+horizontal_alignment = 1
 
 [node name="Option" type="OptionButton" parent="Panel/Margin/Rows/Resolution" unique_id=1897950398]
 layout_mode = 2
+focus_neighbor_top = NodePath("../../SfxVolume/Slider")
+focus_neighbor_bottom = NodePath("../../BackButton")
+theme_override_fonts/font = ExtResource("4_d5so4")
 
-[node name="BackButton" type="Button" parent="Panel/Margin/Rows" unique_id=568537735]
-custom_minimum_size = Vector2(180, 44)
+[node name="BackButton" parent="Panel/Margin/Rows" unique_id=568537735 instance=ExtResource("2_button")]
 layout_mode = 2
+focus_neighbor_top = NodePath("../Resolution/Option")
+focus_neighbor_bottom = NodePath("../MasterVolume/Slider")
 text = "Back"
