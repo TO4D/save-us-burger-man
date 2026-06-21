@@ -4,6 +4,6 @@
 
 [resource]
 font = ExtResource("1_ipoxu")
-font_color = Color(1, 0.7254902, 0.21176471, 1)
+font_color = Color(1, 0.93333334, 0.21176471, 1)
 outline_color = Color(0, 0, 0, 1)
 shadow_size = 0

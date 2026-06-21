@@ -2,7 +2,7 @@ extends Control
 class_name ComboCounter
 
 const RESET_COLOR := Color(1.0, 0.45, 0.4, 1.0)
-const FLASH_COLOR := Color("FFDA94ff")
+const FLASH_COLOR := Color("ffffffff")
 const INACTIVE_COLOR := Color(0.9, 0.9, 0.9, 0.55)
 const IDLE_DISPLAY_SECONDS := 5.0
 const FADE_OUT_SECONDS := 0.18

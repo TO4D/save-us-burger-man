@@ -14,6 +14,7 @@ const INDICATOR_TEXTURE := preload("res://assets/sprites/ui/indicator.png")
 @export var completed_ingredient_modulate: Color = Color(1, 1, 1, 0.5)
 @export var complete_modulate_alpha: float = 0.8
 @export var sliding_window_start_step: int = 4
+@export var sliding_window_end_padding: float = 10.0
 
 @onready var background: NinePatchRect = $RecipeDisplayBackground
 @onready var items_root: Control = $ItemsRoot
@@ -107,11 +108,12 @@ func _render_recipe() -> void:
 
 	custom_minimum_size = total_size
 	size = total_size
+	var sliding_offset := _get_sliding_window_offset(total_size, step_y)
 	background.visible = true
-	background.position = Vector2.ZERO
+	background.position = Vector2(0.0, sliding_offset)
 	background.size = total_size
 	modulate.a = complete_modulate_alpha if active_step >= ingredient_count else 1.0
-	items_root.position = Vector2(background_padding.x, background_padding.y + _get_sliding_window_offset(total_size, step_y))
+	items_root.position = Vector2(background_padding.x, background_padding.y + sliding_offset)
 	items_root.size = content_size
 
 	for i in range(ingredient_count):
@@ -146,7 +148,8 @@ func _get_sliding_window_offset(total_size: Vector2, step_y: float) -> float:
 		return 0.0
 
 	var steps_past_anchor := active_step - start_step + 1
-	return minf(step_y * float(steps_past_anchor), overflow)
+	var max_offset := overflow + maxf(sliding_window_end_padding, 0.0)
+	return minf(step_y * float(steps_past_anchor), max_offset)
 
 
 func _add_indicators(icon_position: Vector2) -> void:

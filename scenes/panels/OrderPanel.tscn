@@ -6,7 +6,6 @@
 [ext_resource type="PackedScene" uid="uid://7coxq8bafj1k" path="res://scenes/components/ComboCounter.tscn" id="4_combo"]
 [ext_resource type="PackedScene" uid="uid://f81sdvkvyogq" path="res://scenes/components/BattleGauge.tscn" id="4_l4fm3"]
 [ext_resource type="PackedScene" uid="uid://dwkpv5wbo3tqm" path="res://scenes/components/UltimateBell.tscn" id="5_bell"]
-[ext_resource type="Texture2D" uid="uid://bolwvjkwtvxb5" path="res://assets/sprites/cook/ult_card.png" id="6_ds823"]
 [ext_resource type="Texture2D" uid="uid://gbpma8v66siu" path="res://assets/sprites/cook/slot.png" id="6_k1074"]
 [ext_resource type="Script" uid="uid://bkg1316f80lh8" path="res://scenes/components/RecipeDisplayStack.gd" id="6_stack"]
 [ext_resource type="PackedScene" uid="uid://dcyr7651s66f" path="res://scenes/components/IngredientSlot.tscn" id="7_slot"]
@@ -27,8 +26,6 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -2.0
-offset_bottom = -2.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
@@ -57,7 +54,7 @@ anchor_bottom = 0.5
 offset_left = -130.0
 offset_top = -80.0
 offset_right = 130.0
-offset_bottom = 85.0
+offset_bottom = 94.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("3_ayopg")
@@ -71,7 +68,7 @@ anchor_bottom = 0.62600005
 offset_left = -94.18001
 offset_top = -106.42001
 offset_right = 175.81999
-offset_bottom = 67.579994
+offset_bottom = 72.579994
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -81,6 +78,7 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_bottom = 5.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -89,7 +87,7 @@ stretch = true
 [node name="StackViewport" type="SubViewport" parent="PlayArea/PlateArea/StackViewportContainer" unique_id=1347070830]
 transparent_bg = true
 handle_input_locally = false
-size = Vector2i(270, 174)
+size = Vector2i(270, 184)
 render_target_update_mode = 4
 
 [node name="PlateStackScene" parent="PlayArea/PlateArea/StackViewportContainer/StackViewport" unique_id=800044148 instance=ExtResource("16_plate_stack")]
@@ -117,23 +115,19 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -96.0
-offset_top = -150.0
+offset_top = -161.0
 offset_right = -6.0
-offset_bottom = -5.0
+offset_bottom = 7.0
 grow_horizontal = 0
 grow_vertical = 0
 mouse_filter = 2
 script = ExtResource("6_stack")
-max_display_height = 145.0
-
-[node name="ultCard" type="Sprite2D" parent="." unique_id=890351622]
-position = Vector2(22, 360)
-texture = ExtResource("6_ds823")
+max_display_height = 168.0
 
 [node name="Foreground_slot" type="TextureRect" parent="." unique_id=1375331359]
 layout_mode = 0
 offset_left = 5.0
-offset_top = 355.0
+offset_top = 364.0
 offset_right = 265.0
 offset_bottom = 475.0
 texture = ExtResource("6_k1074")
@@ -181,12 +175,13 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="UltimateBell" parent="." unique_id=1684200322 instance=ExtResource("5_bell")]
-custom_minimum_size = Vector2(245, 5)
+z_index = 51
+custom_minimum_size = Vector2(45, 11)
 layout_mode = 0
 offset_left = 12.0
-offset_top = 360.0
-offset_right = 257.0
-offset_bottom = 368.0
+offset_top = 347.0
+offset_right = 68.0
+offset_bottom = 358.0
 
 [node name="ResultRank" type="Control" parent="." unique_id=1902987360]
 z_index = 21

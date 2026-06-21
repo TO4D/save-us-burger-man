@@ -41,12 +41,8 @@ const BLACKOUT_WARNING_STEP_SECONDS := 0.2
 const BLACKOUT_WARNING_PAUSE_SECONDS := 0.6
 const RESULT_LABEL_FLASH_SECONDS := 0.2
 const RESULT_LABEL_FLASH_INTERVAL_SECONDS := 0.12
+const RESULT_LABEL_FLASH_COUNT := 2
 const RESULT_LABEL_FLASH_COLOR := Color.WHITE
-const ULT_CARD_READY_POSITION := Vector2(22.0, 340.0)
-const ULT_CARD_HIDDEN_POSITION := Vector2(22.0, 360.0)
-const ULT_CARD_SLIDE_SECONDS := 0.2
-const ULT_CARD_READY_Z_INDEX := 51
-const ULT_CARD_HIDDEN_Z_INDEX := 0
 
 enum Phase { IDLE, CUSTOMER_ENTERING, PLAYING, SERVING, CUSTOMER_EXITING, COMPLETE }
 
@@ -77,7 +73,6 @@ var monster_ultimate_schedule_token: int = 0
 var foreground_slot_home_position: Vector2 = Vector2.ZERO
 var ingredient_slots_home_position: Vector2 = Vector2.ZERO
 var monster_slot_tween: Tween = null
-var ult_card_tween: Tween = null
 var persistent_slot_ingredients: Array[Ingredient] = []
 
 @onready var battle_gauge: BattleGauge = $BattleGauge
@@ -107,7 +102,6 @@ var persistent_slot_ingredients: Array[Ingredient] = []
 @onready var ready_go_label: Label = $ReadyGoOverlay/Label
 @onready var store_light: TextureRect = $StoreLight
 @onready var ultimate_bell: UltimateBell = $UltimateBell
-@onready var ult_card: Sprite2D = $ultCard
 
 var result_label_shadow_settings: LabelSettings
 var result_label_text_settings: LabelSettings
@@ -128,7 +122,6 @@ func _ready() -> void:
 	burger_stack.ingredient_landed.connect(_on_stack_ingredient_landed)
 	ingredient_slots.ingredient_picked.connect(_on_ingredient_picked)
 	_reset_stack_camera()
-	_set_ult_card_ready(UltimateManager.is_ready, false)
 	_sync_player_controls()
 
 
@@ -598,11 +591,12 @@ func _get_order_elapsed_seconds() -> float:
 func _start_result_label_flash() -> void:
 	_stop_result_label_flash()
 	_set_result_label_flash_color(RESULT_LABEL_FLASH_COLOR)
-	result_label_flash_tween = create_tween().set_loops()
+	result_label_flash_tween = create_tween().set_loops(RESULT_LABEL_FLASH_COUNT)
 	result_label_flash_tween.tween_property(result_label_text_settings, "font_color", result_label_text_color, RESULT_LABEL_FLASH_SECONDS)
 	result_label_flash_tween.parallel().tween_property(result_label_shadow_settings, "font_color", result_label_shadow_color, RESULT_LABEL_FLASH_SECONDS)
 	result_label_flash_tween.tween_interval(RESULT_LABEL_FLASH_INTERVAL_SECONDS)
 	result_label_flash_tween.tween_callback(_set_result_label_flash_color.bind(RESULT_LABEL_FLASH_COLOR))
+	result_label_flash_tween.finished.connect(_restore_result_label_colors)
 
 
 func _stop_result_label_flash() -> void:
@@ -637,29 +631,6 @@ func _on_ultimate_triggered() -> void:
 func _on_ultimate_ready_changed(ready: bool) -> void:
 	if ready:
 		AudioManager.play_sfx(AudioManager.Sfx.ULTIMATE_CHARGED)
-	_set_ult_card_ready(ready)
-
-
-func _set_ult_card_ready(ready: bool, animated: bool = true) -> void:
-	if ult_card_tween != null and ult_card_tween.is_valid():
-		ult_card_tween.kill()
-	ult_card_tween = null
-
-	var target_position := ULT_CARD_READY_POSITION if ready else ULT_CARD_HIDDEN_POSITION
-	if not animated:
-		ult_card.position = target_position
-		ult_card.z_index = ULT_CARD_READY_Z_INDEX if ready else ULT_CARD_HIDDEN_Z_INDEX
-		return
-
-	if ready:
-		ult_card.z_index = ULT_CARD_READY_Z_INDEX
-
-	ult_card_tween = create_tween()
-	ult_card_tween.tween_property(ult_card, "position", target_position, ULT_CARD_SLIDE_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	if not ready:
-		ult_card_tween.tween_callback(func() -> void:
-			ult_card.z_index = ULT_CARD_HIDDEN_Z_INDEX
-		)
 
 
 func _on_monster_ultimate_threshold_reached() -> void:

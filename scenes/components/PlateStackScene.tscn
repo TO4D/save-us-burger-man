@@ -11,13 +11,13 @@ position = Vector2(90, 87)
 
 [node name="SpriteBackground" type="Sprite2D" parent="." unique_id=1574109410]
 z_index = -1
-position = Vector2(90, 153)
+position = Vector2(90, 152)
 texture = ExtResource("1_ji84v")
 
 [node name="SpriteDoma" type="Sprite2D" parent="." unique_id=505485120]
-position = Vector2(42, 145)
+position = Vector2(42, 144)
 texture = ExtResource("1_6s5wm")
 
 [node name="BurgerStack" parent="." unique_id=1684319686 instance=ExtResource("1_stack")]
 z_index = 1
-position = Vector2(42, 166)
+position = Vector2(42, 165)
