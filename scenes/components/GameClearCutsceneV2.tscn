@@ -1,0 +1,79 @@
+[gd_scene format=3 uid="uid://w2lu5hsfx3m1"]
+
+[ext_resource type="Script" uid="uid://bo0p0qi1iuqtm" path="res://scenes/components/GameClearCutsceneV2.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://7yh5xgfw7t6e" path="res://assets/sprites/monster/clear_cutscene_stomach1.png" id="2_stomach1"]
+[ext_resource type="Texture2D" uid="uid://dr5mrqsc44vgc" path="res://assets/sprites/monster/clear_cutscene_stomach2.png" id="3_stomach2"]
+[ext_resource type="Texture2D" uid="uid://dgrt3gc5o8gw0" path="res://assets/sprites/monster/clear_cutscene_mouth1.png" id="4_mouth1"]
+[ext_resource type="Texture2D" uid="uid://3q4kf27mb4fb" path="res://assets/sprites/monster/clear_cutscene_mouth2.png" id="5_mouth2"]
+[ext_resource type="Texture2D" uid="uid://bcv4r04f1bqcf" path="res://assets/sprites/monster/monster_vomit1.png" id="6_vomit1"]
+[ext_resource type="Texture2D" uid="uid://d2s7srsewuq51" path="res://assets/sprites/monster/monster_vomit2.png" id="7_vomit2"]
+[ext_resource type="Texture2D" uid="uid://d3pasivcm35s5" path="res://assets/sprites/monster/monster_vomit_ready.png" id="8_vomit_ready"]
+[ext_resource type="PackedScene" uid="uid://co8ng5mvohdud" path="res://resources/particles/success.tscn" id="9_success_particles"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_vomit"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_vomit1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_vomit2")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_vomit_ready")
+}],
+"loop": false,
+"name": &"ready",
+"speed": 1.0
+}]
+
+[node name="GameClearCutscene" type="Control" unique_id=2069998174]
+z_index = 200
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+success_particle_scene = ExtResource("9_success_particles")
+success_particle_side_padding = 2.0
+success_particle_start_y_ratio = 0.8
+success_particle_target_y = 24.0
+stomach_texture_1 = ExtResource("2_stomach1")
+stomach_texture_2 = ExtResource("3_stomach2")
+mouth_texture_1 = ExtResource("4_mouth1")
+mouth_texture_2 = ExtResource("5_mouth2")
+
+[node name="Background" type="ColorRect" parent="." unique_id=446600879]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.65)
+
+[node name="Stomach" type="TextureRect" parent="." unique_id=735292708]
+layout_mode = 0
+mouse_filter = 2
+texture = ExtResource("2_stomach1")
+expand_mode = 1
+
+[node name="Mouth" type="TextureRect" parent="." unique_id=1662679368]
+layout_mode = 0
+mouse_filter = 2
+texture = ExtResource("4_mouth1")
+expand_mode = 1
+
+[node name="VomitAnimation" type="AnimatedSprite2D" parent="." unique_id=1325440303]
+z_index = 2
+position = Vector2(135, 420)
+sprite_frames = SubResource("SpriteFrames_vomit")
+animation = &"ready"

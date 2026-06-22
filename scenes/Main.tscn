@@ -9,7 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://dvq43cqbox0t1" path="res://scenes/panels/SettingsPanel.tscn" id="7_settings"]
 [ext_resource type="PackedScene" path="res://scenes/panels/PauseMenu.tscn" id="8_pause"]
 [ext_resource type="PackedScene" uid="uid://b8h3spi4xyjcb" path="res://scenes/components/GameOverCutscene.tscn" id="9_game_over_cutscene"]
-[ext_resource type="PackedScene" uid="uid://pjrmmf2s4yx5" path="res://scenes/components/GameClearCutscene.tscn" id="10_game_clear_cutscene"]
+[ext_resource type="PackedScene" path="res://scenes/components/GameClearCutsceneV2.tscn" id="10_game_clear_cutscene"]
 
 [node name="Main" type="Node2D" unique_id=1284514419]
 script = ExtResource("1")

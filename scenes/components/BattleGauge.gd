@@ -6,6 +6,8 @@ signal burger_attack_hit
 const BURGER_ATTACK_TEXTURE := preload("res://assets/sprites/ui/order_icon.1.png")
 const DEFAULT_EATING_PARTICLE_SCENE := preload("res://resources/particles/Eating.tscn")
 const DEFAULT_BURGER_PROJECTILE_SCENE := preload("res://scenes/components/BurgerProjectile.tscn")
+const SHOP_ICON_SQUASH_SCALE := Vector2(1.5, 0.5)
+const SHOP_ICON_SQUASH_DURATION := 0.2
 
 @export var distance_display_scale: float = 10.0
 @export var monster_icon_update_interval: float = 0.5
@@ -73,6 +75,8 @@ func _process(delta: float) -> void:
 
 
 func play_burger_attack(knockback_amount: float = 0.0, is_perfect: bool = false) -> void:
+	await _play_shop_icon_squash()
+
 	var target_position := Vector2(monster_icon.global_position.x + 6.0, monster_icon.global_position.y - 110.0)
 	var projectile := _create_burger_projectile()
 	add_child(projectile)
@@ -106,6 +110,17 @@ func play_burger_attack(knockback_amount: float = 0.0, is_perfect: bool = false)
 	projectile.queue_free()
 	_set_monster_idle()
 	monster_knockback_active = false
+
+
+func _play_shop_icon_squash() -> void:
+	var original_scale := shop_icon.scale
+	var start_duration := SHOP_ICON_SQUASH_DURATION * 0.8
+	var end_duration := SHOP_ICON_SQUASH_DURATION * 0.2
+	var tween := create_tween()
+	tween.tween_property(shop_icon, "scale", SHOP_ICON_SQUASH_SCALE, start_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(shop_icon, "scale", original_scale, end_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	await tween.finished
+	shop_icon.scale = original_scale
 
 
 func play_ultimate_barrage(projectile_count: int = 6) -> void:

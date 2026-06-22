@@ -143,8 +143,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not key_event.pressed or key_event.echo:
 		return
 
-	if key_event.keycode == KEY_Z and _can_trigger_ultimate() and UltimateManager.trigger():
+	if (_is_key(key_event, KEY_Z) or _is_key(key_event, KEY_K)) and _can_trigger_ultimate() and UltimateManager.trigger():
 		get_viewport().set_input_as_handled()
+
+
+func _is_key(event: InputEventKey, key: Key) -> bool:
+	return event.keycode == key or event.physical_keycode == key
 
 
 func on_show(data: Dictionary = {}) -> void:

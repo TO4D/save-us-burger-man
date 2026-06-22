@@ -23,7 +23,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.3137255)
+color = Color(0, 0, 0, 0.23529412)
 
 [node name="Panel" type="PanelContainer" parent="Dim" unique_id=1836651363]
 custom_minimum_size = Vector2(220, 0)
