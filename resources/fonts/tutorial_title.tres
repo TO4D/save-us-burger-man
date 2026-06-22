@@ -1,0 +1,7 @@
+[gd_resource type="LabelSettings" format=3 uid="uid://xrgvtltcpjgk"]
+
+[ext_resource type="FontFile" uid="uid://dial72f450tkp" path="res://fonts/neodgm.ttf" id="1_3cibi"]
+
+[resource]
+font = ExtResource("1_3cibi")
+font_size = 32

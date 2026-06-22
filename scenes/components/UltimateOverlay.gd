@@ -6,12 +6,16 @@ signal playback_finished
 const ULTIMATE_FRAMES := preload("res://resources/animations/ultimate.tres")
 const OVERLAY_COLOR := Color(0.0, 0.0, 0.0, 0.72)
 const ANIMATION_NAME := &"default"
+const SLIDE_OFFSCREEN_PADDING := 24.0
+
+@export var intro_slide_seconds: float = 0.1
 
 @onready var dim_overlay: ColorRect = $DimOverlay
 @onready var animation_sprite: AnimatedSprite2D = $AnimationSprite
 
 var _was_tree_paused: bool = false
 var _is_playing: bool = false
+var _slide_tween: Tween = null
 
 
 func _ready() -> void:
@@ -35,8 +39,18 @@ func play_once() -> void:
 	_apply_animation_layout()
 	animation_sprite.stop()
 	animation_sprite.frame = 0
+	var home_position := animation_sprite.position
+	animation_sprite.position = _offscreen_left_position(home_position)
 	_was_tree_paused = get_tree().paused
 	get_tree().paused = true
+	_slide_tween = create_tween()
+	_slide_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	_slide_tween.tween_property(animation_sprite, "position", home_position, intro_slide_seconds).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	await get_tree().create_timer(intro_slide_seconds, true).timeout
+	if not _is_playing:
+		return
+	animation_sprite.position = home_position
+	_slide_tween = null
 	animation_sprite.play(ANIMATION_NAME)
 	await animation_sprite.animation_finished
 	_finish_playback()
@@ -74,6 +88,15 @@ func _apply_animation_layout() -> void:
 	animation_sprite.scale = Vector2.ONE * scale_ratio
 
 
+func _offscreen_left_position(home_position: Vector2) -> Vector2:
+	var frame_texture := _first_frame_texture()
+	if frame_texture == null:
+		return Vector2(-SLIDE_OFFSCREEN_PADDING, home_position.y)
+
+	var half_width := frame_texture.get_width() * absf(animation_sprite.scale.x) * 0.5
+	return Vector2(-half_width - SLIDE_OFFSCREEN_PADDING, home_position.y)
+
+
 func _first_frame_texture() -> Texture2D:
 	if animation_sprite.sprite_frames == null:
 		return null
@@ -85,7 +108,11 @@ func _first_frame_texture() -> Texture2D:
 
 
 func _finish_playback() -> void:
+	if _slide_tween != null and _slide_tween.is_valid():
+		_slide_tween.kill()
+	_slide_tween = null
 	animation_sprite.stop()
+	_apply_animation_layout()
 	visible = false
 	_is_playing = false
 	get_tree().paused = _was_tree_paused

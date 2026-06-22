@@ -46,6 +46,7 @@ func play_cutscene() -> void:
 	var token := _sequence_token
 	_reset_visuals()
 	show()
+	AudioManager.play_sfx(AudioManager.Sfx.GAME_CLEAR_DRUM)
 	_play_sequence(token)
 
 

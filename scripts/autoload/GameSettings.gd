@@ -24,6 +24,7 @@ var master_volume := DEFAULT_MASTER_VOLUME
 var bgm_volume := DEFAULT_BGM_VOLUME
 var sfx_volume := DEFAULT_SFX_VOLUME
 var resolution_index := DEFAULT_RESOLUTION_INDEX
+var tutorial_completed := false
 
 
 func _ready() -> void:
@@ -41,6 +42,7 @@ func load_settings() -> void:
 	bgm_volume = clampf(float(config.get_value("audio", "bgm_volume", DEFAULT_BGM_VOLUME)), 0.0, 1.0)
 	sfx_volume = clampf(float(config.get_value("audio", "sfx_volume", DEFAULT_SFX_VOLUME)), 0.0, 1.0)
 	resolution_index = clampi(int(config.get_value("video", "resolution_index", DEFAULT_RESOLUTION_INDEX)), 0, RESOLUTIONS.size() - 1)
+	tutorial_completed = bool(config.get_value("progress", "tutorial_completed", false))
 
 
 func save_settings() -> void:
@@ -49,6 +51,7 @@ func save_settings() -> void:
 	config.set_value("audio", "bgm_volume", bgm_volume)
 	config.set_value("audio", "sfx_volume", sfx_volume)
 	config.set_value("video", "resolution_index", resolution_index)
+	config.set_value("progress", "tutorial_completed", tutorial_completed)
 	config.save(CONFIG_PATH)
 
 
@@ -84,6 +87,14 @@ func set_resolution_index(value: int) -> void:
 	apply_resolution()
 	save_settings()
 	settings_changed.emit()
+
+
+func complete_tutorial() -> void:
+	if tutorial_completed:
+		return
+
+	tutorial_completed = true
+	save_settings()
 
 
 func apply_audio() -> void:

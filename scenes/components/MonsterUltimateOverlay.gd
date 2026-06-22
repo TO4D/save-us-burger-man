@@ -7,11 +7,15 @@ const FEET_FRAMES := preload("res://resources/animations/monster_ultimate_feet.t
 const OVERLAY_COLOR := Color(0.0, 0.0, 0.0, 0.72)
 const ANIMATION_NAME := &"default"
 const SLIDE_OFFSCREEN_PADDING := 24.0
+const SHAKE_TRIGGER_FRAME := 3
 
 @export var intro_display_seconds: float = 0.5
 @export var intro_slide_seconds: float = 0.24
 @export var feet_slide_seconds: float = 0.18
 @export var feet_hold_seconds: float = 0.5
+@export var screen_shake_seconds: float = 1.0
+@export var screen_shake_strength: float = 3.0
+@export var screen_shake_interval: float = 0.04
 
 @onready var dim_overlay: ColorRect = $DimOverlay
 @onready var intro_sprite: Sprite2D = $IntroSprite
@@ -21,8 +25,12 @@ var _was_tree_paused: bool = false
 var _is_playing: bool = false
 var _intro_home_position: Vector2 = Vector2.ZERO
 var _feet_home_position: Vector2 = Vector2.ZERO
+var _screen_home_position: Vector2 = Vector2.ZERO
+var _screen_root: Control = null
 var _intro_tween: Tween = null
 var _feet_tween: Tween = null
+var _shake_token: int = 0
+var _shake_started: bool = false
 
 
 func _ready() -> void:
@@ -33,6 +41,10 @@ func _ready() -> void:
 	_assign_animation_frames()
 	_intro_home_position = intro_sprite.position
 	_feet_home_position = feet_sprite.position
+	_screen_root = get_parent() as Control
+	if _screen_root != null:
+		_screen_home_position = _screen_root.position
+	feet_sprite.frame_changed.connect(_on_feet_frame_changed)
 	visible = false
 
 
@@ -49,6 +61,10 @@ func play_once() -> void:
 	feet_sprite.position = _offscreen_right_position(feet_sprite, _feet_home_position)
 	feet_sprite.stop()
 	feet_sprite.frame = 0
+	_shake_token += 1
+	_shake_started = false
+	if _screen_root != null:
+		_screen_home_position = _screen_root.position
 	_was_tree_paused = get_tree().paused
 	get_tree().paused = true
 	_slide_to_home(intro_sprite, _intro_home_position, intro_slide_seconds, true)
@@ -142,7 +158,43 @@ func _show_last_feet_frame() -> void:
 	feet_sprite.frame = frame_count - 1
 
 
+func _on_feet_frame_changed() -> void:
+	if not _is_playing or _shake_started:
+		return
+	if feet_sprite.frame != SHAKE_TRIGGER_FRAME:
+		return
+
+	_shake_started = true
+	_shake_token += 1
+	_play_screen_shake(_shake_token)
+
+
+func _play_screen_shake(token: int) -> void:
+	if _screen_root == null:
+		return
+
+	var elapsed := 0.0
+	var interval := maxf(screen_shake_interval, 0.01)
+	while _is_playing and token == _shake_token and elapsed < screen_shake_seconds:
+		_screen_root.position = _screen_home_position + Vector2(
+			randf_range(-screen_shake_strength, screen_shake_strength),
+			randf_range(-screen_shake_strength, screen_shake_strength)
+		)
+		await get_tree().create_timer(interval, true).timeout
+		elapsed += interval
+
+	if token == _shake_token:
+		_restore_screen_position()
+
+
+func _restore_screen_position() -> void:
+	if _screen_root != null:
+		_screen_root.position = _screen_home_position
+
+
 func _finish_playback() -> void:
+	_shake_token += 1
+	_restore_screen_position()
 	if _intro_tween != null and _intro_tween.is_valid():
 		_intro_tween.kill()
 	if _feet_tween != null and _feet_tween.is_valid():

@@ -27,9 +27,9 @@ const ULTIMATE_STACK_SPEED_MULTIPLIER := 2.0
 const MONSTER_ULTIMATE_DELAY_MIN_SECONDS := 2.0
 const MONSTER_ULTIMATE_DELAY_MAX_SECONDS := 5.0
 const MONSTER_ULTIMATE_RETRY_DELAY_SECONDS := 1.0
-const MONSTER_SLOT_EXIT_SECONDS := 0.16
-const MONSTER_SLOT_RETURN_SECONDS := 0.42
-const MONSTER_SLOT_SHUFFLE_WAIT_SECONDS := 0.5
+const MONSTER_SLOT_EXIT_SECONDS := 0.1
+const MONSTER_SLOT_RETURN_SECONDS := 0.3
+const MONSTER_SLOT_SHUFFLE_WAIT_SECONDS := 0.4
 const ORDER_PROGRESS_ICON_SIZE := Vector2(16.0, 16.0)
 const ORDER_PROGRESS_FILL_TEXTURE := preload("res://assets/sprites/ui/order_icon.1.png")
 const ORDER_PROGRESS_EMPTY_TEXTURE := preload("res://assets/sprites/ui/order_icon.2.png")
@@ -143,12 +143,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not key_event.pressed or key_event.echo:
 		return
 
-	if (_is_key(key_event, KEY_Z) or _is_key(key_event, KEY_K)) and _can_trigger_ultimate() and UltimateManager.trigger():
+	if event.is_action_pressed("ultimate") and _can_trigger_ultimate() and UltimateManager.trigger():
 		get_viewport().set_input_as_handled()
-
-
-func _is_key(event: InputEventKey, key: Key) -> bool:
-	return event.keycode == key or event.physical_keycode == key
 
 
 func on_show(data: Dictionary = {}) -> void:
@@ -816,7 +812,7 @@ func _auto_complete_current_recipe(token: int) -> void:
 
 func _sync_player_controls() -> void:
 	var controls_enabled := visible and current_phase == Phase.PLAYING and not gameplay_locked and not ready_go_active and not ultimate_active and not monster_ultimate_active
-	ingredient_slots.set_process_unhandled_input(controls_enabled)
+	ingredient_slots.set_process_input(controls_enabled)
 	ingredient_slots.set_interaction_enabled(controls_enabled)
 	if is_instance_valid(ultimate_bell):
 		ultimate_bell.set_trigger_enabled(_can_trigger_ultimate())

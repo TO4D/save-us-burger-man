@@ -1,9 +1,520 @@
 [gd_scene format=3 uid="uid://dfgoxa8xxbaoh"]
 
+[ext_resource type="Texture2D" uid="uid://kohv0heev7io" path="res://assets/sprites/ui/key_move.tres" id="1_3c52b"]
+[ext_resource type="Script" uid="uid://bbr8bmmyhr0ae" path="res://scenes/panels/TutorialPanel.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://b8d7ilp0bq5er" path="res://assets/sprites/ui/key_move_alt.tres" id="2_kn2ac"]
+[ext_resource type="Texture2D" uid="uid://dstk8v7ntgmfb" path="res://assets/sprites/ui/key_select.tres" id="3_d27wh"]
+[ext_resource type="LabelSettings" uid="uid://wmjgyct62xtb" path="res://resources/fonts/tutorial_or.tres" id="3_j08lj"]
+[ext_resource type="Texture2D" uid="uid://dmdw7med22jdn" path="res://assets/sprites/ui/key_select_alt.tres" id="4_j08lj"]
+[ext_resource type="Texture2D" uid="uid://ba83llbc5ddg6" path="res://assets/sprites/ui/key_ult.tres" id="5_7h8hq"]
+[ext_resource type="Texture2D" uid="uid://bld8wjeeupt6b" path="res://assets/sprites/ui/key_ult_alt.tres" id="6_ymiki"]
+[ext_resource type="LabelSettings" uid="uid://biow4v83hp8d3" path="res://resources/fonts/tutorial_desc.tres" id="7_4axgt"]
+[ext_resource type="Texture2D" uid="uid://bm4el257xnfbj" path="res://assets/sprites/ui/key_esc.tres" id="9_7h8hq"]
+[ext_resource type="LabelSettings" uid="uid://xrgvtltcpjgk" path="res://resources/fonts/tutorial_title.tres" id="10_ymiki"]
+[ext_resource type="PackedScene" uid="uid://d06ul8o8xh72f" path="res://scenes/components/AppButton.tscn" id="11_7h8hq"]
+[ext_resource type="Texture2D" uid="uid://2ugvi1jh5j7v" path="res://assets/sprites/cook/recipe_new.png" id="11_nagxv"]
+[ext_resource type="Texture2D" uid="uid://br77k2xjiahvd" path="res://assets/sprites/ingredients/preview/pre_bun_bottom.png" id="12_5xbv1"]
+[ext_resource type="Texture2D" uid="uid://hhks5ddebfdq" path="res://assets/sprites/ingredients/preview/pre_patty.png" id="13_0xiq8"]
+[ext_resource type="Texture2D" uid="uid://fst4p37g4hrj" path="res://assets/sprites/ingredients/preview/pre_lettuce.png" id="14_6sltv"]
+[ext_resource type="Texture2D" uid="uid://by4iu3yr7xo7g" path="res://assets/sprites/ingredients/preview/pre_bun_top.png" id="15_vlrdo"]
+[ext_resource type="FontFile" uid="uid://dial72f450tkp" path="res://fonts/neodgm.ttf" id="16_nmgs2"]
+[ext_resource type="Texture2D" uid="uid://d4fy3jdll418u" path="res://assets/sprites/ingredients/slots/slot_bunBottom1.png" id="17_e8fxn"]
+[ext_resource type="Texture2D" uid="uid://c2hkr8qt7wre4" path="res://assets/sprites/ingredients/slots/slot_focus.png" id="18_rk2w7"]
+[ext_resource type="Texture2D" uid="uid://038ql586lje0" path="res://assets/sprites/ingredients/slots/slot_lettuce1.png" id="19_12kpq"]
+[ext_resource type="Texture2D" uid="uid://doucnguhwonww" path="res://assets/sprites/ingredients/slots/slot_patty1.png" id="20_6wm7c"]
+[ext_resource type="Texture2D" uid="uid://cfrb2u87yk8s6" path="res://assets/sprites/cook/gauge-star-fill.png" id="21_drlih"]
+[ext_resource type="Texture2D" uid="uid://d2k7sdgm3oluo" path="res://assets/sprites/cook/gauge-frame.png" id="22_24idb"]
+[ext_resource type="Texture2D" uid="uid://kx528lpg0lkh" path="res://assets/sprites/cook/gauge-fill.png" id="23_m2eit"]
+[ext_resource type="Texture2D" uid="uid://0m1h3pw3oxiy" path="res://assets/sprites/store/shop_new_tone.png" id="24_j85ou"]
+[ext_resource type="Texture2D" uid="uid://8ascfekdsfoe" path="res://assets/sprites/monster/monster_new_new1.png" id="25_x43h7"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_wfrg8"]
+font = ExtResource("16_nmgs2")
+font_size = 8
+
 [node name="TutorialPanel" type="Control" unique_id=1331379368]
+visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="back" type="ColorRect" parent="." unique_id=1612137952]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.8627451)
+
+[node name="title" type="Label" parent="." unique_id=1214728254]
+layout_mode = 0
+offset_top = 34.0
+offset_right = 270.0
+offset_bottom = 66.0
+text = "어떻게 해요?"
+label_settings = ExtResource("10_ymiki")
+horizontal_alignment = 1
+
+[node name="howto" type="Control" parent="." unique_id=18932690]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -135.0
+offset_top = -145.0
+offset_right = 135.0
+offset_bottom = 175.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(135, 0)
+
+[node name="Group_move" type="Control" parent="howto" unique_id=1119968415]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Label_move" type="Label" parent="howto/Group_move" unique_id=476784906]
+layout_mode = 0
+offset_left = 22.0
+offset_right = 110.0
+offset_bottom = 16.0
+text = "커서 이동"
+label_settings = ExtResource("7_4axgt")
+
+[node name="Move" type="TextureRect" parent="howto/Group_move" unique_id=574715823]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 69.0
+offset_bottom = 35.0
+scale = Vector2(2, 2)
+texture = ExtResource("1_3c52b")
+stretch_mode = 2
+
+[node name="Or" type="Label" parent="howto/Group_move" unique_id=24441903]
+layout_mode = 0
+offset_left = 123.0
+offset_top = 28.0
+offset_right = 139.0
+offset_bottom = 44.0
+text = "or"
+label_settings = ExtResource("3_j08lj")
+
+[node name="Move_alt" type="TextureRect" parent="howto/Group_move" unique_id=263159970]
+layout_mode = 0
+offset_left = 143.0
+offset_top = 20.0
+offset_right = 192.0
+offset_bottom = 35.0
+scale = Vector2(2, 2)
+texture = ExtResource("2_kn2ac")
+stretch_mode = 2
+
+[node name="Group_select" type="Control" parent="howto" unique_id=1185382897]
+anchors_preset = 0
+offset_top = 65.0
+offset_right = 40.0
+offset_bottom = 105.0
+
+[node name="Label_select" type="Label" parent="howto/Group_select" unique_id=356178799]
+layout_mode = 0
+offset_left = 22.0
+offset_right = 110.0
+offset_bottom = 16.0
+text = "선택"
+label_settings = ExtResource("7_4axgt")
+
+[node name="Select" type="TextureRect" parent="howto/Group_select" unique_id=1377387429]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 53.0
+offset_bottom = 35.0
+scale = Vector2(2, 2)
+texture = ExtResource("3_d27wh")
+stretch_mode = 2
+
+[node name="Or" type="Label" parent="howto/Group_select" unique_id=1698676461]
+layout_mode = 0
+offset_left = 92.0
+offset_top = 28.0
+offset_right = 108.0
+offset_bottom = 44.0
+text = "or"
+label_settings = ExtResource("3_j08lj")
+
+[node name="Select_alt" type="TextureRect" parent="howto/Group_select" unique_id=1665066472]
+layout_mode = 0
+offset_left = 113.0
+offset_top = 20.0
+offset_right = 126.0
+offset_bottom = 35.0
+scale = Vector2(2, 2)
+texture = ExtResource("4_j08lj")
+stretch_mode = 2
+
+[node name="Group_ult" type="Control" parent="howto" unique_id=344709620]
+anchors_preset = 0
+offset_top = 130.0
+offset_right = 40.0
+offset_bottom = 170.0
+
+[node name="Label_ult" type="Label" parent="howto/Group_ult" unique_id=6149546]
+layout_mode = 0
+offset_left = 22.0
+offset_right = 110.0
+offset_bottom = 23.0
+text = "필살기"
+label_settings = ExtResource("7_4axgt")
+
+[node name="ult" type="TextureRect" parent="howto/Group_ult" unique_id=748713868]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 33.0
+offset_bottom = 35.0
+scale = Vector2(2, 2)
+texture = ExtResource("5_7h8hq")
+stretch_mode = 2
+
+[node name="ult_alt" type="TextureRect" parent="howto/Group_ult" unique_id=2079215009]
+layout_mode = 0
+offset_left = 74.0
+offset_top = 20.0
+offset_right = 87.0
+offset_bottom = 35.0
+scale = Vector2(2, 2)
+texture = ExtResource("6_ymiki")
+stretch_mode = 2
+
+[node name="Or" type="Label" parent="howto/Group_ult" unique_id=410851821]
+layout_mode = 0
+offset_left = 53.0
+offset_top = 28.0
+offset_right = 69.0
+offset_bottom = 44.0
+text = "or"
+label_settings = ExtResource("3_j08lj")
+
+[node name="Group_pause" type="Control" parent="howto" unique_id=825574353]
+anchors_preset = 0
+offset_top = 195.0
+offset_right = 40.0
+offset_bottom = 235.0
+
+[node name="Label_pause" type="Label" parent="howto/Group_pause" unique_id=234237265]
+layout_mode = 0
+offset_left = 22.0
+offset_right = 110.0
+offset_bottom = 23.0
+text = "게임정지"
+label_settings = ExtResource("7_4axgt")
+
+[node name="esc" type="TextureRect" parent="howto/Group_pause" unique_id=274182866]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 45.0
+offset_bottom = 35.0
+scale = Vector2(2, 2)
+texture = ExtResource("9_7h8hq")
+stretch_mode = 2
+
+[node name="Page" type="Label" parent="howto" unique_id=1176931681]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -135.0
+offset_top = -23.0
+offset_right = 135.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "(1/2)"
+label_settings = ExtResource("3_j08lj")
+horizontal_alignment = 1
+
+[node name="gui" type="Control" parent="." unique_id=817460669]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -135.0
+offset_top = -145.0
+offset_right = 135.0
+offset_bottom = 175.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(135, 0)
+
+[node name="recipe" type="Control" parent="gui" unique_id=1894371377]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="sampleburger" type="Control" parent="gui/recipe" unique_id=900227816]
+anchors_preset = 0
+offset_left = 46.0
+offset_right = 86.0
+offset_bottom = 40.0
+
+[node name="back" type="TextureRect" parent="gui/recipe/sampleburger" unique_id=1560221802]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 1.0
+offset_right = 111.0
+offset_bottom = 101.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("11_nagxv")
+expand_mode = 1
+
+[node name="sample1" type="TextureRect" parent="gui/recipe/sampleburger" unique_id=1635498949]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 36.0
+offset_right = 96.0
+offset_bottom = 59.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("12_5xbv1")
+stretch_mode = 2
+
+[node name="sample2" type="TextureRect" parent="gui/recipe/sampleburger" unique_id=1313426753]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 27.0
+offset_right = 96.0
+offset_bottom = 50.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("13_0xiq8")
+stretch_mode = 2
+
+[node name="sample3" type="TextureRect" parent="gui/recipe/sampleburger" unique_id=1317685533]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 17.0
+offset_right = 96.0
+offset_bottom = 40.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("14_6sltv")
+stretch_mode = 2
+
+[node name="sample4" type="TextureRect" parent="gui/recipe/sampleburger" unique_id=1949004833]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 7.0
+offset_right = 96.0
+offset_bottom = 30.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("15_vlrdo")
+stretch_mode = 2
+
+[node name="Label" type="Label" parent="gui/recipe" unique_id=642425497]
+layout_mode = 0
+offset_left = 128.0
+offset_top = 1.0
+offset_right = 248.0
+offset_bottom = 31.0
+text = "화면 우측에 등장하는
+햄버거 레시피를 확인하세요.
+"
+label_settings = SubResource("LabelSettings_wfrg8")
+
+[node name="slots" type="Control" parent="gui" unique_id=1423873457]
+anchors_preset = 0
+offset_top = 75.0
+offset_right = 40.0
+offset_bottom = 115.0
+
+[node name="slot" type="TextureRect" parent="gui/slots" unique_id=1184258413]
+layout_mode = 0
+offset_left = 22.0
+offset_right = 80.0
+offset_bottom = 48.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("17_e8fxn")
+
+[node name="slot4" type="TextureRect" parent="gui/slots" unique_id=455192680]
+layout_mode = 0
+offset_left = 51.0
+offset_top = -1.0
+offset_right = 113.0
+offset_bottom = 51.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("18_rk2w7")
+stretch_mode = 2
+
+[node name="slot2" type="TextureRect" parent="gui/slots" unique_id=1009122313]
+layout_mode = 0
+offset_left = 52.0
+offset_right = 110.0
+offset_bottom = 48.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("19_12kpq")
+
+[node name="slot3" type="TextureRect" parent="gui/slots" unique_id=673921667]
+layout_mode = 0
+offset_left = 83.0
+offset_right = 141.0
+offset_bottom = 48.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("20_6wm7c")
+
+[node name="Label2" type="Label" parent="gui/slots" unique_id=1167976628]
+layout_mode = 0
+offset_left = 128.0
+offset_right = 248.0
+offset_bottom = 30.0
+text = "화면 하단의 재료슬롯에서
+키보드로 커서를 움직여
+올바른 순서로 재료를 선택하세요."
+label_settings = SubResource("LabelSettings_wfrg8")
+
+[node name="ult" type="Control" parent="gui" unique_id=1117317828]
+anchors_preset = 0
+offset_top = 138.0
+offset_right = 40.0
+offset_bottom = 178.0
+
+[node name="Label2" type="Label" parent="gui/ult" unique_id=676367141]
+layout_mode = 0
+offset_left = 128.0
+offset_top = 3.0
+offset_right = 256.0
+offset_bottom = 33.0
+text = "필살기 게이지가 가득차면
+필살기를 사용할 수 있습니다."
+label_settings = SubResource("LabelSettings_wfrg8")
+
+[node name="ult-sample" type="Control" parent="gui/ult" unique_id=1500423663]
+anchors_preset = 0
+offset_left = 32.0
+offset_top = -1.0
+offset_right = 72.0
+offset_bottom = 39.0
+
+[node name="star" type="TextureRect" parent="gui/ult/ult-sample" unique_id=2117711107]
+layout_mode = 0
+offset_left = 22.0
+offset_right = 33.0
+offset_bottom = 11.0
+texture = ExtResource("21_drlih")
+stretch_mode = 2
+
+[node name="gauge-empty" type="TextureRect" parent="gui/ult/ult-sample" unique_id=833584163]
+layout_mode = 0
+offset_left = 33.0
+offset_top = 3.0
+offset_right = 78.0
+offset_bottom = 10.0
+texture = ExtResource("22_24idb")
+stretch_mode = 2
+
+[node name="star2" type="TextureRect" parent="gui/ult/ult-sample" unique_id=1961077856]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 16.0
+offset_right = 33.0
+offset_bottom = 27.0
+texture = ExtResource("21_drlih")
+stretch_mode = 2
+
+[node name="gauge" type="TextureRect" parent="gui/ult/ult-sample" unique_id=790493424]
+layout_mode = 0
+offset_left = 33.0
+offset_top = 19.0
+offset_right = 78.0
+offset_bottom = 26.0
+texture = ExtResource("22_24idb")
+stretch_mode = 2
+
+[node name="gaute-fill" type="TextureRect" parent="gui/ult/ult-sample" unique_id=1948870934]
+layout_mode = 0
+offset_left = 33.0
+offset_top = 19.0
+offset_right = 78.0
+offset_bottom = 26.0
+texture = ExtResource("23_m2eit")
+stretch_mode = 2
+
+[node name="game" type="Control" parent="gui" unique_id=1598368009]
+anchors_preset = 0
+offset_top = 207.0
+offset_right = 40.0
+offset_bottom = 247.0
+
+[node name="sample" type="Control" parent="gui/game" unique_id=435512040]
+anchors_preset = 0
+offset_left = 51.0
+offset_right = 91.0
+offset_bottom = 40.0
+
+[node name="shop" type="TextureRect" parent="gui/game/sample" unique_id=1970134182]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 52.0
+offset_right = 48.0
+offset_bottom = 80.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("24_j85ou")
+stretch_mode = 2
+
+[node name="monster" type="TextureRect" parent="gui/game/sample" unique_id=1918728505]
+layout_mode = 0
+offset_left = -6.0
+offset_top = -11.0
+offset_right = 264.0
+offset_bottom = 219.0
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("25_x43h7")
+stretch_mode = 2
+
+[node name="Label2" type="Label" parent="gui/game" unique_id=1991198001]
+layout_mode = 0
+offset_left = 128.0
+offset_top = 3.0
+offset_right = 256.0
+offset_bottom = 33.0
+text = "가게가 먹히지 않도록
+햄버거를 계속 먹여야합니다!"
+label_settings = SubResource("LabelSettings_wfrg8")
+
+[node name="Page" type="Label" parent="gui" unique_id=470340813]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -135.0
+offset_top = -23.0
+offset_right = 135.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "(2/2)"
+label_settings = ExtResource("3_j08lj")
+horizontal_alignment = 1
+
+[node name="ContinueButton" parent="." unique_id=1418697759 instance=ExtResource("11_7h8hq")]
+layout_mode = 0
+offset_left = 77.0
+offset_top = 420.0
+offset_right = 197.0
+offset_bottom = 452.0
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath(".")
+text = "계속"

@@ -15,36 +15,25 @@ func _ready() -> void:
 	_initialize_slots()
 
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if is_mobile_input or not visible:
 		return
-	if event is not InputEventKey:
-		return
-
-	var key_event := event as InputEventKey
-	if not key_event.pressed or key_event.echo:
-		return
-
-	if _is_key(key_event, KEY_LEFT) or _is_key(key_event, KEY_A):
+	if event.is_action_pressed("ingredient_move_left"):
 		_move_slot_focus(Vector2i(-1, 0))
 		get_viewport().set_input_as_handled()
-	elif _is_key(key_event, KEY_RIGHT) or _is_key(key_event, KEY_D):
+	elif event.is_action_pressed("ingredient_move_right"):
 		_move_slot_focus(Vector2i(1, 0))
 		get_viewport().set_input_as_handled()
-	elif _is_key(key_event, KEY_UP) or _is_key(key_event, KEY_W):
+	elif event.is_action_pressed("ingredient_move_up"):
 		_move_slot_focus(Vector2i(0, -1))
 		get_viewport().set_input_as_handled()
-	elif _is_key(key_event, KEY_DOWN) or _is_key(key_event, KEY_S):
+	elif event.is_action_pressed("ingredient_move_down"):
 		_move_slot_focus(Vector2i(0, 1))
 		get_viewport().set_input_as_handled()
-	elif _is_key(key_event, KEY_J):
+	elif event.is_action_pressed("ingredient_select"):
 		if _is_slot_index_visible(focused_slot_index):
 			ingredient_slot_nodes[focused_slot_index].trigger_pick()
 		get_viewport().set_input_as_handled()
-
-
-func _is_key(event: InputEventKey, key: Key) -> bool:
-	return event.keycode == key or event.physical_keycode == key
 
 
 func configure(ingredients: Array[Ingredient], mobile_input: bool, enabled: bool) -> void:

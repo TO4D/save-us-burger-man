@@ -1,10 +1,12 @@
 extends Control
 
 signal start_pressed
+signal tutorial_pressed
 signal settings_pressed
 signal quit_pressed
 
 @onready var start_button: Button = $Center/Buttons/StartButton
+@onready var tutorial_button: Button = $Center/Buttons/TutorialButton
 @onready var settings_button: Button = $Center/Buttons/SettingsButton
 @onready var credits_button: Button = $Center/Buttons/CreditsButton
 @onready var quit_button: Button = $Center/Buttons/QuitButton
@@ -14,6 +16,7 @@ signal quit_pressed
 
 func _ready() -> void:
 	start_button.pressed.connect(func(): start_pressed.emit())
+	tutorial_button.pressed.connect(func(): tutorial_pressed.emit())
 	settings_button.pressed.connect(func(): settings_pressed.emit())
 	credits_button.pressed.connect(_show_credits)
 	credits_close_button.pressed.connect(_hide_credits)

@@ -56,12 +56,18 @@ theme_override_constants/separation = 10
 [node name="StartButton" parent="Center/Buttons" unique_id=400919795 instance=ExtResource("2_button")]
 layout_mode = 2
 focus_neighbor_top = NodePath("../QuitButton")
-focus_neighbor_bottom = NodePath("../SettingsButton")
+focus_neighbor_bottom = NodePath("../TutorialButton")
 text = "Game Start"
+
+[node name="TutorialButton" parent="Center/Buttons" instance=ExtResource("2_button")]
+layout_mode = 2
+focus_neighbor_top = NodePath("../StartButton")
+focus_neighbor_bottom = NodePath("../SettingsButton")
+text = "Tutorial"
 
 [node name="SettingsButton" parent="Center/Buttons" unique_id=406740847 instance=ExtResource("2_button")]
 layout_mode = 2
-focus_neighbor_top = NodePath("../StartButton")
+focus_neighbor_top = NodePath("../TutorialButton")
 focus_neighbor_bottom = NodePath("../CreditsButton")
 text = "Settings"
 

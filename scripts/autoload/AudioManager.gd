@@ -16,6 +16,7 @@ enum Sfx {
 	FIRE_BURGER,
 	ULTIMATE_CHARGED,
 	ULTIMATE,
+	GAME_CLEAR_DRUM,
 }
 
 enum Bgm {
@@ -40,6 +41,7 @@ const SFX_PATHS := {
 	Sfx.FIRE_BURGER: "res://assets/audio/sfx/fire_burger.ogg",
 	Sfx.ULTIMATE_CHARGED: "res://assets/audio/sfx/ultimate_charge2.ogg",
 	Sfx.ULTIMATE: "res://assets/audio/sfx/ultimate.ogg",
+	Sfx.GAME_CLEAR_DRUM: "res://assets/audio/sfx/game_clear_drum.ogg",
 }
 
 const BGM_PATHS := {
