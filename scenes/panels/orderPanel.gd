@@ -1,19 +1,21 @@
 extends Control
 
 signal order_completed(success: bool)
+signal countdown_finished
 
-const READY_OVERLAY_SECONDS := 2.0
+const READY_OVERLAY_SECONDS := 3.0
 const GO_OVERLAY_SECONDS := 0.6
+const COUNTDOWN_LABELS := ["3", "2", "1"]
 const COMPLETED_BURGER_DISPLAY_SECONDS := 0.2
 const DOMA_SLIDE_SECONDS := 0.15
 const DOMA_ENTRY_SECONDS := 0.35
-const PERFECT_BURGER_HALO_COLOR := Color(1.0, 0.88, 0.25, 0.9)
-const NORMAL_BURGER_HALO_COLOR := Color(1.0, 1.0, 1.0, 0.588)
-const PERFECT_BURGER_HALO_OUTLINE_SIZE := 1.5
-const NORMAL_BURGER_HALO_OUTLINE_SIZE := 1.5
-const PERFECT_BURGER_HALO_GLOW_SIZE := 4.0
-const NORMAL_BURGER_HALO_GLOW_SIZE := 4.0
-const PERFECT_BURGER_HALO_GLOW_STRENGTH := 0.38
+const PERFECT_BURGER_HALO_COLOR := Color(1.0, 0.845, 0.07, 1.0)
+const NORMAL_BURGER_HALO_COLOR := Color(1.0, 1.0, 1.0, 1.0)
+const PERFECT_BURGER_HALO_OUTLINE_SIZE := 4
+const NORMAL_BURGER_HALO_OUTLINE_SIZE := 4
+const PERFECT_BURGER_HALO_GLOW_SIZE := 2.0
+const NORMAL_BURGER_HALO_GLOW_SIZE := 2.0
+const PERFECT_BURGER_HALO_GLOW_STRENGTH := 0.6
 const NORMAL_BURGER_HALO_GLOW_STRENGTH := 0.25
 const DOMA_SLIDE_DISTANCE := 240.0
 const STACK_VIEWPORT_SIZE := Vector2(180.0, 174.0)
@@ -28,6 +30,9 @@ const MONSTER_ULTIMATE_DELAY_MIN_SECONDS := 2.0
 const MONSTER_ULTIMATE_DELAY_MAX_SECONDS := 5.0
 const MONSTER_ULTIMATE_RETRY_DELAY_SECONDS := 1.0
 const MONSTER_SLOT_EXIT_SECONDS := 0.1
+const MONSTER_SLOT_EXIT_STAGGER_SECONDS := 0.04
+const MONSTER_SLOT_OFF_SFX_INTERVAL_SECONDS := 0.05
+const MONSTER_SLOT_OFF_SFX_COUNT := 3
 const MONSTER_SLOT_RETURN_SECONDS := 0.3
 const MONSTER_SLOT_SHUFFLE_WAIT_SECONDS := 0.4
 const ORDER_PROGRESS_ICON_SIZE := Vector2(16.0, 16.0)
@@ -58,7 +63,6 @@ var round_token: int = 0
 var doma_home_position: Vector2 = Vector2.ZERO
 var is_mobile_input: bool = false
 var mistake_count: int = 0
-var order_started_at_msec: int = 0
 var result_rank_tween: Tween = null
 var result_label_flash_tween: Tween = null
 var stack_landing_token: int = 0
@@ -73,6 +77,7 @@ var monster_ultimate_schedule_token: int = 0
 var foreground_slot_home_position: Vector2 = Vector2.ZERO
 var ingredient_slots_home_position: Vector2 = Vector2.ZERO
 var monster_slot_tween: Tween = null
+var monster_slot_child_home_positions: Dictionary = {}
 var persistent_slot_ingredients: Array[Ingredient] = []
 var gameplay_locked := false
 
@@ -90,9 +95,6 @@ var gameplay_locked := false
 @onready var result_label: Control = $ResultRank/Result_Label
 @onready var result_label_shadow: Label = $ResultRank/Result_Label/shadow
 @onready var result_label_text: Label = $ResultRank/Result_Label/text
-@onready var result_time_label: Control = $ResultRank/Result_time_Label
-@onready var result_time_label_shadow: Label = $ResultRank/Result_time_Label/shadow
-@onready var result_time_label_text: Label = $ResultRank/Result_time_Label/text
 @onready var blackout_overlay: ColorRect = $BlackoutOverlay
 @onready var combo_counter: ComboCounter = $ComboCounter
 @onready var foreground_slot: TextureRect = $Foreground_slot
@@ -100,7 +102,9 @@ var gameplay_locked := false
 @onready var ready_go_overlay: ColorRect = $ReadyGoOverlay
 @onready var ultimate_overlay: UltimateOverlay = $UltimateOverlay
 @onready var monster_ultimate_overlay: MonsterUltimateOverlay = $MonsterUltimateOverlay
-@onready var ready_go_label: Label = $ReadyGoOverlay/Label
+@onready var ready_go_label: Control = $ReadyGoOverlay/Label
+@onready var ready_go_label_shadow: Label = $ReadyGoOverlay/Label/shadow
+@onready var ready_go_label_text: Label = $ReadyGoOverlay/Label/text
 @onready var store_light: TextureRect = $StoreLight
 @onready var ultimate_bell: UltimateBell = $UltimateBell
 
@@ -162,7 +166,6 @@ func on_show(data: Dictionary = {}) -> void:
 	current_recipe_index = 0
 	current_step = 0
 	mistake_count = 0
-	order_started_at_msec = 0
 	blackout_event_active = false
 	blackout_used_for_customer = false
 	ultimate_active = false
@@ -185,6 +188,7 @@ func on_show(data: Dictionary = {}) -> void:
 		await _run_ready_go_overlay(token)
 		if token != round_token:
 			return
+	countdown_finished.emit()
 	_start_order(token)
 
 func _on_run_started() -> void:
@@ -243,7 +247,6 @@ func _start_play(token: int) -> void:
 	if token != round_token:
 		return
 	current_phase = Phase.PLAYING
-	order_started_at_msec = Time.get_ticks_msec()
 	_setup_ingredient_slots(true)
 	_sync_player_controls()
 	_schedule_monster_ultimate_if_pending(token)
@@ -334,14 +337,22 @@ func _run_ready_go_overlay(token: int) -> void:
 	GameRun.set_start_blocked(true)
 	ready_go_overlay.modulate.a = 1.0
 	ready_go_label.scale = Vector2.ONE
-	ready_go_label.text = "Ready..."
 	ready_go_overlay.visible = true
 	_sync_player_controls()
-	await get_tree().create_timer(READY_OVERLAY_SECONDS).timeout
-	if token != round_token:
-		return
 
-	ready_go_label.text = "Go"
+	var countdown_step_seconds := READY_OVERLAY_SECONDS / COUNTDOWN_LABELS.size()
+	for label_text in COUNTDOWN_LABELS:
+		_set_ready_go_label_text(label_text)
+		AudioManager.play_sfx(AudioManager.Sfx.COUNTDOWN)
+		ready_go_label.scale = Vector2(1.18, 1.18)
+		var countdown_tween := create_tween()
+		countdown_tween.tween_property(ready_go_label, "scale", Vector2.ONE, countdown_step_seconds * 0.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		await get_tree().create_timer(countdown_step_seconds).timeout
+		if token != round_token:
+			return
+
+	_set_ready_go_label_text("Go!")
+	AudioManager.play_sfx(AudioManager.Sfx.START)
 	ready_go_label.scale = Vector2(1.18, 1.18)
 	var tween := create_tween()
 	tween.tween_property(ready_go_label, "scale", Vector2.ONE, GO_OVERLAY_SECONDS * 0.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
@@ -353,6 +364,11 @@ func _run_ready_go_overlay(token: int) -> void:
 	ready_go_active = false
 	GameRun.set_start_blocked(false)
 	_sync_player_controls()
+
+
+func _set_ready_go_label_text(value: String) -> void:
+	ready_go_label_shadow.text = value
+	ready_go_label_text.text = value
 
 
 func _setup_ingredient_slots(enabled: bool) -> void:
@@ -518,8 +534,6 @@ func _flash_wrong_input() -> void:
 
 func _show_result_rank(is_perfect: bool) -> void:
 	result_label.visible = true
-	result_time_label.visible = true
-	_set_result_time_label_text(_get_order_elapsed_seconds())
 	_set_result_label_text("PERFECT" if is_perfect else "GREAT")
 	if is_perfect:
 		_start_result_label_flash()
@@ -561,7 +575,6 @@ func _hide_result_rank() -> void:
 
 func _hide_result_rank_images() -> void:
 	result_label.visible = false
-	result_time_label.visible = false
 
 
 func _setup_result_label_flash() -> void:
@@ -586,18 +599,6 @@ func _duplicate_label_settings(label: Label) -> LabelSettings:
 func _set_result_label_text(value: String) -> void:
 	result_label_shadow.text = value
 	result_label_text.text = value
-
-
-func _set_result_time_label_text(elapsed_seconds: float) -> void:
-	var value := "%.2fs" % elapsed_seconds
-	result_time_label_shadow.text = value
-	result_time_label_text.text = value
-
-
-func _get_order_elapsed_seconds() -> float:
-	if order_started_at_msec <= 0:
-		return 0.0
-	return float(Time.get_ticks_msec() - order_started_at_msec) / 1000.0
 
 
 func _start_result_label_flash() -> void:
@@ -685,6 +686,7 @@ func _run_monster_ultimate_sequence(token: int) -> void:
 	monster_ultimate_active = true
 	DistanceManager.hold_freeze()
 	_sync_player_controls()
+	AudioManager.play_sfx_while_paused(AudioManager.Sfx.ULTIMATE)
 	await monster_ultimate_overlay.play_once()
 	if token != round_token:
 		DistanceManager.release_freeze()
@@ -740,11 +742,24 @@ func _run_monster_slot_shuffle_effect(token: int) -> void:
 	var offscreen_offset := Vector2(0.0, size.y - foreground_slot_home_position.y + foreground_slot.size.y + 24.0)
 	var foreground_exit_position := foreground_slot_home_position + offscreen_offset
 	var slots_exit_position := ingredient_slots_home_position + offscreen_offset
+	var exiting_slots: Array[IngredientSlot] = []
+	for slot in ingredient_slots.ingredient_slot_nodes:
+		if slot.visible and slot.ingredient != null:
+			monster_slot_child_home_positions[slot] = slot.position
+			exiting_slots.append(slot)
+	exiting_slots.shuffle()
 
+	_play_monster_slot_off_sfx(token)
 	monster_slot_tween = create_tween().set_parallel(true)
 	monster_slot_tween.tween_property(foreground_slot, "position", foreground_exit_position, MONSTER_SLOT_EXIT_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	monster_slot_tween.tween_property(ingredient_slots, "position", slots_exit_position, MONSTER_SLOT_EXIT_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	for order in range(exiting_slots.size()):
+		var slot := exiting_slots[order]
+		var slot_home_position: Vector2 = monster_slot_child_home_positions[slot]
+		monster_slot_tween.tween_property(slot, "position", slot_home_position + offscreen_offset, MONSTER_SLOT_EXIT_SECONDS).set_delay(MONSTER_SLOT_EXIT_STAGGER_SECONDS * order).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	await monster_slot_tween.finished
+	ingredient_slots.position = slots_exit_position
+	_restore_monster_slot_child_positions()
+	monster_slot_child_home_positions.clear()
 	if token != round_token:
 		return
 
@@ -761,6 +776,15 @@ func _run_monster_slot_shuffle_effect(token: int) -> void:
 	monster_slot_tween = null
 
 
+func _play_monster_slot_off_sfx(token: int) -> void:
+	for play_index in range(MONSTER_SLOT_OFF_SFX_COUNT):
+		if token != round_token or not monster_ultimate_active:
+			return
+		AudioManager.play_sfx(AudioManager.Sfx.SLOT_OFF)
+		if play_index < MONSTER_SLOT_OFF_SFX_COUNT - 1:
+			await get_tree().create_timer(MONSTER_SLOT_OFF_SFX_INTERVAL_SECONDS).timeout
+
+
 func _reset_ingredient_slot_panel_position() -> void:
 	_reset_monster_slot_tween()
 	foreground_slot.position = foreground_slot_home_position
@@ -771,6 +795,16 @@ func _reset_monster_slot_tween() -> void:
 	if monster_slot_tween != null and monster_slot_tween.is_valid():
 		monster_slot_tween.kill()
 	monster_slot_tween = null
+	_restore_monster_slot_child_positions()
+	monster_slot_child_home_positions.clear()
+
+
+func _restore_monster_slot_child_positions() -> void:
+	for slot_value in monster_slot_child_home_positions:
+		var slot := slot_value as IngredientSlot
+		if is_instance_valid(slot):
+			var home_position: Vector2 = monster_slot_child_home_positions[slot]
+			slot.position = home_position
 
 
 func _merge_persistent_slot_ingredients(source_ingredients: Array[Ingredient]) -> Array[Ingredient]:
@@ -882,8 +916,9 @@ func _slide_completed_burger_left(completion_was_perfect: bool) -> void:
 	add_child(sliding_group)
 	sliding_group.global_position = Vector2.ZERO
 
-	var stack_snapshot := await _create_stack_viewport_snapshot()
-	var halo_snapshot := await _create_burger_stack_halo_snapshot()
+	var snapshots := await _create_completed_burger_snapshots()
+	var stack_snapshot: Sprite2D = snapshots["stack"]
+	var halo_snapshot: Sprite2D = snapshots["halo"]
 	sliding_group.add_child(stack_snapshot)
 	stack_snapshot.global_position = stack_viewport_container.global_position
 	sliding_group.add_child(halo_snapshot)
@@ -917,7 +952,7 @@ func _apply_completed_burger_halo(snapshot: Sprite2D, completion_was_perfect: bo
 	snapshot.material = material
 
 
-func _create_stack_viewport_snapshot() -> Sprite2D:
+func _create_completed_burger_snapshots() -> Dictionary:
 	var viewport_size := Vector2(stack_viewport.size)
 	var snapshot_viewport := SubViewport.new()
 	snapshot_viewport.transparent_bg = true
@@ -925,31 +960,43 @@ func _create_stack_viewport_snapshot() -> Sprite2D:
 	snapshot_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 	add_child(snapshot_viewport)
 
+	var halo_viewport := SubViewport.new()
+	halo_viewport.transparent_bg = true
+	halo_viewport.size = stack_viewport.size
+	halo_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
+	add_child(halo_viewport)
+
+	var captured_camera_position := stack_camera.position
 	var doma_copy := _copy_sprite_for_snapshot(sprite_doma)
-	doma_copy.position = sprite_doma.position - stack_camera.position + viewport_size * 0.5
+	doma_copy.position = sprite_doma.position - captured_camera_position + viewport_size * 0.5
 	snapshot_viewport.add_child(doma_copy)
 
 	var stack_copy := Node2D.new()
-	stack_copy.position = burger_stack.position - stack_camera.position + viewport_size * 0.5
+	stack_copy.position = burger_stack.position - captured_camera_position + viewport_size * 0.5
 	stack_copy.z_index = burger_stack.z_index
 	snapshot_viewport.add_child(stack_copy)
+
+	var halo_stack_copy := Node2D.new()
+	halo_stack_copy.position = stack_copy.position
+	halo_stack_copy.z_index = stack_copy.z_index
+	halo_viewport.add_child(halo_stack_copy)
 
 	for child in burger_stack.get_children():
 		var source_sprite := child as Sprite2D
 		if source_sprite == null:
 			continue
 		stack_copy.add_child(_copy_sprite_for_snapshot(source_sprite))
+		halo_stack_copy.add_child(_copy_sprite_for_snapshot(source_sprite))
 
 	await RenderingServer.frame_post_draw
-	var image := snapshot_viewport.get_texture().get_image()
-	var texture := ImageTexture.create_from_image(image)
+	var stack_snapshot := _create_snapshot_sprite(snapshot_viewport)
+	var halo_snapshot := _create_snapshot_sprite(halo_viewport)
 	snapshot_viewport.queue_free()
-
-	var snapshot := Sprite2D.new()
-	snapshot.texture = texture
-	snapshot.centered = false
-	snapshot.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	return snapshot
+	halo_viewport.queue_free()
+	return {
+		"stack": stack_snapshot,
+		"halo": halo_snapshot,
+	}
 
 
 func _copy_sprite_for_snapshot(source: Sprite2D) -> Sprite2D:
@@ -968,39 +1015,9 @@ func _copy_sprite_for_snapshot(source: Sprite2D) -> Sprite2D:
 	return copied_sprite
 
 
-func _create_burger_stack_halo_snapshot() -> Sprite2D:
-	var viewport_size := Vector2(stack_viewport.size)
-	var halo_viewport := SubViewport.new()
-	halo_viewport.transparent_bg = true
-	halo_viewport.size = stack_viewport.size
-	halo_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
-	add_child(halo_viewport)
-
-	var stack_copy := Node2D.new()
-	stack_copy.position = burger_stack.position - stack_camera.position + viewport_size * 0.5
-	halo_viewport.add_child(stack_copy)
-
-	for child in burger_stack.get_children():
-		var source_sprite := child as Sprite2D
-		if source_sprite == null:
-			continue
-
-		var copied_sprite := Sprite2D.new()
-		copied_sprite.texture = source_sprite.texture
-		copied_sprite.centered = source_sprite.centered
-		copied_sprite.offset = source_sprite.offset
-		copied_sprite.position = source_sprite.position
-		copied_sprite.scale = source_sprite.scale
-		copied_sprite.rotation = source_sprite.rotation
-		copied_sprite.modulate = source_sprite.modulate
-		copied_sprite.texture_filter = source_sprite.texture_filter
-		stack_copy.add_child(copied_sprite)
-
-	await RenderingServer.frame_post_draw
-	var image := halo_viewport.get_texture().get_image()
+func _create_snapshot_sprite(source_viewport: SubViewport) -> Sprite2D:
+	var image := source_viewport.get_texture().get_image()
 	var texture := ImageTexture.create_from_image(image)
-	halo_viewport.queue_free()
-
 	var snapshot := Sprite2D.new()
 	snapshot.texture = texture
 	snapshot.centered = false

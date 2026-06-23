@@ -55,12 +55,11 @@ layout_mode = 0
 offset_top = 34.0
 offset_right = 270.0
 offset_bottom = 66.0
-text = "어떻게 해요?"
+text = "How to Play"
 label_settings = ExtResource("10_ymiki")
 horizontal_alignment = 1
 
 [node name="howto" type="Control" parent="." unique_id=18932690]
-visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -85,7 +84,7 @@ layout_mode = 0
 offset_left = 22.0
 offset_right = 110.0
 offset_bottom = 16.0
-text = "커서 이동"
+text = "Move Cursor"
 label_settings = ExtResource("7_4axgt")
 
 [node name="Move" type="TextureRect" parent="howto/Group_move" unique_id=574715823]
@@ -128,7 +127,7 @@ layout_mode = 0
 offset_left = 22.0
 offset_right = 110.0
 offset_bottom = 16.0
-text = "선택"
+text = "Select"
 label_settings = ExtResource("7_4axgt")
 
 [node name="Select" type="TextureRect" parent="howto/Group_select" unique_id=1377387429]
@@ -171,7 +170,7 @@ layout_mode = 0
 offset_left = 22.0
 offset_right = 110.0
 offset_bottom = 23.0
-text = "필살기"
+text = "Special Move"
 label_settings = ExtResource("7_4axgt")
 
 [node name="ult" type="TextureRect" parent="howto/Group_ult" unique_id=748713868]
@@ -214,7 +213,7 @@ layout_mode = 0
 offset_left = 22.0
 offset_right = 110.0
 offset_bottom = 23.0
-text = "게임정지"
+text = "Pause"
 label_settings = ExtResource("7_4axgt")
 
 [node name="esc" type="TextureRect" parent="howto/Group_pause" unique_id=274182866]
@@ -244,6 +243,7 @@ label_settings = ExtResource("3_j08lj")
 horizontal_alignment = 1
 
 [node name="gui" type="Control" parent="." unique_id=817460669]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -326,17 +326,17 @@ offset_left = 89.0
 offset_top = 1.0
 offset_right = 305.0
 offset_bottom = 55.0
-text = "화면 우측의
-레시피를 확인하세요.
+text = "Check the recipe 
+on the right.
 "
 label_settings = SubResource("LabelSettings_wfrg8")
 
 [node name="slots" type="Control" parent="gui" unique_id=1423873457]
 anchors_preset = 0
 offset_left = -7.0
-offset_top = 52.0
+offset_top = 49.0
 offset_right = 33.0
-offset_bottom = 92.0
+offset_bottom = 89.0
 
 [node name="slot" type="TextureRect" parent="gui/slots" unique_id=1184258413]
 layout_mode = 0
@@ -381,17 +381,18 @@ offset_left = 96.0
 offset_top = 10.0
 offset_right = 288.0
 offset_bottom = 52.0
-text = "키보드로 커서를 움직여
-올바른 순서로 재료를 
-선택하세요."
+text = "Move the cursor with 
+the keyboard and
+choose the ingredients 
+in order."
 label_settings = SubResource("LabelSettings_wfrg8")
 
 [node name="ult" type="Control" parent="gui" unique_id=1117317828]
 anchors_preset = 0
 offset_left = -39.0
-offset_top = 136.0
+offset_top = 140.0
 offset_right = 1.0
-offset_bottom = 176.0
+offset_bottom = 180.0
 
 [node name="Label2" type="Label" parent="gui/ult" unique_id=676367141]
 layout_mode = 0
@@ -399,8 +400,9 @@ offset_left = 128.0
 offset_top = 3.0
 offset_right = 256.0
 offset_bottom = 33.0
-text = "필살기 게이지를 채워
-필살기를 사용하세요."
+text = "Fill the Special Gauge 
+and unleash your 
+special move."
 label_settings = SubResource("LabelSettings_wfrg8")
 
 [node name="ult-sample" type="Control" parent="gui/ult" unique_id=1500423663]
@@ -457,9 +459,9 @@ stretch_mode = 2
 [node name="game" type="Control" parent="gui" unique_id=1598368009]
 anchors_preset = 0
 offset_left = -39.0
-offset_top = 203.0
+offset_top = 221.0
 offset_right = 1.0
-offset_bottom = 243.0
+offset_bottom = 261.0
 
 [node name="sample" type="Control" parent="gui/game" unique_id=435512040]
 anchors_preset = 0
@@ -493,8 +495,8 @@ offset_left = 128.0
 offset_top = -11.0
 offset_right = 290.0
 offset_bottom = 19.0
-text = "햄버거를 계속 
-먹이세요!"
+text = "Keep feeding it 
+burgers!"
 label_settings = SubResource("LabelSettings_wfrg8")
 
 [node name="Page" type="Label" parent="gui" unique_id=470340813]
@@ -523,4 +525,4 @@ focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath(".")
 focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath(".")
-text = "계속"
+text = "Continue"

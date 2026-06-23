@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cy2h7uomvjvrq" path="res://scenes/panels/StartPanel.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://d06ul8o8xh72f" path="res://scenes/components/AppButton.tscn" id="2_button"]
-[ext_resource type="LabelSettings" uid="uid://6wss840bitqx" path="res://resources/fonts/start_title.tres" id="2_n84dy"]
+[ext_resource type="Texture2D" uid="uid://bbwevso42jyb0" path="res://assets/sprites/ui/title.png" id="2_i64lr"]
 [ext_resource type="LabelSettings" uid="uid://jaix775cyv7l" path="res://resources/fonts/gameclear_title.tres" id="3_credits_title"]
 [ext_resource type="LabelSettings" uid="uid://dv3b3430c2ap1" path="res://resources/fonts/gameclear_desc.tres" id="4_credits_desc"]
 
@@ -16,12 +16,19 @@ grow_vertical = 2
 script = ExtResource("1")
 
 [node name="Background" type="ColorRect" parent="." unique_id=1112697827]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Back" type="TextureRect" parent="." unique_id=1264393155]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("2_i64lr")
 
 [node name="Center" type="VBoxContainer" parent="." unique_id=422920646]
 layout_mode = 1
@@ -31,22 +38,13 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -120.0
-offset_top = -165.0
+offset_top = 15.0
 offset_right = 120.0
-offset_bottom = 165.0
+offset_bottom = 235.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 18
+theme_override_constants/separation = 120
 alignment = 1
-
-[node name="TitleLabel" type="Label" parent="Center" unique_id=563294702]
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "Save Us,
-Burger Man"
-label_settings = ExtResource("2_n84dy")
-horizontal_alignment = 1
-autowrap_mode = 3
 
 [node name="Buttons" type="VBoxContainer" parent="Center" unique_id=1405900965]
 layout_mode = 2
@@ -59,7 +57,7 @@ focus_neighbor_top = NodePath("../QuitButton")
 focus_neighbor_bottom = NodePath("../TutorialButton")
 text = "Game Start"
 
-[node name="TutorialButton" parent="Center/Buttons" instance=ExtResource("2_button")]
+[node name="TutorialButton" parent="Center/Buttons" unique_id=810566850 instance=ExtResource("2_button")]
 layout_mode = 2
 focus_neighbor_top = NodePath("../StartButton")
 focus_neighbor_bottom = NodePath("../SettingsButton")
@@ -83,7 +81,7 @@ focus_neighbor_top = NodePath("../CreditsButton")
 focus_neighbor_bottom = NodePath("../StartButton")
 text = "Quit Game"
 
-[node name="CreditsOverlay" type="Control" parent="."]
+[node name="CreditsOverlay" type="Control" parent="." unique_id=206394161]
 visible = false
 z_index = 201
 layout_mode = 1
@@ -92,9 +90,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
 
-[node name="Dim" type="ColorRect" parent="CreditsOverlay"]
+[node name="Dim" type="ColorRect" parent="CreditsOverlay" unique_id=758428242]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -103,7 +100,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.3137255)
 
-[node name="Panel" type="PanelContainer" parent="CreditsOverlay/Dim"]
+[node name="Panel" type="PanelContainer" parent="CreditsOverlay/Dim" unique_id=1765130692]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 1
 anchors_preset = 8
@@ -118,32 +115,34 @@ offset_bottom = 130.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Margin" type="MarginContainer" parent="CreditsOverlay/Dim/Panel"]
+[node name="Margin" type="MarginContainer" parent="CreditsOverlay/Dim/Panel" unique_id=331897400]
 layout_mode = 2
 theme_override_constants/margin_left = 18
 theme_override_constants/margin_top = 18
 theme_override_constants/margin_right = 18
 theme_override_constants/margin_bottom = 18
 
-[node name="Rows" type="VBoxContainer" parent="CreditsOverlay/Dim/Panel/Margin"]
+[node name="Rows" type="VBoxContainer" parent="CreditsOverlay/Dim/Panel/Margin" unique_id=1488158845]
 layout_mode = 2
 theme_override_constants/separation = 12
 alignment = 1
 
-[node name="TitleLabel" type="Label" parent="CreditsOverlay/Dim/Panel/Margin/Rows"]
+[node name="TitleLabel" type="Label" parent="CreditsOverlay/Dim/Panel/Margin/Rows" unique_id=1206843129]
 layout_mode = 2
 text = "Credits"
 label_settings = ExtResource("3_credits_title")
 horizontal_alignment = 1
 
-[node name="CreditsLabel" type="Label" parent="CreditsOverlay/Dim/Panel/Margin/Rows"]
+[node name="CreditsLabel" type="Label" parent="CreditsOverlay/Dim/Panel/Margin/Rows" unique_id=1660270947]
 layout_mode = 2
-text = "Save Us, Burger Man\n\nCreated by the Burger What team."
+text = "Save Us, Burger Man
+
+Created by the Burger What team."
 label_settings = ExtResource("4_credits_desc")
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="CloseButton" parent="CreditsOverlay/Dim/Panel/Margin/Rows" instance=ExtResource("2_button")]
+[node name="CloseButton" parent="CreditsOverlay/Dim/Panel/Margin/Rows" unique_id=182655184 instance=ExtResource("2_button")]
 layout_mode = 2
 focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath(".")

@@ -12,14 +12,23 @@
 [ext_resource type="Script" uid="uid://b20bp6pi5tbgd" path="res://scenes/components/IngredientSlotGrid.gd" id="8_grid"]
 [ext_resource type="PackedScene" uid="uid://cx4wtpu6m3qdr" path="res://scenes/components/MultiOrder.tscn" id="9_multi"]
 [ext_resource type="PackedScene" uid="uid://ch1nxmlssyr2g" path="res://scenes/components/UltimateOverlay.tscn" id="10_ult_overlay"]
-[ext_resource type="LabelSettings" uid="uid://de5mn4trntmbj" path="res://resources/fonts/Result_time_shadow.tres" id="12_ds823"]
+[ext_resource type="FontFile" uid="uid://dial72f450tkp" path="res://fonts/neodgm.ttf" id="12_78q0n"]
 [ext_resource type="LabelSettings" uid="uid://cy0ggqjcgv7nf" path="res://resources/fonts/OrderResultLabel.tres" id="12_k1074"]
-[ext_resource type="LabelSettings" uid="uid://c4say4by786ck" path="res://resources/fonts/Result_time.tres" id="13_78wiy"]
 [ext_resource type="LabelSettings" uid="uid://bnkbmixeetrqv" path="res://resources/fonts/OrderResultLabel_shadow.tres" id="13_ds823"]
 [ext_resource type="Texture2D" uid="uid://dbsxpj7ft5qqc" path="res://assets/sprites/store/light_on.png" id="15_l4fm3"]
 [ext_resource type="PackedScene" uid="uid://c37hgp1q5ourt" path="res://scenes/components/PlateStackScene.tscn" id="16_plate_stack"]
 [ext_resource type="PackedScene" uid="uid://cacit4jsxeo4r" path="res://scenes/components/MonsterUltimateOverlay.tscn" id="17_monster_ult_overlay"]
 [ext_resource type="Texture2D" uid="uid://dc2jy6gw3vvpp" path="res://assets/sprites/cook/roof.png" id="18_ayopg"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_ready_go_shadow"]
+font = ExtResource("12_78q0n")
+font_size = 48
+font_color = Color(0.84705883, 0.4745098, 0.007843138, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_k1074"]
+font = ExtResource("12_78q0n")
+font_size = 48
+font_color = Color(1, 0.74509805, 0.19215687, 1)
 
 [node name="OrderPanel" type="Control" unique_id=890599604]
 layout_mode = 3
@@ -209,7 +218,7 @@ anchor_bottom = 0.5
 offset_left = -130.0
 offset_top = -10.0
 offset_right = 130.0
-offset_bottom = 60.0
+offset_bottom = 40.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.39215687)
@@ -265,57 +274,6 @@ label_settings = ExtResource("12_k1074")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Result_time_Label" type="Control" parent="ResultRank" unique_id=975941777]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -135.0
-offset_top = 34.0
-offset_right = 135.0
-offset_bottom = 58.0
-grow_horizontal = 2
-grow_vertical = 2
-pivot_offset = Vector2(135, 0)
-
-[node name="shadow" type="Label" parent="ResultRank/Result_time_Label" unique_id=81534736]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -83.0
-offset_top = -12.0
-offset_right = 85.0
-offset_bottom = 12.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "9.99s"
-label_settings = ExtResource("12_ds823")
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="text" type="Label" parent="ResultRank/Result_time_Label" unique_id=1482512099]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -84.0
-offset_top = -12.0
-offset_right = 84.0
-offset_bottom = 12.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "9.99s"
-label_settings = ExtResource("13_78wiy")
-horizontal_alignment = 1
-vertical_alignment = 1
-
 [node name="BlackoutOverlay" type="ColorRect" parent="." unique_id=1651185138]
 visible = false
 z_index = 20
@@ -329,7 +287,6 @@ mouse_filter = 2
 color = Color(0, 0, 0, 0.87058824)
 
 [node name="ReadyGoOverlay" type="ColorRect" parent="." unique_id=100287123]
-visible = false
 z_index = 30
 layout_mode = 1
 anchors_preset = 15
@@ -340,22 +297,54 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 0.4)
 
-[node name="Label" type="Label" parent="ReadyGoOverlay" unique_id=836220494]
+[node name="Label" type="Control" parent="ReadyGoOverlay" unique_id=836220494]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -160.0
-offset_top = -48.0
-offset_right = 160.0
-offset_bottom = 48.0
+offset_left = -135.0
+offset_top = -25.0
+offset_right = 135.0
+offset_bottom = 25.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 42
-text = "Ready..."
+pivot_offset = Vector2(135, 25)
+
+[node name="shadow" type="Label" parent="ReadyGoOverlay/Label" unique_id=1879030185]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -133.0
+offset_top = -22.0
+offset_right = 137.0
+offset_bottom = 28.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "3"
+label_settings = SubResource("LabelSettings_ready_go_shadow")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="text" type="Label" parent="ReadyGoOverlay/Label" unique_id=599155678]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -135.0
+offset_top = -25.0
+offset_right = 135.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "3"
+label_settings = SubResource("LabelSettings_k1074")
 horizontal_alignment = 1
 vertical_alignment = 1
 

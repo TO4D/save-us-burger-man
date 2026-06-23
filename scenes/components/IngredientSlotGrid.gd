@@ -5,10 +5,16 @@ signal ingredient_picked(ingredient: Ingredient)
 
 const MAX_INGREDIENT_SLOTS := 8
 const SLOT_COLUMNS := 4
+const SLOT_ENTER_OFFSET_Y := 56.0
+const SLOT_ENTER_DURATION := 0.28
+const SLOT_ENTER_STAGGER := 0.06
 
 var ingredient_slot_nodes: Array[IngredientSlot] = []
 var focused_slot_index: int = 0
 var is_mobile_input: bool = false
+var configured_slot_count: int = 0
+var slot_enter_tweens: Array[Tween] = []
+var slot_enter_animation_token: int = 0
 
 
 func _ready() -> void:
@@ -38,6 +44,13 @@ func _input(event: InputEvent) -> void:
 
 func configure(ingredients: Array[Ingredient], mobile_input: bool, enabled: bool) -> void:
 	is_mobile_input = mobile_input
+	_cancel_slot_enter_animations()
+	var next_slot_count := mini(ingredients.size(), ingredient_slot_nodes.size())
+	var new_slot_indices: Array[int] = []
+	if configured_slot_count > 0 and next_slot_count > configured_slot_count:
+		for index in range(configured_slot_count, next_slot_count):
+			new_slot_indices.append(index)
+
 	for index in range(ingredient_slot_nodes.size()):
 		var slot := ingredient_slot_nodes[index]
 		if index < ingredients.size():
@@ -46,8 +59,14 @@ func configure(ingredients: Array[Ingredient], mobile_input: bool, enabled: bool
 		else:
 			slot.clear_slot()
 
+	configured_slot_count = next_slot_count
 	set_interaction_enabled(enabled)
 	focus_current_slot()
+	if not new_slot_indices.is_empty():
+		for index in new_slot_indices:
+			ingredient_slot_nodes[index].modulate.a = 0.0
+		slot_enter_animation_token += 1
+		_animate_new_slots.call_deferred(new_slot_indices, slot_enter_animation_token)
 
 
 func clear_slots() -> void:
@@ -125,6 +144,35 @@ func _initialize_slots() -> void:
 
 	if ingredient_slot_nodes.size() != MAX_INGREDIENT_SLOTS:
 		push_warning("[IngredientSlotGrid] Expected %d ingredient slots, found %d." % [MAX_INGREDIENT_SLOTS, ingredient_slot_nodes.size()])
+
+
+func _animate_new_slots(slot_indices: Array[int], token: int) -> void:
+	if token != slot_enter_animation_token:
+		return
+
+	for order in range(slot_indices.size()):
+		var index := slot_indices[order]
+		if not _is_slot_index_visible(index):
+			continue
+		var slot := ingredient_slot_nodes[index]
+		var target_position := slot.position
+		slot.position = target_position + Vector2(0.0, SLOT_ENTER_OFFSET_Y)
+		var tween := create_tween()
+		slot_enter_tweens.append(tween)
+		var delay := SLOT_ENTER_STAGGER * order
+		tween.set_parallel(true)
+		tween.tween_property(slot, "position", target_position, SLOT_ENTER_DURATION).set_delay(delay).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		tween.tween_property(slot, "modulate:a", 1.0, SLOT_ENTER_DURATION * 0.65).set_delay(delay).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+
+func _cancel_slot_enter_animations() -> void:
+	slot_enter_animation_token += 1
+	for tween in slot_enter_tweens:
+		if tween != null and tween.is_valid():
+			tween.kill()
+	slot_enter_tweens.clear()
+	for slot in ingredient_slot_nodes:
+		slot.modulate.a = 1.0
 
 
 func _sync_focused_slot_index_from_owner() -> void:

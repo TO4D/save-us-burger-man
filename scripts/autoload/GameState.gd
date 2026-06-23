@@ -13,10 +13,10 @@ const INGREDIENT_RESOURCE_PATHS: Array[String] = [
 
 const STAGE_INGREDIENT_COUNTS := {
 	1: 4,
-	2: 8,
-	3: 8,
-	4: 8,
-	5: 8,
+	2: 4,
+	3: 6,
+	4: 6,
+	5: 6,
 	6: 8,
 	7: 8,
 	8: 8,
@@ -35,7 +35,7 @@ var _ingredient_cache: Array[Ingredient] = []
 
 func get_stage_ingredients(stage: int) -> Array[Ingredient]:
 	_ensure_ingredient_cache()
-	var stage_key: int = clampi(stage, 1, 5)
+	var stage_key: int = clampi(stage, 1, 10)
 	var count: int = STAGE_INGREDIENT_COUNTS.get(stage_key, 4) as int
 	var result: Array[Ingredient] = []
 	var visible_count: int = mini(count, _ingredient_cache.size())
