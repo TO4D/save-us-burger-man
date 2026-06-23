@@ -173,6 +173,7 @@ func _play_screen_shake(token: int) -> void:
 	if _screen_root == null:
 		return
 
+	AudioManager.play_sfx_while_paused(AudioManager.Sfx.MONSTER_FOOTSTEP)
 	var elapsed := 0.0
 	var interval := maxf(screen_shake_interval, 0.01)
 	while _is_playing and token == _shake_token and elapsed < screen_shake_seconds:

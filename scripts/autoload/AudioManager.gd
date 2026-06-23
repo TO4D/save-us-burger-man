@@ -16,7 +16,12 @@ enum Sfx {
 	FIRE_BURGER,
 	ULTIMATE_CHARGED,
 	ULTIMATE,
+	MONSTER_FOOTSTEP,
+	SLOT_OFF,
+	GAME_OVER,
 	GAME_CLEAR_DRUM,
+	COUNTDOWN,
+	START,
 }
 
 enum Bgm {
@@ -41,13 +46,24 @@ const SFX_PATHS := {
 	Sfx.FIRE_BURGER: "res://assets/audio/sfx/fire_burger.ogg",
 	Sfx.ULTIMATE_CHARGED: "res://assets/audio/sfx/ultimate_charge2.ogg",
 	Sfx.ULTIMATE: "res://assets/audio/sfx/ultimate.ogg",
+	Sfx.MONSTER_FOOTSTEP: "res://assets/audio/sfx/monster_footstep.ogg",
+	Sfx.SLOT_OFF: "res://assets/audio/sfx/slot_off.ogg",
+	Sfx.GAME_OVER: "res://assets/audio/sfx/gameover.ogg",
 	Sfx.GAME_CLEAR_DRUM: "res://assets/audio/sfx/game_clear_drum.ogg",
+	Sfx.COUNTDOWN: "res://assets/audio/sfx/count.ogg",
+	Sfx.START: "res://assets/audio/sfx/start.ogg",
 }
 
 const BGM_PATHS := {
-	Bgm.MAIN_MENU: "res://assets/audio/bgm/main_menu.ogg",
-	Bgm.CUTSCENE: "res://assets/audio/bgm/cutscene.ogg",
-	Bgm.INGAME: "res://assets/audio/bgm/ingame.ogg",
+	Bgm.MAIN_MENU: "res://assets/audio/bgm/The_Mountains_Loop.ogg",
+	Bgm.CUTSCENE: "res://assets/audio/bgm/none.ogg",
+	Bgm.INGAME: "res://assets/audio/bgm/8Bit_DNA_Loop.ogg",
+}
+
+const BGM_VOLUME_OFFSETS_DB := {
+	Bgm.MAIN_MENU: -8.0,
+	Bgm.CUTSCENE: -10.0,
+	Bgm.INGAME: -15.0,
 }
 
 var sfx_bus: StringName = &"SFX"
@@ -58,9 +74,12 @@ var _missing_audio_paths: Dictionary = {}
 
 
 func _ready() -> void:
+	_ensure_audio_bus(bgm_bus)
+	_ensure_audio_bus(sfx_bus)
 	_bgm_player = AudioStreamPlayer.new()
 	_bgm_player.name = "BgmPlayer"
 	_bgm_player.bus = bgm_bus
+	_bgm_player.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(_bgm_player)
 
 
@@ -84,14 +103,17 @@ func play_bgm(bgm: Bgm, volume_db: float = 0.0) -> void:
 	if _current_bgm == bgm and _bgm_player.playing:
 		return
 
-	var stream := _load_stream(BGM_PATHS.get(bgm, ""))
+	var path: String = BGM_PATHS.get(bgm, "")
+	var stream := _load_stream(path)
 	if stream == null:
+		stop_bgm()
 		return
 
+	_enable_loop(stream)
 	_current_bgm = bgm
 	_bgm_player.stop()
 	_bgm_player.stream = stream
-	_bgm_player.volume_db = volume_db
+	_bgm_player.volume_db = volume_db + BGM_VOLUME_OFFSETS_DB.get(bgm, 0.0)
 	_bgm_player.play()
 
 
@@ -111,6 +133,13 @@ func _load_stream(path: String) -> AudioStream:
 	return stream
 
 
+func _enable_loop(stream: AudioStream) -> void:
+	if stream is AudioStreamWAV:
+		(stream as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
+	elif stream is AudioStreamOggVorbis:
+		(stream as AudioStreamOggVorbis).loop = true
+
+
 func _play_stream(stream: AudioStream, volume_db: float, pitch_scale: float, process_mode_value: ProcessMode) -> void:
 	var player := AudioStreamPlayer.new()
 	player.name = "SfxPlayer"
@@ -122,3 +151,13 @@ func _play_stream(stream: AudioStream, volume_db: float, pitch_scale: float, pro
 	add_child(player)
 	player.finished.connect(player.queue_free)
 	player.play()
+
+
+func _ensure_audio_bus(bus_name: StringName) -> void:
+	if AudioServer.get_bus_index(bus_name) >= 0:
+		return
+
+	AudioServer.add_bus()
+	var bus_index := AudioServer.get_bus_count() - 1
+	AudioServer.set_bus_name(bus_index, bus_name)
+	AudioServer.set_bus_send(bus_index, &"Master")

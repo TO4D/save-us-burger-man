@@ -1,6 +1,7 @@
-[gd_scene format=3 uid="uid://d06ul8o8xh72f"]
+[gd_scene load_steps=6 format=3 uid="uid://d06ul8o8xh72f"]
 
 [ext_resource type="FontFile" uid="uid://dial72f450tkp" path="res://fonts/neodgm.ttf" id="1_font"]
+[ext_resource type="Script" path="res://scenes/components/AppButton.gd" id="2_script"]
 
 [sub_resource type="StyleBoxFlat" id="StyleNormal"]
 bg_color = Color(0.882353, 0.780392, 0.615686, 1)
@@ -54,3 +55,4 @@ theme_override_styles/pressed = SubResource("StylePressed")
 theme_override_styles/hover = SubResource("StyleHover")
 theme_override_styles/focus = SubResource("StyleFocus")
 text = "Button"
+script = ExtResource("2_script")

@@ -45,6 +45,7 @@ func _ready() -> void:
 	game_over_cutscene.finished.connect(_on_game_over_cutscene_finished)
 	game_clear_cutscene.finished.connect(_on_game_clear_cutscene_finished)
 	order_panel.order_completed.connect(_on_order_completed)
+	order_panel.countdown_finished.connect(_on_order_countdown_finished)
 	$PanelLayer/GameOverPanel.restart_pressed.connect(start_run)
 	$PanelLayer/GameOverPanel.main_menu_pressed.connect(_return_to_main_menu)
 	$PanelLayer/VictoryPanel.restart_pressed.connect(start_run)
@@ -56,6 +57,7 @@ func _ready() -> void:
 	pause_menu.visible = false
 	tutorial_panel.visible = false
 	get_tree().paused = false
+	AudioManager.play_bgm(AudioManager.Bgm.MAIN_MENU)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -99,9 +101,11 @@ func start_run() -> void:
 
 
 func _on_start_pressed() -> void:
+	AudioManager.stop_bgm()
 	if skip_intro_cutscene:
 		_begin_run_after_intro()
 		return
+	AudioManager.play_bgm(AudioManager.Bgm.CUTSCENE)
 	PanelManager.show_panel(PanelManager.PanelType.CUTSCENE)
 
 
@@ -122,9 +126,14 @@ func _on_order_completed(success: bool) -> void:
 	GameRun.on_order_completed(success)
 
 
+func _on_order_countdown_finished() -> void:
+	AudioManager.play_bgm(AudioManager.Bgm.INGAME)
+
+
 func _on_run_failed(stats: Dictionary) -> void:
 	pending_game_over_stats = stats
 	order_panel.set_gameplay_locked(true)
+	AudioManager.stop_bgm()
 	game_over_cutscene.play_cutscene()
 
 
@@ -227,6 +236,7 @@ func _return_to_main_menu() -> void:
 	order_panel.set_gameplay_locked(false)
 	get_tree().paused = false
 	GameRun.abort()
+	AudioManager.play_bgm(AudioManager.Bgm.MAIN_MENU)
 	PanelManager.show_panel(PanelManager.PanelType.START)
 
 

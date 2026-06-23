@@ -21,6 +21,7 @@ func play_cutscene() -> void:
 	animated_sprite.stop()
 	animated_sprite.animation = ANIMATION_NAME
 	animated_sprite.frame = 0
+	AudioManager.play_sfx(AudioManager.Sfx.GAME_OVER)
 	animated_sprite.play()
 
 
