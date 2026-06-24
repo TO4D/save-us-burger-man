@@ -22,6 +22,7 @@ enum Sfx {
 	GAME_CLEAR_DRUM,
 	COUNTDOWN,
 	START,
+	WARNING_GROWL,
 }
 
 enum Bgm {
@@ -52,6 +53,7 @@ const SFX_PATHS := {
 	Sfx.GAME_CLEAR_DRUM: "res://assets/audio/sfx/game_clear_drum.ogg",
 	Sfx.COUNTDOWN: "res://assets/audio/sfx/count.ogg",
 	Sfx.START: "res://assets/audio/sfx/start.ogg",
+	Sfx.WARNING_GROWL: "res://assets/audio/sfx/warning_growl.ogg",
 }
 
 const BGM_PATHS := {

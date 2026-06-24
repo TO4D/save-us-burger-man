@@ -144,6 +144,7 @@ func _on_game_over_cutscene_finished() -> void:
 func _on_run_victory(stats: Dictionary) -> void:
 	pending_victory_stats = stats
 	order_panel.set_gameplay_locked(true)
+	AudioManager.stop_bgm()
 	game_clear_cutscene.play_cutscene()
 
 

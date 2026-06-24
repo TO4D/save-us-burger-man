@@ -80,6 +80,8 @@ var monster_slot_tween: Tween = null
 var monster_slot_child_home_positions: Dictionary = {}
 var persistent_slot_ingredients: Array[Ingredient] = []
 var gameplay_locked := false
+var completed_burger_slide_groups: Array[Node2D] = []
+var completed_burger_slide_tween: Tween = null
 
 @onready var battle_gauge: BattleGauge = $BattleGauge
 @onready var recipe_display_stack: RecipeDisplayStack = $PlayArea/RecipeDisplayStack
@@ -175,6 +177,7 @@ func on_show(data: Dictionary = {}) -> void:
 	blackout_overlay.visible = false
 	store_light.texture = STORE_LIGHT_ON_TEXTURE
 	_hide_result_rank()
+	_clear_completed_burger_slide_groups()
 	burger_stack.clear_stack()
 	_reset_stack_camera()
 	_setup_ingredient_slots(false)
@@ -219,6 +222,7 @@ func on_hide() -> void:
 	_clear_order_progress_dots()
 	ingredient_slots.set_interaction_enabled(false)
 	ingredient_slots.clear_slots()
+	_clear_completed_burger_slide_groups()
 	burger_stack.clear_stack()
 	_reset_stack_camera()
 	pending_stack_landing_tokens.clear()
@@ -412,22 +416,31 @@ func _on_stack_ingredient_landed(_stack_position: Vector2, token: int) -> void:
 	combo_counter.show_at_fixed_position()
 
 
-func _wait_for_pending_stack_landings() -> void:
-	while not pending_stack_landing_tokens.is_empty():
-		await burger_stack.ingredient_landed
+func _wait_for_pending_stack_landings(token: int) -> bool:
+	while token == round_token and not pending_stack_landing_tokens.is_empty():
 		await get_tree().process_frame
+	return token == round_token
 
 
 func _finish_current_burger() -> void:
+	var token := round_token
 	current_phase = Phase.SERVING
 	_sync_player_controls()
-	await _wait_for_pending_stack_landings()
+	var stack_landings_completed := await _wait_for_pending_stack_landings(token)
+	if not stack_landings_completed:
+		return
 	var completion_was_perfect := mistake_count == 0
 	_play_recipe_completion_feedback(round_token)
 
-	await _slide_completed_burger_left(completion_was_perfect)
+	var slide_completed := await _slide_completed_burger_left(completion_was_perfect, token)
+	if not slide_completed:
+		return
 	await _play_burger_throw_attack(_fullness_per_burger(), _knockback_per_burger(), completion_was_perfect)
+	if token != round_token:
+		return
 	await recipe_display_stack.complete_current_recipe()
+	if token != round_token:
+		return
 	current_recipe_index += 1
 	_update_order_progress_dots()
 
@@ -442,6 +455,8 @@ func _finish_current_burger() -> void:
 	recipe_display_stack.set_current_step(current_step)
 	burger_stack.clear_stack()
 	await _enter_doma_from_right()
+	if token != round_token:
+		return
 	current_phase = Phase.PLAYING
 	_setup_ingredient_slots(true)
 	_sync_player_controls()
@@ -911,12 +926,19 @@ func _return_stack_camera_to_default() -> void:
 	stack_camera_tween = null
 
 
-func _slide_completed_burger_left(completion_was_perfect: bool) -> void:
+func _slide_completed_burger_left(completion_was_perfect: bool, token: int) -> bool:
+	_clear_completed_burger_slide_groups()
 	var sliding_group := Node2D.new()
 	add_child(sliding_group)
+	completed_burger_slide_groups.append(sliding_group)
 	sliding_group.global_position = Vector2.ZERO
 
 	var snapshots := await _create_completed_burger_snapshots()
+	if token != round_token:
+		_queue_free_snapshot_sprites(snapshots)
+		_remove_completed_burger_slide_group(sliding_group)
+		return false
+
 	var stack_snapshot: Sprite2D = snapshots["stack"]
 	var halo_snapshot: Sprite2D = snapshots["halo"]
 	sliding_group.add_child(stack_snapshot)
@@ -929,17 +951,48 @@ func _slide_completed_burger_left(completion_was_perfect: bool) -> void:
 	burger_stack.clear_stack()
 
 	await get_tree().create_timer(COMPLETED_BURGER_DISPLAY_SECONDS).timeout
+	if token != round_token:
+		_remove_completed_burger_slide_group(sliding_group)
+		return false
 
 	if stack_camera_tween != null and stack_camera_tween.is_valid():
 		stack_camera_tween.kill()
 
 	var tween: Tween = create_tween().set_parallel(true)
+	completed_burger_slide_tween = tween
 	stack_camera_tween = tween
 	tween.tween_property(sliding_group, "position:x", sliding_group.position.x - DOMA_SLIDE_DISTANCE, DOMA_SLIDE_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tween.tween_property(stack_camera, "position", STACK_CAMERA_DEFAULT_POSITION, STACK_CAMERA_RETURN_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	await tween.finished
+	if completed_burger_slide_tween == tween:
+		completed_burger_slide_tween = null
 	stack_camera_tween = null
-	sliding_group.queue_free()
+	_remove_completed_burger_slide_group(sliding_group)
+	return token == round_token
+
+
+func _clear_completed_burger_slide_groups() -> void:
+	if completed_burger_slide_tween != null and completed_burger_slide_tween.is_valid():
+		completed_burger_slide_tween.kill()
+	completed_burger_slide_tween = null
+
+	for group in completed_burger_slide_groups:
+		if is_instance_valid(group):
+			group.queue_free()
+	completed_burger_slide_groups.clear()
+
+
+func _remove_completed_burger_slide_group(group: Node2D) -> void:
+	completed_burger_slide_groups.erase(group)
+	if is_instance_valid(group):
+		group.queue_free()
+
+
+func _queue_free_snapshot_sprites(snapshots: Dictionary) -> void:
+	for snapshot in snapshots.values():
+		var node := snapshot as Node
+		if is_instance_valid(node):
+			node.queue_free()
 
 
 func _apply_completed_burger_halo(snapshot: Sprite2D, completion_was_perfect: bool) -> void:
