@@ -10,6 +10,7 @@ enum TutorialReturnMode { MAIN_MENU, PAUSE_MENU, START_RUN }
 var show_ready_go_on_next_order := false
 var settings_return_mode := SettingsReturnMode.MAIN_MENU
 var tutorial_return_mode := TutorialReturnMode.MAIN_MENU
+var game_over_sequence_id := 0
 
 @onready var start_panel = $PanelLayer/StartPanel
 @onready var order_panel = $PanelLayer/OrderPanel
@@ -88,6 +89,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func start_run() -> void:
+	game_over_sequence_id += 1
 	settings_panel.visible = false
 	pause_menu.visible = false
 	tutorial_panel.visible = false
@@ -131,6 +133,7 @@ func _on_order_countdown_finished() -> void:
 
 
 func _on_run_failed(stats: Dictionary) -> void:
+	game_over_sequence_id += 1
 	pending_game_over_stats = stats
 	order_panel.set_gameplay_locked(true)
 	AudioManager.stop_bgm()
@@ -138,6 +141,10 @@ func _on_run_failed(stats: Dictionary) -> void:
 
 
 func _on_game_over_cutscene_finished() -> void:
+	var sequence_id := game_over_sequence_id
+	await get_tree().create_timer(0.4).timeout
+	if sequence_id != game_over_sequence_id:
+		return
 	PanelManager.show_panel(PanelManager.PanelType.GAME_OVER, pending_game_over_stats)
 
 
@@ -227,6 +234,7 @@ func _resume_game() -> void:
 
 
 func _return_to_main_menu() -> void:
+	game_over_sequence_id += 1
 	settings_panel.visible = false
 	pause_menu.visible = false
 	tutorial_panel.visible = false

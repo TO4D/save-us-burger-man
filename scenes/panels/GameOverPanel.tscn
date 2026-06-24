@@ -15,6 +15,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 title_text = "Game Over"
+button_enable_delay = 0.5
 
 [node name="Dim" type="ColorRect" parent="." unique_id=65234220]
 layout_mode = 1
