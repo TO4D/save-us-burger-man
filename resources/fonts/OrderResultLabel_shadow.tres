@@ -5,4 +5,4 @@
 [resource]
 font = ExtResource("1_peagl")
 font_size = 48
-font_color = Color(0.8480485, 0.47375882, 0.0071901567, 1)
+font_color = Color(0.6, 0.32941177, 0.003921569, 1)

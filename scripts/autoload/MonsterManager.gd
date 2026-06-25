@@ -4,8 +4,8 @@ signal satiety_changed(value: float, max_value: float)
 signal ultimate_threshold_reached
 signal satisfied
 
-const MAX_SATIETY := 650.0
-#const MAX_SATIETY := 10
+#const MAX_SATIETY := 650.0
+const MAX_SATIETY := 10
 const ULTIMATE_THRESHOLD_RATIOS: Array[float] = [0.6]
 
 var satiety := 0.0

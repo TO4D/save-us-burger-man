@@ -80,6 +80,7 @@ func start() -> void:
 	_reset_blackout_state()
 	ComboManager.reset()
 	UltimateManager.reset()
+	ScoreManager.reset_run()
 	DistanceManager.reset()
 	MonsterManager.reset()
 	DistanceManager.set_stage(current_stage)
@@ -243,7 +244,8 @@ func _on_distance_game_over() -> void:
 	if not running:
 		return
 
-	var stats := _build_stats()
+	var is_new_high_score := ScoreManager.finish_run()
+	var stats := _build_stats(is_new_high_score)
 	running = false
 	start_blocked = false
 	_reset_blackout_state()
@@ -257,7 +259,8 @@ func _on_monster_satisfied() -> void:
 	if not running:
 		return
 
-	var stats := _build_stats()
+	var is_new_high_score := ScoreManager.finish_run()
+	var stats := _build_stats(is_new_high_score)
 	running = false
 	start_blocked = false
 	_reset_blackout_state()
@@ -267,8 +270,11 @@ func _on_monster_satisfied() -> void:
 	run_victory.emit(stats)
 
 
-func _build_stats() -> Dictionary:
+func _build_stats(is_new_high_score: bool = false) -> Dictionary:
 	return {
+		"score": ScoreManager.score,
+		"high_score": GameSettings.high_score,
+		"is_new_high_score": is_new_high_score,
 		"served": served_customers,
 		"max_combo": ComboManager.max_combo,
 		"failed": failed_customers,

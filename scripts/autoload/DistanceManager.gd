@@ -8,17 +8,12 @@ const MAX_DISTANCE := 100.0
 const MAX_STAGE := 10
 const MIN_DECAY_PER_SECOND := 1.75
 const MAX_DECAY_PER_SECOND := 4.75
-const UNFED_WARNING_SECONDS := 15.0
-const UNFED_ACCEL_START_SECONDS := 20.0
-const UNFED_ACCEL_RAMP_SECONDS := 5.0
 
 var distance := MAX_DISTANCE
-var decay_per_second := 1.0
+var decay_per_second := 1
 var running := false
 var freeze_remaining := 0.0
 var freeze_hold_count := 0
-var unfed_elapsed := 0.0
-var unfed_warning_played := false
 
 
 func _process(delta: float) -> void:
@@ -33,13 +28,7 @@ func _process(delta: float) -> void:
 		freeze_changed.emit(freeze_remaining > 0.0, freeze_remaining)
 		return
 
-	unfed_elapsed += delta
-	if not unfed_warning_played and unfed_elapsed >= UNFED_WARNING_SECONDS:
-		unfed_warning_played = true
-		AudioManager.play_sfx(AudioManager.Sfx.WARNING_GROWL)
-
-	var effective_decay := _current_decay_per_second()
-	distance = max(distance - effective_decay * delta, 0.0)
+	distance = max(distance - decay_per_second * delta, 0.0)
 	distance_changed.emit(distance, MAX_DISTANCE)
 
 	if distance <= 0.0:
@@ -52,8 +41,6 @@ func reset() -> void:
 	running = true
 	freeze_remaining = 0.0
 	freeze_hold_count = 0
-	unfed_elapsed = 0.0
-	unfed_warning_played = false
 	distance_changed.emit(distance, MAX_DISTANCE)
 	freeze_changed.emit(false, freeze_remaining)
 
@@ -62,8 +49,6 @@ func stop() -> void:
 	running = false
 	freeze_remaining = 0.0
 	freeze_hold_count = 0
-	unfed_elapsed = 0.0
-	unfed_warning_played = false
 	freeze_changed.emit(false, freeze_remaining)
 
 
@@ -74,22 +59,8 @@ func set_stage(stage: int) -> void:
 
 
 func recover(amount: float) -> void:
-	unfed_elapsed = 0.0
-	unfed_warning_played = false
 	distance = min(distance + amount, MAX_DISTANCE)
 	distance_changed.emit(distance, MAX_DISTANCE)
-
-
-func _current_decay_per_second() -> float:
-	if unfed_elapsed < UNFED_ACCEL_START_SECONDS:
-		return decay_per_second
-
-	var accel_ratio := clampf(
-		(unfed_elapsed - UNFED_ACCEL_START_SECONDS) / UNFED_ACCEL_RAMP_SECONDS,
-		0.0,
-		1.0
-	)
-	return lerpf(decay_per_second, MAX_DECAY_PER_SECOND, accel_ratio)
 
 
 func freeze(duration: float) -> void:

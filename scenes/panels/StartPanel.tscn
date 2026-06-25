@@ -5,6 +5,16 @@
 [ext_resource type="Texture2D" uid="uid://bbwevso42jyb0" path="res://assets/sprites/ui/title.png" id="2_i64lr"]
 [ext_resource type="LabelSettings" uid="uid://jaix775cyv7l" path="res://resources/fonts/gameclear_title.tres" id="3_credits_title"]
 [ext_resource type="LabelSettings" uid="uid://dv3b3430c2ap1" path="res://resources/fonts/gameclear_desc.tres" id="4_credits_desc"]
+[ext_resource type="FontFile" uid="uid://dial72f450tkp" path="res://fonts/neodgm.ttf" id="5_high_score_font"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_high_score_shadow"]
+font = ExtResource("5_high_score_font")
+font_color = Color(0.60147643, 0.33014226, 0.0024351273, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_high_score"]
+font = ExtResource("5_high_score_font")
+font_color = Color(1, 0.74509805, 0.19215687, 1)
+outline_color = Color(0.24705882, 0.10980392, 0.015686275, 1)
 
 [node name="StartPanel" type="Control" unique_id=2127225055]
 layout_mode = 3
@@ -29,6 +39,39 @@ layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 texture = ExtResource("2_i64lr")
+
+[node name="HighScoreLabel" type="Control" parent="." unique_id=1977913925]
+z_index = 10
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -49.0
+offset_top = -70.0
+offset_right = 49.0
+offset_bottom = -50.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="shadow" type="Label" parent="HighScoreLabel" unique_id=1077048531]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 142.0
+offset_bottom = 21.0
+text = "Best 0000000"
+label_settings = SubResource("LabelSettings_high_score_shadow")
+vertical_alignment = 1
+
+[node name="text" type="Label" parent="HighScoreLabel" unique_id=1527127969]
+layout_mode = 0
+offset_right = 142.0
+offset_bottom = 20.0
+text = "Best 0000000"
+label_settings = SubResource("LabelSettings_high_score")
+vertical_alignment = 1
 
 [node name="Center" type="VBoxContainer" parent="." unique_id=422920646]
 layout_mode = 1

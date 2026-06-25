@@ -82,8 +82,12 @@ var persistent_slot_ingredients: Array[Ingredient] = []
 var gameplay_locked := false
 var completed_burger_slide_groups: Array[Node2D] = []
 var completed_burger_slide_tween: Tween = null
+var displayed_score := 0
+var score_tween: Tween = null
 
 @onready var battle_gauge: BattleGauge = $BattleGauge
+@onready var score_label_shadow: Label = $ScoreLabel/shadow
+@onready var score_label_text: Label = $ScoreLabel/text
 @onready var recipe_display_stack: RecipeDisplayStack = $PlayArea/RecipeDisplayStack
 @onready var stack_viewport_container: SubViewportContainer = $PlayArea/PlateArea/StackViewportContainer
 @onready var stack_viewport: SubViewport = $PlayArea/PlateArea/StackViewportContainer/StackViewport
@@ -127,6 +131,7 @@ func _ready() -> void:
 	MonsterManager.ultimate_threshold_reached.connect(_on_monster_ultimate_threshold_reached)
 	GameRun.blackout_requested.connect(_on_blackout_requested)
 	GameRun.run_started.connect(_on_run_started)
+	ScoreManager.score_changed.connect(_on_score_changed)
 	burger_stack.ingredient_landed.connect(_on_stack_ingredient_landed)
 	ingredient_slots.ingredient_picked.connect(_on_ingredient_picked)
 	_reset_stack_camera()
@@ -186,6 +191,7 @@ func on_show(data: Dictionary = {}) -> void:
 	sprite_doma.visible = false
 	_setup_order_progress_dots()
 	_sync_player_controls()
+	_update_score_label(ScoreManager.score)
 	var token := round_token
 	if data.get("show_ready_go", false):
 		await _run_ready_go_overlay(token)
@@ -375,6 +381,33 @@ func _set_ready_go_label_text(value: String) -> void:
 	ready_go_label_text.text = value
 
 
+func _on_score_changed(value: int) -> void:
+	_animate_score_to(value)
+
+
+func _update_score_label(value: Variant) -> void:
+	displayed_score = roundi(float(value))
+	var text := "%07d" % displayed_score
+	if score_label_shadow != null:
+		score_label_shadow.text = text
+	if score_label_text != null:
+		score_label_text.text = text
+
+
+func _animate_score_to(value: int) -> void:
+	if score_tween != null and score_tween.is_valid():
+		score_tween.kill()
+	score_tween = null
+
+	if value <= displayed_score:
+		_update_score_label(value)
+		return
+
+	score_tween = create_tween()
+	score_tween.tween_method(_update_score_label, displayed_score, value, 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	score_tween.tween_callback(func(): score_tween = null)
+
+
 func _setup_ingredient_slots(enabled: bool) -> void:
 	var stage: int = customer.get("stage", 1) as int
 	var ingredients: Array[Ingredient] = GameState.get_slot_ingredients(stage)
@@ -430,6 +463,7 @@ func _finish_current_burger() -> void:
 	if not stack_landings_completed:
 		return
 	var completion_was_perfect := mistake_count == 0
+	ScoreManager.add_completed_burger(current_recipe.ingredients.size(), completion_was_perfect, ComboManager.combo)
 	_play_recipe_completion_feedback(round_token)
 
 	var slide_completed := await _slide_completed_burger_left(completion_was_perfect, token)

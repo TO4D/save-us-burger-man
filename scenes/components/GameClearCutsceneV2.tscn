@@ -63,16 +63,18 @@ mouse_filter = 2
 color = Color(0, 0, 0, 0.65)
 
 [node name="Stomach" type="TextureRect" parent="." unique_id=735292708]
+visible = false
 layout_mode = 0
 mouse_filter = 2
 texture = ExtResource("2_stomach1")
-expand_mode = 1
+stretch_mode = 2
 
 [node name="Mouth" type="TextureRect" parent="." unique_id=1662679368]
+visible = false
 layout_mode = 0
 mouse_filter = 2
 texture = ExtResource("4_mouth1")
-expand_mode = 1
+stretch_mode = 2
 
 [node name="VomitAnimation" type="AnimatedSprite2D" parent="." unique_id=1325440303]
 z_index = 2

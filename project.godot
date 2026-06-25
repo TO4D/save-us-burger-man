@@ -27,6 +27,7 @@ UltimateManager="*res://scripts/autoload/UltimateManager.gd"
 AudioManager="*res://scripts/autoload/AudioManager.gd"
 MonsterManager="*res://scripts/autoload/MonsterManager.gd"
 GameSettings="*res://scripts/autoload/GameSettings.gd"
+ScoreManager="*res://scripts/autoload/ScoreManager.gd"
 
 [display]
 

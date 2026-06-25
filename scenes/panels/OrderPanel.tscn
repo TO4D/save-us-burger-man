@@ -21,10 +21,19 @@
 [ext_resource type="Texture2D" uid="uid://dc2jy6gw3vvpp" path="res://assets/sprites/cook/roof.png" id="18_ayopg"]
 [ext_resource type="PackedScene" uid="uid://cy10uew7rhedf" path="res://scenes/components/SatietyGauge.tscn" id="19_satiety"]
 
+[sub_resource type="LabelSettings" id="LabelSettings_score_shadow"]
+font = ExtResource("12_78q0n")
+font_color = Color(0.60147643, 0.33014226, 0.0024351273, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_score"]
+font = ExtResource("12_78q0n")
+font_color = Color(1, 0.74509805, 0.19215687, 1)
+outline_color = Color(0.24705882, 0.10980392, 0.015686275, 1)
+
 [sub_resource type="LabelSettings" id="LabelSettings_ready_go_shadow"]
 font = ExtResource("12_78q0n")
 font_size = 48
-font_color = Color(0.84705883, 0.4745098, 0.007843138, 1)
+font_color = Color(0.6, 0.32941177, 0.003921569, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_k1074"]
 font = ExtResource("12_78q0n")
@@ -47,10 +56,37 @@ layout_mode = 1
 [node name="SatietyGauge" parent="." unique_id=1685649722 instance=ExtResource("19_satiety")]
 z_index = 51
 layout_mode = 0
-offset_left = 206.0
-offset_top = 3.0
-offset_right = 262.0
-offset_bottom = 23.0
+offset_left = 205.0
+offset_top = 7.0
+offset_right = 261.0
+offset_bottom = 27.0
+
+[node name="ScoreLabel" type="Control" parent="." unique_id=1856309124]
+z_index = 52
+layout_mode = 1
+anchors_preset = 0
+offset_left = 5.0
+offset_top = 1.0
+offset_right = 65.0
+offset_bottom = 21.0
+
+[node name="shadow" type="Label" parent="ScoreLabel" unique_id=1503703067]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 142.0
+offset_bottom = 21.0
+text = "0000000"
+label_settings = SubResource("LabelSettings_score_shadow")
+vertical_alignment = 1
+
+[node name="text" type="Label" parent="ScoreLabel" unique_id=1176817057]
+layout_mode = 0
+offset_right = 142.0
+offset_bottom = 20.0
+text = "0000000"
+label_settings = SubResource("LabelSettings_score")
+vertical_alignment = 1
 
 [node name="PlayArea" type="Control" parent="." unique_id=1325333956]
 layout_mode = 1

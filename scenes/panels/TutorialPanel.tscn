@@ -27,6 +27,7 @@
 [ext_resource type="Texture2D" uid="uid://kx528lpg0lkh" path="res://assets/sprites/cook/gauge-fill.png" id="23_m2eit"]
 [ext_resource type="Texture2D" uid="uid://0m1h3pw3oxiy" path="res://assets/sprites/store/shop_new_tone.png" id="24_j85ou"]
 [ext_resource type="Texture2D" uid="uid://8ascfekdsfoe" path="res://assets/sprites/monster/monster_new_new1.png" id="25_x43h7"]
+[ext_resource type="Texture2D" uid="uid://bxcrpde0qo3by" path="res://assets/sprites/ui/hungry_icon.png" id="27_0xiq8"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_wfrg8"]
 line_spacing = 2.0
@@ -60,6 +61,7 @@ label_settings = ExtResource("10_ymiki")
 horizontal_alignment = 1
 
 [node name="howto" type="Control" parent="." unique_id=18932690]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -243,7 +245,6 @@ label_settings = ExtResource("3_j08lj")
 horizontal_alignment = 1
 
 [node name="gui" type="Control" parent="." unique_id=817460669]
-visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -482,11 +483,38 @@ stretch_mode = 2
 [node name="monster" type="TextureRect" parent="gui/game/sample" unique_id=1918728505]
 layout_mode = 0
 offset_left = -6.0
-offset_top = -11.0
+offset_top = 4.0
 offset_right = 264.0
-offset_bottom = 219.0
+offset_bottom = 234.0
 scale = Vector2(0.25, 0.25)
 texture = ExtResource("25_x43h7")
+stretch_mode = 2
+
+[node name="hungry" type="TextureRect" parent="gui/game/sample" unique_id=1579920687]
+layout_mode = 0
+offset_left = -4.0
+offset_top = -10.0
+offset_right = 23.0
+offset_bottom = 18.0
+texture = ExtResource("27_0xiq8")
+stretch_mode = 2
+
+[node name="gauge2" type="TextureRect" parent="gui/game/sample" unique_id=1376669838]
+layout_mode = 0
+offset_left = 13.0
+offset_top = -9.0
+offset_right = 58.0
+offset_bottom = 1.0
+texture = ExtResource("22_24idb")
+stretch_mode = 2
+
+[node name="gaute-fill" type="TextureRect" parent="gui/game/sample" unique_id=411001274]
+layout_mode = 0
+offset_left = 13.0
+offset_top = -9.0
+offset_right = 58.0
+offset_bottom = 1.0
+texture = ExtResource("23_m2eit")
 stretch_mode = 2
 
 [node name="Label2" type="Label" parent="gui/game" unique_id=1991198001]
