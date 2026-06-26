@@ -4,4 +4,4 @@
 
 [resource]
 font = ExtResource("1_aj5cc")
-font_color = Color(0.86, 0, 0.40133336, 1)
+font_color = Color(0.76862746, 0.09411765, 0.40784314, 1)

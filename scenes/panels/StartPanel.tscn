@@ -125,7 +125,6 @@ focus_neighbor_bottom = NodePath("../StartButton")
 text = "Quit Game"
 
 [node name="CreditsOverlay" type="Control" parent="." unique_id=206394161]
-visible = false
 z_index = 201
 layout_mode = 1
 anchors_preset = 15
@@ -141,7 +140,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.3137255)
+color = Color(0, 0, 0, 0.8627451)
 
 [node name="Panel" type="PanelContainer" parent="CreditsOverlay/Dim" unique_id=1765130692]
 custom_minimum_size = Vector2(220, 0)
@@ -152,9 +151,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -110.0
-offset_top = -130.0
+offset_top = -170.0
 offset_right = 110.0
-offset_bottom = 130.0
+offset_bottom = 170.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -180,7 +179,9 @@ horizontal_alignment = 1
 layout_mode = 2
 text = "Save Us, Burger Man
 
-Created by the Burger What team."
+Created by Hoon
+
+Music by timbeek.com"
 label_settings = ExtResource("4_credits_desc")
 horizontal_alignment = 1
 autowrap_mode = 3

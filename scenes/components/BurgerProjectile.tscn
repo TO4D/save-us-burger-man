@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://qpi1qvj1iuqp"]
 
 [ext_resource type="Script" uid="uid://dw6r2futqyrx4" path="res://scenes/components/BurgerProjectile.gd" id="1_projectile"]
-[ext_resource type="Texture2D" uid="uid://76c4ewjj0sgk" path="res://assets/sprites/ui/order_icon.1.png" id="2_burger"]
+[ext_resource type="Texture2D" uid="uid://0u68lvfq1grc" path="res://assets/sprites/ui/burger_projectile.png" id="3_b8d5m"]
 [ext_resource type="Texture2D" uid="uid://clnsn3okvsbo6" path="res://assets/sprites/particle/burger_fire_effect.png" id="3_fire"]
 
 [sub_resource type="Curve" id="Curve_fire_trail_scale"]
@@ -19,7 +19,7 @@ angular_velocity_min = -120.0
 angular_velocity_max = 120.0
 gravity = Vector3(0, 0, 0)
 scale_min = 0.45
-scale_max = 1.25
+scale_max = 0.79999995
 scale_curve = SubResource("CurveTexture_fire_trail_scale")
 
 [node name="BurgerProjectile" type="Node2D" unique_id=1572533074]
@@ -28,17 +28,20 @@ script = ExtResource("1_projectile")
 
 [node name="CoreFire" type="Sprite2D" parent="." unique_id=24517638]
 visible = false
+modulate = Color(1, 1, 1, 0.8)
 z_index = -1
 texture_filter = 1
+position = Vector2(0, 1)
 scale = Vector2(2, 2)
 texture = ExtResource("3_fire")
 
 [node name="FireTrail" type="GPUParticles2D" parent="." unique_id=1953345231]
 visible = false
+modulate = Color(1, 1, 1, 0.8)
 z_index = -2
 texture_filter = 1
 emitting = false
-amount = 16
+amount = 24
 texture = ExtResource("3_fire")
 lifetime = 0.36
 preprocess = 0.04
@@ -47,5 +50,4 @@ process_material = SubResource("ParticleProcessMaterial_fire_trail")
 
 [node name="BurgerIcon" type="Sprite2D" parent="." unique_id=781033049]
 z_index = 1
-scale = Vector2(2, 2)
-texture = ExtResource("2_burger")
+texture = ExtResource("3_b8d5m")

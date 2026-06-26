@@ -6,7 +6,7 @@ class_name SatietyGauge
 
 @onready var gauge_progress: TextureProgressBar = $GaugeProgress
 @onready var gauge_frame: TextureRect = $GaugeFrame
-@onready var percent_label: Label = $PercentLabel
+@onready var percent_label: Label = $IconLabelWrapper/PercentLabel
 
 
 func _ready() -> void:

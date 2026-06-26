@@ -5,6 +5,18 @@
 [ext_resource type="LabelSettings" uid="uid://cfgrcy516kj8i" path="res://resources/fonts/gameover_desc.tres" id="3_pyhpj"]
 [ext_resource type="PackedScene" uid="uid://d06ul8o8xh72f" path="res://scenes/components/AppButton.tscn" id="4_button"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r4cqq"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.1, 0.1, 0.1, 0.78431374)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
 [node name="GameOverPanel" type="Control" unique_id=1136727094]
 z_index = 201
 layout_mode = 3
@@ -40,6 +52,7 @@ offset_right = 110.0
 offset_bottom = 130.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_r4cqq")
 
 [node name="Margin" type="MarginContainer" parent="Dim/Panel" unique_id=2051382161]
 layout_mode = 2
@@ -63,7 +76,8 @@ autowrap_mode = 3
 
 [node name="StatsLabel" type="Label" parent="Dim/Panel/Margin/Rows" unique_id=2026648377]
 layout_mode = 2
-text = "TEST"
+text = "TEST
+Soredfasdfa"
 label_settings = ExtResource("3_pyhpj")
 horizontal_alignment = 1
 

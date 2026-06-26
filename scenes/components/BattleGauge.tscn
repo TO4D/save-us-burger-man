@@ -140,3 +140,10 @@ offset_bottom = 88.0
 grow_horizontal = 2
 mouse_filter = 2
 color = Color(0.4, 0.85, 1, 0.18)
+
+[node name="FirePos" type="Control" parent="." unique_id=885345887]
+anchors_preset = 0
+offset_left = 135.0
+offset_top = 150.0
+offset_right = 136.0
+offset_bottom = 151.0

@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://cy10uew7rhedf"]
 
 [ext_resource type="Script" path="res://scenes/components/SatietyGauge.gd" id="1_satiety"]
-[ext_resource type="Texture2D" uid="uid://l7fyxe3ecdq6" path="res://assets/sprites/ui/gauge-hungry_frame.png" id="2_ygeyr"]
-[ext_resource type="Texture2D" uid="uid://bqb8ej71qtv23" path="res://assets/sprites/ui/gauge-hungry_fill.png" id="3_5m1xi"]
+[ext_resource type="Texture2D" uid="uid://bkd6665bvrlwg" path="res://assets/sprites/ui/gauge-hungry_frame_long.png" id="2_ygeyr"]
+[ext_resource type="Texture2D" uid="uid://cj64qlwh4nmbo" path="res://assets/sprites/ui/gauge-hungry_fill_long.png" id="3_5m1xi"]
 [ext_resource type="FontFile" uid="uid://dial72f450tkp" path="res://fonts/neodgm.ttf" id="4_font"]
 [ext_resource type="Texture2D" uid="uid://bxcrpde0qo3by" path="res://assets/sprites/ui/hungry_icon.png" id="5_ygeyr"]
 
@@ -22,39 +22,39 @@ script = ExtResource("1_satiety")
 
 [node name="GaugeFrame" type="TextureRect" parent="." unique_id=153722276]
 layout_mode = 0
-offset_left = 15.0
 offset_top = -2.0
-offset_right = 60.0
+offset_right = 80.0
 offset_bottom = 12.0
 mouse_filter = 2
 texture = ExtResource("2_ygeyr")
 
 [node name="GaugeProgress" type="TextureProgressBar" parent="." unique_id=571527933]
 layout_mode = 0
-offset_left = 15.0
 offset_top = -2.0
-offset_right = 60.0
+offset_right = 80.0
 offset_bottom = 12.0
 mouse_filter = 2
 texture_progress = ExtResource("3_5m1xi")
 
-[node name="PercentLabel" type="Label" parent="." unique_id=28711887]
+[node name="IconLabelWrapper" type="HBoxContainer" parent="." unique_id=1263689741]
 layout_mode = 0
-offset_left = 16.0
 offset_top = -2.0
-offset_right = 61.0
+offset_right = 80.0
 offset_bottom = 14.0
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="hungryIcon" type="TextureRect" parent="IconLabelWrapper" unique_id=1240137075]
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("5_ygeyr")
+stretch_mode = 2
+
+[node name="PercentLabel" type="Label" parent="IconLabelWrapper" unique_id=28711887]
+layout_mode = 2
 theme_override_fonts/font = ExtResource("4_font")
 theme_override_font_sizes/font_size = 8
 text = "0%"
 label_settings = SubResource("LabelSettings_a8yk2")
-horizontal_alignment = 1
+horizontal_alignment = 2
 vertical_alignment = 1
-
-[node name="hungryIcon" type="TextureRect" parent="." unique_id=1240137075]
-layout_mode = 0
-offset_top = -1.0
-offset_right = 15.0
-offset_bottom = 11.0
-texture = ExtResource("5_ygeyr")
-stretch_mode = 2

@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://bhqevj3brqk8g"]
+
+[ext_resource type="Script" uid="uid://cx5uru8q20e0q" path="res://scenes/components/PopcornComboCounter.gd" id="1_popcorn_combo"]
+[ext_resource type="FontFile" uid="uid://bivsctx4h0jw" path="res://fonts/Jersey25-Regular.ttf" id="2_font"]
+[ext_resource type="LabelSettings" uid="uid://bbx0n2c7skyw8" path="res://resources/fonts/ComboLabel.tres" id="3_label"]
+[ext_resource type="LabelSettings" uid="uid://cvfgn7ja1dsor" path="res://resources/fonts/ComboLabel_shadow.tres" id="4_shadow"]
+
+[node name="PopcornComboCounter" type="Node2D" unique_id=1862936248]
+z_index = 60
+script = ExtResource("1_popcorn_combo")
+
+[node name="PopcornLabelTemplate" type="Control" parent="." unique_id=314141416]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_left = -60.0
+offset_top = -14.0
+offset_right = 60.0
+offset_bottom = 14.0
+pivot_offset = Vector2(60, 14)
+mouse_filter = 2
+
+[node name="shadow" type="Label" parent="PopcornLabelTemplate" unique_id=648210292]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 121.0
+offset_bottom = 29.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+text = "0 COMBO"
+label_settings = ExtResource("4_shadow")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ValueLabel" type="Label" parent="PopcornLabelTemplate" unique_id=1257884530]
+layout_mode = 0
+offset_right = 120.0
+offset_bottom = 28.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+text = "0 COMBO"
+label_settings = ExtResource("3_label")
+horizontal_alignment = 1
+vertical_alignment = 1

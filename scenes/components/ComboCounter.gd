@@ -2,8 +2,8 @@ extends Control
 class_name ComboCounter
 
 const RESET_COLOR := Color(1.0, 0.45, 0.4, 1.0)
-const FLASH_COLOR := Color("ffffffff")
-const INACTIVE_COLOR := Color(0.9, 0.9, 0.9, 0.55)
+const FLASH_COLOR := Color("937439ff")
+const INACTIVE_COLOR := Color("b08c4a")
 const IDLE_DISPLAY_SECONDS := 5.0
 const FADE_OUT_SECONDS := 0.18
 const COMBO_FLASH_SECONDS := 0.4
@@ -14,6 +14,8 @@ const COMBO_SCALE_BACK_SECONDS := 0.2
 
 @onready var value_label: Label = $ValueLabel
 @onready var value_label_shadow: Label = $shadow
+
+@export var enabled := true
 
 var _display_position: Vector2
 var _label_base_scale: Vector2
@@ -30,6 +32,10 @@ func _ready() -> void:
 	_display_position = position
 	_label_base_scale = value_label.scale
 	_shadow_base_scale = value_label_shadow.scale
+	if not enabled:
+		visible = false
+		modulate.a = 0.0
+		return
 	if value_label.label_settings != null:
 		_value_label_settings = value_label.label_settings.duplicate()
 	else:

@@ -42,6 +42,7 @@ const STORE_LIGHT_ON_TEXTURE := preload("res://assets/sprites/store/light_on.png
 const STORE_LIGHT_OFF_TEXTURE := preload("res://assets/sprites/store/light_off.png")
 const STORE_LIGHT_FAIL_TEXTURE := preload("res://assets/sprites/store/light_fail.png")
 const COMPLETED_BURGER_HALO_SHADER := preload("res://resources/vfx/completed_burger_halo.gdshader")
+const POPCORN_COMBO_COUNTER_SCENE := preload("res://scenes/components/PopcornComboCounter.tscn")
 const BLACKOUT_WARNING_STEP_SECONDS := 0.2
 const BLACKOUT_WARNING_PAUSE_SECONDS := 0.6
 const RESULT_LABEL_FLASH_SECONDS := 0.2
@@ -118,9 +119,11 @@ var result_label_shadow_settings: LabelSettings
 var result_label_text_settings: LabelSettings
 var result_label_shadow_color: Color
 var result_label_text_color: Color
+var popcorn_combo_counter: PopcornComboCounter
 
 
 func _ready() -> void:
+	_setup_popcorn_combo_counter()
 	_setup_result_label_flash()
 	doma_home_position = sprite_doma.position
 	foreground_slot_home_position = foreground_slot.position
@@ -356,8 +359,9 @@ func _run_ready_go_overlay(token: int) -> void:
 		AudioManager.play_sfx(AudioManager.Sfx.COUNTDOWN)
 		ready_go_label.scale = Vector2(1.18, 1.18)
 		var countdown_tween := create_tween()
+		countdown_tween.set_pause_mode(Tween.TWEEN_PAUSE_BOUND)
 		countdown_tween.tween_property(ready_go_label, "scale", Vector2.ONE, countdown_step_seconds * 0.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		await get_tree().create_timer(countdown_step_seconds).timeout
+		await get_tree().create_timer(countdown_step_seconds, false).timeout
 		if token != round_token:
 			return
 
@@ -365,8 +369,9 @@ func _run_ready_go_overlay(token: int) -> void:
 	AudioManager.play_sfx(AudioManager.Sfx.START)
 	ready_go_label.scale = Vector2(1.18, 1.18)
 	var tween := create_tween()
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_BOUND)
 	tween.tween_property(ready_go_label, "scale", Vector2.ONE, GO_OVERLAY_SECONDS * 0.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	await get_tree().create_timer(GO_OVERLAY_SECONDS).timeout
+	await get_tree().create_timer(GO_OVERLAY_SECONDS, false).timeout
 	if token != round_token:
 		return
 
@@ -438,7 +443,7 @@ func _on_ingredient_picked(ingredient: Ingredient) -> void:
 		_finish_current_burger()
 
 
-func _on_stack_ingredient_landed(_stack_position: Vector2, token: int) -> void:
+func _on_stack_ingredient_landed(stack_position: Vector2, token: int) -> void:
 	var token_index: int = pending_stack_landing_tokens.find(token)
 	if token_index < 0:
 		return
@@ -447,6 +452,8 @@ func _on_stack_ingredient_landed(_stack_position: Vector2, token: int) -> void:
 	if not ultimate_active:
 		UltimateManager.add_gauge_for_combo(ComboManager.combo)
 	combo_counter.show_at_fixed_position()
+	#if is_instance_valid(popcorn_combo_counter):
+		#popcorn_combo_counter.pop(ComboManager.combo, _stack_viewport_point_to_panel_global(stack_position))
 
 
 func _wait_for_pending_stack_landings(token: int) -> bool:
@@ -631,6 +638,22 @@ func _setup_result_label_flash() -> void:
 	result_label_text_settings = _duplicate_label_settings(result_label_text)
 	result_label_shadow_color = result_label_shadow_settings.font_color
 	result_label_text_color = result_label_text_settings.font_color
+
+
+func _setup_popcorn_combo_counter() -> void:
+	popcorn_combo_counter = POPCORN_COMBO_COUNTER_SCENE.instantiate() as PopcornComboCounter
+	add_child(popcorn_combo_counter)
+
+
+func _stack_viewport_point_to_panel_global(stack_position: Vector2) -> Vector2:
+	var viewport_size := Vector2(stack_viewport.size)
+	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
+		return stack_viewport_container.global_position
+
+	var displayed_position := stack_position - stack_camera.position + viewport_size * 0.5
+	var container_scale := stack_viewport_container.size / viewport_size
+	displayed_position *= container_scale
+	return stack_viewport_container.global_position + displayed_position
 
 
 func _duplicate_label_settings(label: Label) -> LabelSettings:

@@ -29,6 +29,7 @@ const SHOP_ICON_SQUASH_DURATION := 0.2
 @export var monster_eating_particle_cleanup_seconds: float = 2.4
 
 @onready var shop_icon: Sprite2D = $ShopIcon
+@onready var fire_pos: Control = $FirePos
 @onready var monster_icon: Node2D = $MonsterIcon
 @onready var monster_eating_sprite: AnimatedSprite2D = $MonsterIcon/EatingSprite
 @onready var monster_state_sprite: Sprite2D = $MonsterIcon/StateSprite
@@ -85,11 +86,11 @@ func play_burger_attack(knockback_amount: float = 0.0, is_perfect: bool = false)
 	AudioManager.play_sfx(AudioManager.Sfx.FIRE_BURGER)
 
 	var tween: Tween = create_tween().set_parallel(true)
-	tween.tween_property(projectile, "global_position", target_position, 0.34).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tween.tween_property(projectile, "scale", Vector2(1.1, 1.1), 0.34)
+	tween.tween_property(projectile, "global_position", target_position, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	#tween.tween_property(projectile, "scale", Vector2(1.1, 1.1), 0.34)
 	var projectile_icon := projectile.get_node_or_null("BurgerIcon") as Sprite2D
 	if projectile_icon != null:
-		tween.tween_property(projectile_icon, "rotation", TAU * 1.35, 0.34)
+		tween.tween_property(projectile_icon, "rotation", TAU * 0.35, 0.34)
 	await tween.finished
 
 	monster_knockback_active = true
@@ -135,8 +136,8 @@ func _create_burger_projectile() -> Node2D:
 		projectile = Sprite2D.new()
 		(projectile as Sprite2D).texture = BURGER_ATTACK_TEXTURE
 
-	projectile.position = shop_icon.position
-	projectile.scale = Vector2(0.8, 0.8)
+	projectile.position = fire_pos.position
+	projectile.scale = Vector2(1, 1)
 	projectile.z_index = 20
 	return projectile
 
