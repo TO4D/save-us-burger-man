@@ -151,9 +151,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -110.0
-offset_top = -170.0
+offset_top = -200.0
 offset_right = 110.0
-offset_bottom = 170.0
+offset_bottom = 200.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -175,15 +175,33 @@ text = "Credits"
 label_settings = ExtResource("3_credits_title")
 horizontal_alignment = 1
 
-[node name="CreditsLabel" type="Label" parent="CreditsOverlay/Dim/Panel/Margin/Rows" unique_id=1660270947]
+[node name="CreditsScroll" type="ScrollContainer" parent="CreditsOverlay/Dim/Panel/Margin/Rows" unique_id=1344046822]
 layout_mode = 2
-text = "Save Us, Burger Man
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
-Created by Hoon
+[node name="CreditsLabel" type="Label" parent="CreditsOverlay/Dim/Panel/Margin/Rows/CreditsScroll" unique_id=1660270947]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Created by 
+Hoon Studio
 
-Music by timbeek.com"
+Game Design 
+Programming
+Art & Animation
+UI
+Hoon
+
+Music
+timbeek.com
+
+Sfx
+pixabay.com, Kenney
+
+Special Thanks
+JB
+SiHoon"
 label_settings = ExtResource("4_credits_desc")
-horizontal_alignment = 1
 autowrap_mode = 3
 
 [node name="CloseButton" parent="CreditsOverlay/Dim/Panel/Margin/Rows" unique_id=182655184 instance=ExtResource("2_button")]

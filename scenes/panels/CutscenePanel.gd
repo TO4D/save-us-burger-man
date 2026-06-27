@@ -2,42 +2,169 @@ extends Control
 
 signal cutscene_finished
 
-@export var cutscene_images: Array[Texture2D] = []
+const CUTSCENE_SIZE := Vector2(270.0, 270.0)
+const SLIDE_DURATION := 0.45
+const SHAKE_DELAY := 1.0
+const SHAKE_DURATION := 1.0
+const SHAKE_INTERVAL := 0.04
+const SHAKE_STRENGTH := 4.0
+const THIRD_SCENE_SECOND_IMAGE_DELAY := 0.2
 
-@onready var scene_image: TextureRect = $Center/SceneFrame/SceneImage
-@onready var progress_label: Label = $Footer/ProgressLabel
+const OPENING_CUTSCENE_1 := preload("res://assets/sprites/cutscenes/opening_cutscene1.png")
+const OPENING_CUTSCENE_2 := preload("res://assets/sprites/cutscenes/opening_cutscene2.png")
+const OPENING_CUTSCENE_3 := preload("res://assets/sprites/cutscenes/opening_cutscene3.png")
+const OPENING_CUTSCENE_4 := preload("res://assets/sprites/cutscenes/opening_cutscene4.png")
+const VERSUS_IMAGE := preload("res://assets/sprites/ui/versus.png")
+
+@onready var scene_image: TextureRect = $ImageRoot/SceneImage
+@onready var overlay_image: TextureRect = $ImageRoot/OverlayImage
+@onready var versus_image: TextureRect = $ImageRoot/VersusImage
 @onready var next_button: Button = $Footer/NextButton
 
 var _current_index := 0
+var _sequence_token := 0
+var _active_tween: Tween
 
 
 func _ready() -> void:
+	mouse_filter = Control.MOUSE_FILTER_STOP
 	next_button.pressed.connect(_on_next_pressed)
 
 
 func on_show(_data: Dictionary = {}) -> void:
+	_sequence_token += 1
 	_current_index = 0
+	_reset_visuals()
 	_show_current_scene()
-	if cutscene_images.size() > 0:
-		next_button.grab_focus()
+	next_button.grab_focus()
+
+
+func on_hide() -> void:
+	_sequence_token += 1
+	if _active_tween != null and _active_tween.is_valid():
+		_active_tween.kill()
 
 
 func _show_current_scene() -> void:
-	var scene_count := cutscene_images.size()
-	if scene_count == 0:
-		push_warning("CutscenePanel has no cutscene images assigned.")
-		cutscene_finished.emit()
-		return
+	_sequence_token += 1
+	var token := _sequence_token
+	_reset_visuals()
+	next_button.disabled = false
 
-	scene_image.texture = cutscene_images[_current_index]
-	progress_label.text = "%d / %d" % [_current_index + 1, scene_count]
-	next_button.text = "Start" if _current_index == scene_count - 1 else "Next"
+	match _current_index:
+		0:
+			next_button.text = "Next"
+			scene_image.texture = OPENING_CUTSCENE_1
+			_play_first_scene_effect(token)
+		1:
+			next_button.text = "Next"
+			scene_image.texture = OPENING_CUTSCENE_2
+		2:
+			next_button.text = "Start"
+			_play_third_scene(token)
 
 
 func _on_next_pressed() -> void:
 	_current_index += 1
-	if _current_index >= cutscene_images.size():
+	if _current_index >= 3:
 		cutscene_finished.emit()
 		return
 
 	_show_current_scene()
+
+
+func _play_first_scene_effect(token: int) -> void:
+	await get_tree().create_timer(SHAKE_DELAY).timeout
+	if token != _sequence_token:
+		return
+	await _shake_image(scene_image, token)
+
+
+func _play_third_scene(token: int) -> void:
+	scene_image.texture = OPENING_CUTSCENE_3
+	overlay_image.texture = OPENING_CUTSCENE_4
+	scene_image.position = Vector2(-CUTSCENE_SIZE.x, _center_position().y)
+	overlay_image.position = Vector2(size.x, _center_position().y)
+	overlay_image.show()
+
+	await _slide_to(scene_image, _center_position())
+	if token != _sequence_token:
+		return
+
+	await get_tree().create_timer(THIRD_SCENE_SECOND_IMAGE_DELAY).timeout
+	if token != _sequence_token:
+		return
+
+	overlay_image.position = Vector2(size.x, _center_position().y)
+	await _slide_to(overlay_image, _center_position())
+	if token != _sequence_token:
+		return
+
+	_show_versus_image()
+	_shake_images_forever(token)
+
+
+func _slide_to(target: Control, end_position: Vector2) -> void:
+	_active_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_active_tween.tween_property(target, "position", end_position, SLIDE_DURATION)
+	await _active_tween.finished
+
+
+func _shake_image(target: Control, token: int) -> void:
+	var origin := target.position
+	var elapsed := 0.0
+	while token == _sequence_token and elapsed < SHAKE_DURATION:
+		target.position = origin + Vector2(
+			randf_range(-SHAKE_STRENGTH, SHAKE_STRENGTH),
+			randf_range(-SHAKE_STRENGTH, SHAKE_STRENGTH)
+		)
+		await get_tree().create_timer(SHAKE_INTERVAL).timeout
+		elapsed += SHAKE_INTERVAL
+	if token == _sequence_token:
+		target.position = origin
+
+
+func _shake_images_forever(token: int) -> void:
+	var scene_origin := scene_image.position
+	var overlay_origin := overlay_image.position
+	while token == _sequence_token:
+		scene_image.position = scene_origin + _random_shake_offset()
+		overlay_image.position = overlay_origin + _random_shake_offset()
+		await get_tree().create_timer(SHAKE_INTERVAL).timeout
+
+
+func _random_shake_offset() -> Vector2:
+	return Vector2(
+		randf_range(-SHAKE_STRENGTH, SHAKE_STRENGTH),
+		randf_range(-SHAKE_STRENGTH, SHAKE_STRENGTH)
+	)
+
+
+func _reset_visuals() -> void:
+	if _active_tween != null and _active_tween.is_valid():
+		_active_tween.kill()
+
+	scene_image.texture = null
+	scene_image.size = CUTSCENE_SIZE
+	scene_image.position = _center_position()
+	scene_image.show()
+
+	overlay_image.texture = null
+	overlay_image.size = CUTSCENE_SIZE
+	overlay_image.position = _center_position()
+	overlay_image.hide()
+
+	versus_image.texture = null
+	versus_image.position = _center_position()
+	versus_image.hide()
+
+
+func _center_position() -> Vector2:
+	return (size - CUTSCENE_SIZE) * 0.5
+
+
+func _show_versus_image() -> void:
+	versus_image.texture = VERSUS_IMAGE
+	versus_image.size = VERSUS_IMAGE.get_size()
+	versus_image.position = (size - versus_image.size) * 0.5
+	versus_image.show()
