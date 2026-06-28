@@ -53,6 +53,13 @@ func on_hide() -> void:
 		_active_tween.kill()
 
 
+func skip() -> void:
+	_sequence_token += 1
+	if _active_tween != null and _active_tween.is_valid():
+		_active_tween.kill()
+	cutscene_finished.emit()
+
+
 func _show_current_scene() -> void:
 	_sequence_token += 1
 	var token := _sequence_token

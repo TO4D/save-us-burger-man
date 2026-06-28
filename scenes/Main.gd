@@ -4,7 +4,7 @@ extends Node2D
 @export var skip_intro_cutscene: bool = false
 @export var skip_start_overlay: bool = false
 
-enum SettingsReturnMode { MAIN_MENU, PAUSE_MENU }
+enum SettingsReturnMode { MAIN_MENU, PAUSE_MENU, CUTSCENE_PAUSE }
 enum TutorialReturnMode { MAIN_MENU, PAUSE_MENU, START_RUN }
 
 var show_ready_go_on_next_order := false
@@ -17,6 +17,7 @@ var game_over_sequence_id := 0
 @onready var settings_panel = $PanelLayer/SettingsPanel
 @onready var pause_menu = $PanelLayer/PauseMenu
 @onready var tutorial_panel = $PanelLayer/TutorialPanel
+@onready var cutscene_panel = $PanelLayer/CutscenePanel
 @onready var game_over_cutscene = $PanelLayer/GameOverCutscene
 @onready var game_clear_cutscene = $PanelLayer/GameClearCutscene
 
@@ -39,17 +40,18 @@ func _ready() -> void:
 	tutorial_panel.finished.connect(_on_tutorial_finished)
 	pause_menu.resume_pressed.connect(_resume_game)
 	pause_menu.tutorial_pressed.connect(_show_pause_tutorial)
+	pause_menu.skip_intro_pressed.connect(_skip_intro_cutscene)
 	pause_menu.main_menu_pressed.connect(_return_to_main_menu)
 	pause_menu.settings_pressed.connect(_show_pause_settings)
 	pause_menu.quit_pressed.connect(_quit_game)
-	$PanelLayer/CutscenePanel.cutscene_finished.connect(_on_cutscene_finished)
+	cutscene_panel.cutscene_finished.connect(_on_cutscene_finished)
 	game_over_cutscene.finished.connect(_on_game_over_cutscene_finished)
 	game_clear_cutscene.finished.connect(_on_game_clear_cutscene_finished)
 	order_panel.order_completed.connect(_on_order_completed)
 	order_panel.countdown_finished.connect(_on_order_countdown_finished)
-	$PanelLayer/GameOverPanel.restart_pressed.connect(start_run)
+	$PanelLayer/GameOverPanel.restart_pressed.connect(_restart_run)
 	$PanelLayer/GameOverPanel.main_menu_pressed.connect(_return_to_main_menu)
-	$PanelLayer/VictoryPanel.restart_pressed.connect(start_run)
+	$PanelLayer/VictoryPanel.restart_pressed.connect(_restart_run)
 	$PanelLayer/VictoryPanel.main_menu_pressed.connect(_return_to_main_menu)
 	GameRun.customer_ready.connect(_on_customer_ready)
 	GameRun.run_failed.connect(_on_run_failed)
@@ -83,6 +85,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		return
 
+	if _can_pause_intro_cutscene():
+		_pause_intro_cutscene()
+		get_viewport().set_input_as_handled()
+		return
+
 	if _can_pause_game():
 		_pause_game()
 		get_viewport().set_input_as_handled()
@@ -100,6 +107,11 @@ func start_run() -> void:
 	order_panel.set_gameplay_locked(false)
 	get_tree().paused = false
 	GameRun.start()
+
+
+func _restart_run() -> void:
+	show_ready_go_on_next_order = not skip_start_overlay
+	start_run()
 
 
 func _on_start_pressed() -> void:
@@ -204,7 +216,7 @@ func _show_main_settings() -> void:
 
 
 func _show_pause_settings() -> void:
-	settings_return_mode = SettingsReturnMode.PAUSE_MENU
+	settings_return_mode = SettingsReturnMode.CUTSCENE_PAUSE if _can_pause_intro_cutscene() or _is_intro_cutscene_paused() else SettingsReturnMode.PAUSE_MENU
 	get_tree().paused = true
 	pause_menu.visible = false
 	settings_panel.visible = true
@@ -214,7 +226,14 @@ func _show_pause_settings() -> void:
 
 func _on_settings_back_pressed() -> void:
 	settings_panel.visible = false
-	if settings_return_mode == SettingsReturnMode.PAUSE_MENU and get_tree().paused:
+	if (
+		(settings_return_mode == SettingsReturnMode.PAUSE_MENU or settings_return_mode == SettingsReturnMode.CUTSCENE_PAUSE)
+		and get_tree().paused
+	):
+		if settings_return_mode == SettingsReturnMode.CUTSCENE_PAUSE:
+			pause_menu.set_intro_cutscene_mode()
+		else:
+			pause_menu.set_gameplay_mode()
 		pause_menu.visible = true
 		pause_menu.on_show()
 	else:
@@ -222,6 +241,14 @@ func _on_settings_back_pressed() -> void:
 
 
 func _pause_game() -> void:
+	pause_menu.set_gameplay_mode()
+	pause_menu.visible = true
+	get_tree().paused = true
+	pause_menu.on_show()
+
+
+func _pause_intro_cutscene() -> void:
+	pause_menu.set_intro_cutscene_mode()
 	pause_menu.visible = true
 	get_tree().paused = true
 	pause_menu.on_show()
@@ -232,6 +259,14 @@ func _resume_game() -> void:
 	pause_menu.visible = false
 	tutorial_panel.visible = false
 	get_tree().paused = false
+
+
+func _skip_intro_cutscene() -> void:
+	settings_panel.visible = false
+	pause_menu.visible = false
+	tutorial_panel.visible = false
+	get_tree().paused = false
+	cutscene_panel.skip()
 
 
 func _return_to_main_menu() -> void:
@@ -256,3 +291,11 @@ func _quit_game() -> void:
 
 func _can_pause_game() -> bool:
 	return GameRun.running and PanelManager.current_panel == order_panel
+
+
+func _can_pause_intro_cutscene() -> bool:
+	return PanelManager.current_panel == cutscene_panel and cutscene_panel.visible and not get_tree().paused
+
+
+func _is_intro_cutscene_paused() -> bool:
+	return PanelManager.current_panel == cutscene_panel and cutscene_panel.visible and get_tree().paused
