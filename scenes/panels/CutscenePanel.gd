@@ -4,17 +4,22 @@ signal cutscene_finished
 
 const CUTSCENE_SIZE := Vector2(270.0, 270.0)
 const SLIDE_DURATION := 0.45
-const SHAKE_DELAY := 1.0
+const SHAKE_DELAY := 0.5
 const SHAKE_DURATION := 1.0
 const SHAKE_INTERVAL := 0.04
 const SHAKE_STRENGTH := 4.0
-const THIRD_SCENE_SECOND_IMAGE_DELAY := 0.2
+const TWO_IMAGE_SCENE_SECOND_IMAGE_DELAY := 0.2
 
+const OPENING_CUTSCENE_0 := preload("res://assets/sprites/cutscenes/opening_cutscene0.png")
 const OPENING_CUTSCENE_1 := preload("res://assets/sprites/cutscenes/opening_cutscene1.png")
 const OPENING_CUTSCENE_2 := preload("res://assets/sprites/cutscenes/opening_cutscene2.png")
 const OPENING_CUTSCENE_3 := preload("res://assets/sprites/cutscenes/opening_cutscene3.png")
 const OPENING_CUTSCENE_4 := preload("res://assets/sprites/cutscenes/opening_cutscene4.png")
+const OPENING_CUTSCENE_5 := preload("res://assets/sprites/cutscenes/opening_cutscene5.png")
+const OPENING_CUTSCENE_6 := preload("res://assets/sprites/cutscenes/opening_cutscene6.png")
+const OPENING_CUTSCENE_7 := preload("res://assets/sprites/cutscenes/opening_cutscene7.png")
 const VERSUS_IMAGE := preload("res://assets/sprites/ui/versus.png")
+const SCENE_COUNT := 7
 
 @onready var scene_image: TextureRect = $ImageRoot/SceneImage
 @onready var overlay_image: TextureRect = $ImageRoot/OverlayImage
@@ -54,19 +59,31 @@ func _show_current_scene() -> void:
 	match _current_index:
 		0:
 			next_button.text = "Next"
-			scene_image.texture = OPENING_CUTSCENE_1
+			scene_image.texture = OPENING_CUTSCENE_0
 			_play_first_scene_effect(token)
 		1:
 			next_button.text = "Next"
-			scene_image.texture = OPENING_CUTSCENE_2
+			scene_image.texture = OPENING_CUTSCENE_1
 		2:
+			next_button.text = "Next"
+			scene_image.texture = OPENING_CUTSCENE_2
+		3:
+			next_button.text = "Next"
+			scene_image.texture = OPENING_CUTSCENE_3
+		4:
+			next_button.text = "Next"
+			scene_image.texture = OPENING_CUTSCENE_4
+		5:
+			next_button.text = "Next"
+			scene_image.texture = OPENING_CUTSCENE_5
+		6:
 			next_button.text = "Start"
-			_play_third_scene(token)
+			_play_two_image_scene(OPENING_CUTSCENE_6, OPENING_CUTSCENE_7, token)
 
 
 func _on_next_pressed() -> void:
 	_current_index += 1
-	if _current_index >= 3:
+	if _current_index >= SCENE_COUNT:
 		cutscene_finished.emit()
 		return
 
@@ -77,25 +94,28 @@ func _play_first_scene_effect(token: int) -> void:
 	await get_tree().create_timer(SHAKE_DELAY).timeout
 	if token != _sequence_token:
 		return
+	AudioManager.play_sfx(AudioManager.Sfx.WARNING_GROWL)
 	await _shake_image(scene_image, token)
 
 
-func _play_third_scene(token: int) -> void:
-	scene_image.texture = OPENING_CUTSCENE_3
-	overlay_image.texture = OPENING_CUTSCENE_4
+func _play_two_image_scene(first_texture: Texture2D, second_texture: Texture2D, token: int) -> void:
+	scene_image.texture = first_texture
+	overlay_image.texture = second_texture
 	scene_image.position = Vector2(-CUTSCENE_SIZE.x, _center_position().y)
 	overlay_image.position = Vector2(size.x, _center_position().y)
 	overlay_image.show()
 
+	AudioManager.play_sfx(AudioManager.Sfx.ULTIMATE)
 	await _slide_to(scene_image, _center_position())
 	if token != _sequence_token:
 		return
 
-	await get_tree().create_timer(THIRD_SCENE_SECOND_IMAGE_DELAY).timeout
+	await get_tree().create_timer(TWO_IMAGE_SCENE_SECOND_IMAGE_DELAY).timeout
 	if token != _sequence_token:
 		return
 
 	overlay_image.position = Vector2(size.x, _center_position().y)
+	AudioManager.play_sfx(AudioManager.Sfx.ULTIMATE)
 	await _slide_to(overlay_image, _center_position())
 	if token != _sequence_token:
 		return

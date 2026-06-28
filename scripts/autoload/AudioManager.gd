@@ -58,7 +58,7 @@ const SFX_PATHS := {
 
 const BGM_PATHS := {
 	Bgm.MAIN_MENU: "res://assets/audio/bgm/The_Mountains_Loop.ogg",
-	Bgm.CUTSCENE: "res://assets/audio/bgm/none.ogg",
+	Bgm.CUTSCENE: "res://assets/audio/bgm/Take_Cover_Loop.ogg",
 	Bgm.INGAME: "res://assets/audio/bgm/8Bit_DNA_Loop.ogg",
 }
 

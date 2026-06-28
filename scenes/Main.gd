@@ -112,6 +112,7 @@ func _on_start_pressed() -> void:
 
 
 func _on_cutscene_finished() -> void:
+	AudioManager.stop_bgm()
 	_begin_run_after_intro()
 
 
