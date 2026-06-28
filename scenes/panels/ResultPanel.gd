@@ -60,7 +60,8 @@ func _set_buttons_disabled(disabled: bool) -> void:
 
 func _format_time(seconds: float) -> String:
 	var total_seconds := maxi(roundi(seconds), 0)
-	return "%02d:%02d" % [total_seconds / 60, total_seconds % 60]
+	var minutes := floori(float(total_seconds) / 60.0)
+	return "%02d:%02d" % [minutes, total_seconds % 60]
 
 
 func _progress_percent(data: Dictionary) -> int:

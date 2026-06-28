@@ -443,7 +443,7 @@ func _on_ingredient_picked(ingredient: Ingredient) -> void:
 		_finish_current_burger()
 
 
-func _on_stack_ingredient_landed(stack_position: Vector2, token: int) -> void:
+func _on_stack_ingredient_landed(_stack_position: Vector2, token: int) -> void:
 	var token_index: int = pending_stack_landing_tokens.find(token)
 	if token_index < 0:
 		return
@@ -551,7 +551,6 @@ func _play_burger_throw_attack(fullness_amount: float, attack_knockback: float, 
 	var hit_monster := func() -> void:
 		AudioManager.play_sfx(AudioManager.Sfx.ATTACK)
 		MonsterManager.add_satiety(fullness_amount)
-		print("[OrderPanel] Burger served fullness=%.1f, monster satiety=%.1f/%.1f" % [fullness_amount, MonsterManager.satiety, MonsterManager.MAX_SATIETY])
 		DistanceManager.recover(attack_knockback)
 	battle_gauge.burger_attack_hit.connect(hit_monster, CONNECT_ONE_SHOT)
 	await battle_gauge.play_burger_attack(attack_knockback, completion_was_perfect)
@@ -713,8 +712,8 @@ func _on_ultimate_triggered() -> void:
 	_run_ultimate_sequence(round_token)
 
 
-func _on_ultimate_ready_changed(ready: bool) -> void:
-	if ready:
+func _on_ultimate_ready_changed(is_ready: bool) -> void:
+	if is_ready:
 		AudioManager.play_sfx(AudioManager.Sfx.ULTIMATE_CHARGED)
 
 
@@ -1053,13 +1052,13 @@ func _queue_free_snapshot_sprites(snapshots: Dictionary) -> void:
 
 
 func _apply_completed_burger_halo(snapshot: Sprite2D, completion_was_perfect: bool) -> void:
-	var material := ShaderMaterial.new()
-	material.shader = COMPLETED_BURGER_HALO_SHADER
-	material.set_shader_parameter("halo_color", PERFECT_BURGER_HALO_COLOR if completion_was_perfect else NORMAL_BURGER_HALO_COLOR)
-	material.set_shader_parameter("outline_size", PERFECT_BURGER_HALO_OUTLINE_SIZE if completion_was_perfect else NORMAL_BURGER_HALO_OUTLINE_SIZE)
-	material.set_shader_parameter("glow_size", PERFECT_BURGER_HALO_GLOW_SIZE if completion_was_perfect else NORMAL_BURGER_HALO_GLOW_SIZE)
-	material.set_shader_parameter("glow_strength", PERFECT_BURGER_HALO_GLOW_STRENGTH if completion_was_perfect else NORMAL_BURGER_HALO_GLOW_STRENGTH)
-	snapshot.material = material
+	var halo_material := ShaderMaterial.new()
+	halo_material.shader = COMPLETED_BURGER_HALO_SHADER
+	halo_material.set_shader_parameter("halo_color", PERFECT_BURGER_HALO_COLOR if completion_was_perfect else NORMAL_BURGER_HALO_COLOR)
+	halo_material.set_shader_parameter("outline_size", PERFECT_BURGER_HALO_OUTLINE_SIZE if completion_was_perfect else NORMAL_BURGER_HALO_OUTLINE_SIZE)
+	halo_material.set_shader_parameter("glow_size", PERFECT_BURGER_HALO_GLOW_SIZE if completion_was_perfect else NORMAL_BURGER_HALO_GLOW_SIZE)
+	halo_material.set_shader_parameter("glow_strength", PERFECT_BURGER_HALO_GLOW_STRENGTH if completion_was_perfect else NORMAL_BURGER_HALO_GLOW_STRENGTH)
+	snapshot.material = halo_material
 
 
 func _create_completed_burger_snapshots() -> Dictionary:

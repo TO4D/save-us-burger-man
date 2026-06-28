@@ -29,4 +29,3 @@ func show_panel(panel: PanelType, data: Dictionary = {}) -> void:
 	if current_panel.has_method("on_show"):
 		current_panel.on_show(data)
 	panel_changed.emit(PanelType.keys()[panel])
-	print("[PanelManager] 패널 전환: ", PanelType.keys()[panel])

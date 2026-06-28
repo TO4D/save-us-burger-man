@@ -6,6 +6,7 @@ const CUTSCENE_SIZE := Vector2(270.0, 270.0)
 const SLIDE_DURATION := 0.45
 const SHAKE_DELAY := 0.5
 const SHAKE_DURATION := 1.0
+const STOP_SCENE_SHAKE_DURATION := 0.3
 const SHAKE_INTERVAL := 0.04
 const SHAKE_STRENGTH := 4.0
 const TWO_IMAGE_SCENE_SECOND_IMAGE_DELAY := 0.2
@@ -13,13 +14,15 @@ const TWO_IMAGE_SCENE_SECOND_IMAGE_DELAY := 0.2
 const OPENING_CUTSCENE_0 := preload("res://assets/sprites/cutscenes/opening_cutscene0.png")
 const OPENING_CUTSCENE_1 := preload("res://assets/sprites/cutscenes/opening_cutscene1.png")
 const OPENING_CUTSCENE_2 := preload("res://assets/sprites/cutscenes/opening_cutscene2.png")
+const OPENING_CUTSCENE_2_1 := preload("res://assets/sprites/cutscenes/opening_cutscene2_1.png")
+const OPENING_CUTSCENE_2_2 := preload("res://assets/sprites/cutscenes/opening_cutscene2_2.png")
 const OPENING_CUTSCENE_3 := preload("res://assets/sprites/cutscenes/opening_cutscene3.png")
 const OPENING_CUTSCENE_4 := preload("res://assets/sprites/cutscenes/opening_cutscene4.png")
 const OPENING_CUTSCENE_5 := preload("res://assets/sprites/cutscenes/opening_cutscene5.png")
 const OPENING_CUTSCENE_6 := preload("res://assets/sprites/cutscenes/opening_cutscene6.png")
 const OPENING_CUTSCENE_7 := preload("res://assets/sprites/cutscenes/opening_cutscene7.png")
 const VERSUS_IMAGE := preload("res://assets/sprites/ui/versus.png")
-const SCENE_COUNT := 7
+const SCENE_COUNT := 9
 
 @onready var scene_image: TextureRect = $ImageRoot/SceneImage
 @onready var overlay_image: TextureRect = $ImageRoot/OverlayImage
@@ -69,14 +72,21 @@ func _show_current_scene() -> void:
 			scene_image.texture = OPENING_CUTSCENE_2
 		3:
 			next_button.text = "Next"
-			scene_image.texture = OPENING_CUTSCENE_3
+			scene_image.texture = OPENING_CUTSCENE_2_1
 		4:
 			next_button.text = "Next"
-			scene_image.texture = OPENING_CUTSCENE_4
+			scene_image.texture = OPENING_CUTSCENE_2_2
 		5:
 			next_button.text = "Next"
-			scene_image.texture = OPENING_CUTSCENE_5
+			scene_image.texture = OPENING_CUTSCENE_3
+			_play_stop_scene_effect(token)
 		6:
+			next_button.text = "Next"
+			scene_image.texture = OPENING_CUTSCENE_4
+		7:
+			next_button.text = "Next"
+			scene_image.texture = OPENING_CUTSCENE_5
+		8:
 			next_button.text = "Start"
 			_play_two_image_scene(OPENING_CUTSCENE_6, OPENING_CUTSCENE_7, token)
 
@@ -96,6 +106,11 @@ func _play_first_scene_effect(token: int) -> void:
 		return
 	AudioManager.play_sfx(AudioManager.Sfx.WARNING_GROWL)
 	await _shake_image(scene_image, token)
+
+
+func _play_stop_scene_effect(token: int) -> void:
+	AudioManager.play_sfx(AudioManager.Sfx.CUTSCENE_STOP)
+	await _shake_image(scene_image, token, STOP_SCENE_SHAKE_DURATION)
 
 
 func _play_two_image_scene(first_texture: Texture2D, second_texture: Texture2D, token: int) -> void:
@@ -130,10 +145,10 @@ func _slide_to(target: Control, end_position: Vector2) -> void:
 	await _active_tween.finished
 
 
-func _shake_image(target: Control, token: int) -> void:
+func _shake_image(target: Control, token: int, duration: float = SHAKE_DURATION) -> void:
 	var origin := target.position
 	var elapsed := 0.0
-	while token == _sequence_token and elapsed < SHAKE_DURATION:
+	while token == _sequence_token and elapsed < duration:
 		target.position = origin + Vector2(
 			randf_range(-SHAKE_STRENGTH, SHAKE_STRENGTH),
 			randf_range(-SHAKE_STRENGTH, SHAKE_STRENGTH)

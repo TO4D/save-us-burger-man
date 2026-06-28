@@ -23,6 +23,7 @@ enum Sfx {
 	COUNTDOWN,
 	START,
 	WARNING_GROWL,
+	CUTSCENE_STOP,
 }
 
 enum Bgm {
@@ -54,6 +55,7 @@ const SFX_PATHS := {
 	Sfx.COUNTDOWN: "res://assets/audio/sfx/count.ogg",
 	Sfx.START: "res://assets/audio/sfx/start.ogg",
 	Sfx.WARNING_GROWL: "res://assets/audio/sfx/warning_growl.ogg",
+	Sfx.CUTSCENE_STOP: "res://assets/audio/sfx/cutscene_stop.ogg",
 }
 
 const BGM_PATHS := {

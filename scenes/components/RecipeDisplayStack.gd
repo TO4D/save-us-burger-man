@@ -143,7 +143,6 @@ func _position_tickets(animated: bool) -> void:
 			continue
 
 		var target_position := _get_ticket_position(ticket, index)
-		var target_alpha := _get_ticket_alpha(index)
 		ticket.z_index = _get_ticket_z_index(index)
 
 		if animated:

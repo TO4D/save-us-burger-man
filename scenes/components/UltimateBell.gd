@@ -55,13 +55,13 @@ func _on_gauge_changed(value: int, max_value: int) -> void:
 	gauge_progress.value = value
 
 
-func _on_ready_changed(ready: bool) -> void:
+func _on_ready_changed(is_ready: bool) -> void:
 	_apply_availability()
-	_set_ready_blinking(ready)
-	gauge_progress.modulate = ready_gauge_modulate if ready else idle_gauge_modulate
-	gauge_frame.modulate = ready_gauge_modulate if ready else idle_gauge_modulate
-	#star_icon.texture = ready_icon_texture if ready else empty_icon_texture
-	glow_rect.visible = ready
+	_set_ready_blinking(is_ready)
+	gauge_progress.modulate = ready_gauge_modulate if is_ready else idle_gauge_modulate
+	gauge_frame.modulate = ready_gauge_modulate if is_ready else idle_gauge_modulate
+	#star_icon.texture = ready_icon_texture if is_ready else empty_icon_texture
+	glow_rect.visible = is_ready
 
 
 func _set_ready_blinking(enabled: bool) -> void:

@@ -10,7 +10,7 @@ const MIN_DECAY_PER_SECOND := 1.75
 const MAX_DECAY_PER_SECOND := 4.75
 
 var distance := MAX_DISTANCE
-var decay_per_second := 1
+var decay_per_second := 1.0
 var running := false
 var freeze_remaining := 0.0
 var freeze_hold_count := 0

@@ -90,7 +90,7 @@ func _render_recipe() -> void:
 
 	if recipe == null or recipe.ingredients.is_empty():
 		custom_minimum_size = Vector2.ZERO
-		size = Vector2.ZERO
+		_set_control_size_deferred(self, Vector2.ZERO)
 		background.visible = false
 		modulate.a = 1.0
 		return
@@ -107,14 +107,14 @@ func _render_recipe() -> void:
 	)
 
 	custom_minimum_size = total_size
-	size = total_size
+	_set_control_size_deferred(self, total_size)
 	var sliding_offset := _get_sliding_window_offset(total_size, step_y)
 	background.visible = true
 	background.position = Vector2(0.0, sliding_offset)
-	background.size = total_size
+	_set_control_size_deferred(background, total_size)
 	modulate.a = complete_modulate_alpha if active_step >= ingredient_count else 1.0
 	items_root.position = Vector2(background_padding.x, background_padding.y + sliding_offset)
-	items_root.size = content_size
+	_set_control_size_deferred(items_root, content_size)
 
 	for i in range(ingredient_count):
 		var ingredient: Ingredient = recipe.ingredients[i]
@@ -123,7 +123,7 @@ func _render_recipe() -> void:
 		icon.texture = ingredient.preview_icon_sprite if ingredient.preview_icon_sprite != null else ingredient.sprite
 		icon.position = icon_position
 		icon.custom_minimum_size = icon_size
-		icon.size = icon_size
+		_set_control_size_deferred(icon, icon_size)
 		icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -173,8 +173,15 @@ func _create_indicator() -> TextureRect:
 	var indicator := TextureRect.new()
 	indicator.texture = INDICATOR_TEXTURE
 	indicator.custom_minimum_size = indicator_size
-	indicator.size = indicator_size
+	_set_control_size_deferred(indicator, indicator_size)
 	indicator.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	indicator.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	indicator.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return indicator
+
+
+func _set_control_size_deferred(control: Control, value: Vector2) -> void:
+	if control == null:
+		return
+
+	control.set_deferred("size", value)

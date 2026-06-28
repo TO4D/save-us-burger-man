@@ -41,7 +41,6 @@ func start_day() -> void:
 		TimeSlot.EVENING: 0
 	}
 	GameState.reset_daily_stats()
-	print("[BusinessDay] 영업 시작! 오늘 손님 ", customer_queue.size(), "명")
 	
 	is_open = true
 	business_state_changed.emit(is_open)

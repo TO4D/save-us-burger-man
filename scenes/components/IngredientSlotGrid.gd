@@ -204,7 +204,7 @@ func _move_slot_focus(direction: Vector2i) -> void:
 		focus_current_slot()
 		return
 
-	var row := int(focused_slot_index / SLOT_COLUMNS)
+	var row := floori(float(focused_slot_index) / float(SLOT_COLUMNS))
 	var column := focused_slot_index % SLOT_COLUMNS
 	var next_row := row + direction.y
 	var next_column := column + direction.x
