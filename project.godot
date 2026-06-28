@@ -11,10 +11,11 @@ config_version=5
 [application]
 
 config/name="Save Us, BurgerMan"
+config/version="1.0.0"
 run/main_scene="uid://fum35x6wo2a6"
 config/quit_on_go_back=false
 config/features=PackedStringArray("4.6", "GL Compatibility")
-config/icon="res://icon.svg"
+config/icon="uid://dlemcwql6xufi"
 
 [autoload]
 
