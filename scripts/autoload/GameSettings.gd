@@ -46,6 +46,9 @@ func load_settings() -> void:
 	tutorial_completed = bool(config.get_value("progress", "tutorial_completed", false))
 	high_score = maxi(int(config.get_value("progress", "high_score", 0)), 0)
 
+	if is_web_build():
+		resolution_index = DEFAULT_RESOLUTION_INDEX
+
 
 func save_settings() -> void:
 	var config := ConfigFile.new()
@@ -86,6 +89,9 @@ func set_sfx_volume(value: float) -> void:
 
 
 func set_resolution_index(value: int) -> void:
+	if is_web_build():
+		return
+
 	resolution_index = clampi(value, 0, RESOLUTIONS.size() - 1)
 	apply_resolution()
 	save_settings()
@@ -119,7 +125,7 @@ func apply_resolution() -> void:
 	var root_window: Window = get_window()
 	root_window.content_scale_size = BASE_VIEWPORT_SIZE
 
-	if OS.has_feature("editor"):
+	if OS.has_feature("editor") or is_web_build():
 		return
 
 	root_window.size = window_size
@@ -137,6 +143,10 @@ func get_resolution_label(index: int) -> String:
 	var safe_index := clampi(index, 0, RESOLUTIONS.size() - 1)
 	var resolution: Dictionary = RESOLUTIONS[safe_index] as Dictionary
 	return resolution["label"] as String
+
+
+func is_web_build() -> bool:
+	return OS.has_feature("web") or OS.get_name() == "Web"
 
 
 func _ensure_audio_buses() -> void:

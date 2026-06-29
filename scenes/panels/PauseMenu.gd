@@ -20,6 +20,7 @@ var menu_mode := MenuMode.GAMEPLAY
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_WHEN_PAUSED
+	_apply_menu_mode()
 	resume_button.pressed.connect(func(): resume_pressed.emit())
 	tutorial_button.pressed.connect(_on_tutorial_button_pressed)
 	main_menu_button.pressed.connect(func(): main_menu_pressed.emit())
@@ -55,17 +56,18 @@ func _on_tutorial_button_pressed() -> void:
 
 func _apply_menu_mode() -> void:
 	var is_intro_cutscene := menu_mode == MenuMode.INTRO_CUTSCENE
+	var show_quit := not is_intro_cutscene and not GameSettings.is_web_build()
 	tutorial_button.text = "Skip Intro" if is_intro_cutscene else "Tutorial"
-	quit_button.visible = not is_intro_cutscene
-	quit_button.focus_mode = Control.FOCUS_NONE if is_intro_cutscene else Control.FOCUS_ALL
+	quit_button.visible = show_quit
+	quit_button.focus_mode = Control.FOCUS_ALL if show_quit else Control.FOCUS_NONE
 
-	resume_button.focus_neighbor_top = NodePath("../SettingsButton") if is_intro_cutscene else NodePath("../QuitButton")
+	resume_button.focus_neighbor_top = NodePath("../QuitButton") if show_quit else NodePath("../SettingsButton")
 	resume_button.focus_neighbor_bottom = NodePath("../TutorialButton")
 	tutorial_button.focus_neighbor_top = NodePath("../ResumeButton")
 	tutorial_button.focus_neighbor_bottom = NodePath("../MainMenuButton")
 	main_menu_button.focus_neighbor_top = NodePath("../TutorialButton")
 	main_menu_button.focus_neighbor_bottom = NodePath("../SettingsButton")
 	settings_button.focus_neighbor_top = NodePath("../MainMenuButton")
-	settings_button.focus_neighbor_bottom = NodePath("../ResumeButton") if is_intro_cutscene else NodePath("../QuitButton")
+	settings_button.focus_neighbor_bottom = NodePath("../QuitButton") if show_quit else NodePath("../ResumeButton")
 	quit_button.focus_neighbor_top = NodePath("../SettingsButton")
 	quit_button.focus_neighbor_bottom = NodePath("../ResumeButton")

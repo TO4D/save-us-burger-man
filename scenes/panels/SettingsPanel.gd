@@ -10,6 +10,7 @@ const UI_FONT := preload("res://fonts/neodgm.ttf")
 @onready var bgm_value_label: Label = $Panel/Margin/Rows/BgmVolume/Value
 @onready var sfx_slider: HSlider = $Panel/Margin/Rows/SfxVolume/Slider
 @onready var sfx_value_label: Label = $Panel/Margin/Rows/SfxVolume/Value
+@onready var resolution_row: VBoxContainer = $Panel/Margin/Rows/Resolution
 @onready var resolution_option: OptionButton = $Panel/Margin/Rows/Resolution/Option
 @onready var back_button: Button = $Panel/Margin/Rows/BackButton
 
@@ -18,6 +19,7 @@ var _syncing := false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	_apply_platform_visibility()
 	resolution_option.get_popup().add_theme_font_override("font", UI_FONT)
 	_setup_resolution_options()
 	master_slider.value_changed.connect(_on_master_volume_changed)
@@ -29,6 +31,7 @@ func _ready() -> void:
 
 
 func on_show(_data: Dictionary = {}) -> void:
+	_apply_platform_visibility()
 	_sync_from_settings()
 	master_slider.grab_focus()
 
@@ -76,3 +79,16 @@ func _update_volume_labels() -> void:
 	master_value_label.text = "%d%%" % int(round(master_slider.value))
 	bgm_value_label.text = "%d%%" % int(round(bgm_slider.value))
 	sfx_value_label.text = "%d%%" % int(round(sfx_slider.value))
+
+
+func _apply_platform_visibility() -> void:
+	var show_resolution := not GameSettings.is_web_build()
+	resolution_row.visible = show_resolution
+	resolution_option.focus_mode = Control.FOCUS_ALL if show_resolution else Control.FOCUS_NONE
+
+	sfx_slider.focus_neighbor_top = NodePath("../../BgmVolume/Slider")
+	sfx_slider.focus_neighbor_bottom = NodePath("../../Resolution/Option") if show_resolution else NodePath("../../BackButton")
+	back_button.focus_neighbor_top = NodePath("../Resolution/Option") if show_resolution else NodePath("../SfxVolume/Slider")
+	back_button.focus_neighbor_bottom = NodePath("../MasterVolume/Slider")
+	master_slider.focus_neighbor_top = NodePath("../../BackButton")
+	master_slider.focus_neighbor_bottom = NodePath("../../BgmVolume/Slider")

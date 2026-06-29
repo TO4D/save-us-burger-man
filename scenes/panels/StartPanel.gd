@@ -18,6 +18,7 @@ signal quit_pressed
 
 func _ready() -> void:
 	GameSettings.settings_changed.connect(_update_high_score_label)
+	_apply_platform_visibility()
 	start_button.pressed.connect(func(): start_pressed.emit())
 	tutorial_button.pressed.connect(func(): tutorial_pressed.emit())
 	settings_button.pressed.connect(func(): settings_pressed.emit())
@@ -37,6 +38,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func on_show(_data: Dictionary = {}) -> void:
 	credits_overlay.hide()
+	_apply_platform_visibility()
 	_update_high_score_label()
 	start_button.grab_focus()
 
@@ -57,3 +59,20 @@ func _show_credits() -> void:
 func _hide_credits() -> void:
 	credits_overlay.hide()
 	credits_button.grab_focus()
+
+
+func _apply_platform_visibility() -> void:
+	var show_quit := not GameSettings.is_web_build()
+	quit_button.visible = show_quit
+	quit_button.focus_mode = Control.FOCUS_ALL if show_quit else Control.FOCUS_NONE
+
+	start_button.focus_neighbor_top = NodePath("../QuitButton") if show_quit else NodePath("../CreditsButton")
+	start_button.focus_neighbor_bottom = NodePath("../TutorialButton")
+	tutorial_button.focus_neighbor_top = NodePath("../StartButton")
+	tutorial_button.focus_neighbor_bottom = NodePath("../SettingsButton")
+	settings_button.focus_neighbor_top = NodePath("../TutorialButton")
+	settings_button.focus_neighbor_bottom = NodePath("../CreditsButton")
+	credits_button.focus_neighbor_top = NodePath("../SettingsButton")
+	credits_button.focus_neighbor_bottom = NodePath("../QuitButton") if show_quit else NodePath("../StartButton")
+	quit_button.focus_neighbor_top = NodePath("../CreditsButton")
+	quit_button.focus_neighbor_bottom = NodePath("../StartButton")

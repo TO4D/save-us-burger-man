@@ -286,6 +286,9 @@ func _return_to_main_menu() -> void:
 
 
 func _quit_game() -> void:
+	if GameSettings.is_web_build():
+		return
+
 	get_tree().quit()
 
 
