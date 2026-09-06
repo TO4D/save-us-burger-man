@@ -16,8 +16,6 @@ const RESOLUTIONS := [
 	{"label": "405 x 720", "size": Vector2i(405, 720)},
 	{"label": "540 x 960", "size": Vector2i(540, 960)},
 	{"label": "608 x 1080", "size": Vector2i(608, 1080)},
-	{"label": "2K (1440 x 2560)", "size": Vector2i(1440, 2560)},
-	{"label": "4K (2160 x 3840)", "size": Vector2i(2160, 3840)},
 ]
 
 var master_volume := DEFAULT_MASTER_VOLUME
